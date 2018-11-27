@@ -5,26 +5,27 @@
 //  Copyright © 2018 Mauri Favaron.
 //  This is open source software.
 //
+// TinyDisp is an evolution of ALAMO model, written by prof. Roberto Sozzi.
+// My contribution is, to clarify the code and its internal working in view
+// of explaining what a conventional Lagrangian particle model is in its very essence.
+//
+// To a very large extent, the simple architecture of orignal ALAMO code
+// has been retained.
+//
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <iostream>
 
 using namespace std;
 
 int main(int argc, const char * argv[]) {
     
-    // Check command line arguments
-    if(argc != 1) {
-        printf("td - TinyDisp: a lightweight Lagrangian particle atmospheric dispersion model.\n");
-        printf("\n");
-        printf("Usage:\n");
-        printf("\n");
-        printf("    ./td <ConfigurationFileName>\n");
-        printf("\n");
-        printf("Copyright 2018 by Servizi Territorio srl\n");
-        printf("This is open-source software, covered by the MIT license\n");
-        printf("\n");
+	// Check command line arguments
+	if(argc != 1) {
+		cout << "td - TinyDisp: a lightweight Lagrangian particle atmospheric dispersion model." << endl << endl;
+		cout << "Usage:" << endl << endl;
+		cout << "    ./td <ConfigurationFileName>" << endl << endl;
+		cout << "Copyright 2018 by Mauri Favaron" << endl;
+		cout << "This is open-source software, covered by the MIT license" << endl << endl;
         return 1;
     }
     
