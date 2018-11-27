@@ -10,18 +10,20 @@
 #include <stdlib.h>
 #include <string.h>
 
+using namespace std;
+
 int main(int argc, const char * argv[]) {
     
     // Check command line arguments
     if(argc != 1) {
-        printf("td - TinyDisp Lagrangian particle atmospheric dispersion model.\n");
+        printf("td - TinyDisp: a lightweight Lagrangian particle atmospheric dispersion model.\n");
         printf("\n");
         printf("Usage:\n");
         printf("\n");
         printf("    ./td <ConfigurationFileName>\n");
         printf("\n");
-        printf("Copyright 2018 by Mauri Favaron\n");
-        printf("This is open-source software\n");
+        printf("Copyright 2018 by Servizi Territorio srl\n");
+        printf("This is open-source software, covered by the MIT license\n");
         printf("\n");
         return 1;
     }
