@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include "ini.h"
 
 int main(int argc, const char* argv[]) {
 
@@ -14,6 +15,7 @@ int main(int argc, const char* argv[]) {
         return 1;
     }
     std::string sFileName = argv[1];
+    ini config(sFileName);
 
     // Leave, communicating successful completion
     return 0;
