@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <algorithm>
 #include "ini.h"
 
 ini::ini(void) {
@@ -16,10 +17,33 @@ ini::ini(void) {
 }
 
 ini::ini(const std::string sFileName) {
+
+    // Main loop: Iterate through input file, line by line
     std::ifstream iniFile(sFileName);
     std::string sLine;
     while(std::getline(iniFile, sLine)) {
-        std::cout << sLine;
+
+        // Get line, and strip any comment from it
+        std::string sCleanLine;
+        if(size_t comment_pos = sLine.find('#') != std::string::npos)
+            sCleanLine = std::string(sLine.cbegin(), find(sLine.cbegin(), sLine.cend(), '#'));
+        else
+            sCleanLine = sLine;
+
+        // Remove leading and trailing blanks
+        size_t firstpos = sCleanLine.find_first_not_of(" \t");
+        if(firstpos != std::string::npos) sCleanLine = sCleanLine.substr(firstpos);
+        size_t lastpos = sCleanLine.find_last_not_of(" \t");
+        firstpos = sCleanLine.find_first_not_of(" \t");
+        if(lastpos != std::string::npos)
+        {
+            sCleanLine = sCleanLine.substr(0, lastpos+1);
+            sCleanLine = sCleanLine.substr(firstpos);
+        }
+        else
+            sCleanLine.erase(std::remove(std::begin(sCleanLine), std::end(sCleanLine), ' '), std::end(sCleanLine));
+
+        std::cout << sCleanLine << std::endl;
     }
 }
 
