@@ -17,5 +17,9 @@ ini::ini(const std::string sFileName) {
 }
 
 ini::~ini() {
-
+    this->sIniFileName.empty();
+    this->svSection.clear();
+    this->svKey.clear();
+    this->svValue.clear();
+    this->mValues.clear();
 }
