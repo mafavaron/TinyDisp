@@ -1,7 +1,10 @@
 //
-// Created by Maurizio Favaron on 2019-04-20.
+// Created by Mauri Favaron on 2019-04-20.
 //
 
+#include <iostream>
+#include <fstream>
+#include <string>
 #include "ini.h"
 
 ini::ini(void) {
@@ -13,7 +16,11 @@ ini::ini(void) {
 }
 
 ini::ini(const std::string sFileName) {
-
+    std::ifstream iniFile(sFileName);
+    std::string sLine;
+    while(std::getline(iniFile, sLine)) {
+        std::cout << sLine;
+    }
 }
 
 ini::~ini() {
