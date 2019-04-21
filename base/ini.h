@@ -1,5 +1,5 @@
 //
-// Created by Maurizi Favaron on 2019-04-20.
+// Created by Mauri Favaron on 2019-04-20.
 //
 
 #ifndef TINYPART_INI_H
