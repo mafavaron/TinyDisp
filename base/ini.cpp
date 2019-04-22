@@ -36,10 +36,14 @@ ini::ini(const std::string sFileName) {
 
         // Check whether this is a section, or a 'key=value' assignment
         if(sCleanLine[0] == '@') {
-
+            sCurrentSection = trim(sCleanLine.substr(1));
+        }
+        else if(size_t iPos = sCleanLine.find_first_of('='); iPos != std::string::npos) {
+            std::string key = trim(sCleanLine.substr(0, iPos-1));
+            std::string val = trim(sCleanLine.substr(iPos+1));
+            std::cout << key << "@" << sCurrentSection << " = " << val << std::endl;
         }
 
-        std::cout << sCleanLine << std::endl;
     }
 }
 
