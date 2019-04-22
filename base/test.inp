@@ -1,9 +1,9 @@
 # Sample initialization file
 
 @ General                            # Here general stuff goes
-    run    ::= Test Set: The Movie   # Name of run
-    author ::= Mauri Favaron         # Author of run (may be a system)
+    run    = Test Set: The Movie   # Name of run
+    author = Mauri Favaron         # Author of run (may be a system)
 
 @ Input                              # Input and input-related stuff
-    meteo  ::= ./test.met            # Contains both surface and profile data
-    #meteo  ::= ./old_test.met       # Contains both surface and profile data - commented out however
+    meteo  = ./test.met            # Contains both surface and profile data
+    #meteo = ./old_test.met       # Contains both surface and profile data - commented out however
