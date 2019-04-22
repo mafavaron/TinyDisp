@@ -16,6 +16,8 @@ private:
     std::vector<std::string>            svKey;
     std::vector<std::string>            svValue;
     std::map<std::string,std::string>   mValues;
+private:
+    static std::string trim(const std::string sString);
 public:
     ini(void);
     ini(const std::string sFileName);
