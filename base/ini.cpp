@@ -52,7 +52,7 @@ ini::~ini() {
 }
 
 std::string ini::trim(const std::string sString) {
-    std::string sCleanLine;
+    std::string sCleanLine = sString;
     size_t firstpos = sCleanLine.find_first_not_of(" \t");
     if(firstpos != std::string::npos) sCleanLine = sCleanLine.substr(firstpos);
     size_t lastpos = sCleanLine.find_last_not_of(" \t");
