@@ -21,6 +21,7 @@ ini::ini(const std::string sFileName) {
     // Main loop: Iterate through input file, line by line
     std::ifstream iniFile(sFileName);
     std::string sLine;
+    std::string sCurrentSection = "";
     while(std::getline(iniFile, sLine)) {
 
         // Get line, and strip any comment from it
@@ -31,17 +32,12 @@ ini::ini(const std::string sFileName) {
             sCleanLine = sLine;
 
         // Remove leading and trailing blanks
-        size_t firstpos = sCleanLine.find_first_not_of(" \t");
-        if(firstpos != std::string::npos) sCleanLine = sCleanLine.substr(firstpos);
-        size_t lastpos = sCleanLine.find_last_not_of(" \t");
-        firstpos = sCleanLine.find_first_not_of(" \t");
-        if(lastpos != std::string::npos)
-        {
-            sCleanLine = sCleanLine.substr(0, lastpos+1);
-            sCleanLine = sCleanLine.substr(firstpos);
+        sCleanLine = trim(sCleanLine);
+
+        // Check whether this is a section, or a 'key=value' assignment
+        if(sCleanLine[0] == '@') {
+
         }
-        else
-            sCleanLine.erase(std::remove(std::begin(sCleanLine), std::end(sCleanLine), ' '), std::end(sCleanLine));
 
         std::cout << sCleanLine << std::endl;
     }
@@ -53,4 +49,20 @@ ini::~ini() {
     this->svKey.clear();
     this->svValue.clear();
     this->mValues.clear();
+}
+
+std::string ini::trim(const std::string sString) {
+    std::string sCleanLine;
+    size_t firstpos = sCleanLine.find_first_not_of(" \t");
+    if(firstpos != std::string::npos) sCleanLine = sCleanLine.substr(firstpos);
+    size_t lastpos = sCleanLine.find_last_not_of(" \t");
+    firstpos = sCleanLine.find_first_not_of(" \t");
+    if(lastpos != std::string::npos)
+    {
+        sCleanLine = sCleanLine.substr(0, lastpos+1);
+        sCleanLine = sCleanLine.substr(firstpos);
+    }
+    else
+        sCleanLine.erase(std::remove(std::begin(sCleanLine), std::end(sCleanLine), ' '), std::end(sCleanLine));
+    return sCleanLine;
 }
