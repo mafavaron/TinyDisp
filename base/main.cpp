@@ -17,6 +17,17 @@ int main(int argc, const char* argv[]) {
     std::string sFileName = argv[1];
     ini config(sFileName);
 
+    // Test configuration
+    std::string sSection = "General";
+    std::string sKey     = "run";
+    std::string sDefault = "Test_Name_00";
+    std::string sName = config.getString(sSection, sKey, sDefault);
+    std::cout << "Value = " << sName << std::endl;
+    sKey     = "nome";
+    sDefault = "Test_Name_01";
+    sName = config.getString(sSection, sKey, sDefault);
+    std::cout << "Value = " << sName << std::endl;
+
     // Leave, communicating successful completion
     return 0;
 
