@@ -78,5 +78,13 @@ std::string ini::trim(const std::string sString) {
 
 std::string ini::getString(std::string sSection, const std::string sKey, const std::string sDefault) {
 
-    return std::string();
+    // Form couple, and search it into the dictionary; if found, yield the corresponding
+    // string value. Otherwise, yield the default. This routine never fails.
+    std::string sFullKey = trim(sKey);
+    sFullKey += "@";
+    sFullKey += trim(sSection);
+    std::string sResult;
+    if(this->mValues.find(sFullKey) != this->mValues.end()) sResult = this->mValues[sFullKey];
+    else sResult = sDefault;
+    return sResult;
 }
