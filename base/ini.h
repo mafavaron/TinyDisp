@@ -22,6 +22,7 @@ public:
     ini(void);
     ini(const std::string sFileName);
     virtual ~ini();
+    std::string getString(std::string sSection, const std::string sKey, const std::string sDefault);
 };
 
 
