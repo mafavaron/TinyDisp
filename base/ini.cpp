@@ -42,6 +42,10 @@ ini::ini(const std::string sFileName) {
             std::string key = trim(sCleanLine.substr(0, iPos-1));
             std::string val = trim(sCleanLine.substr(iPos+1));
             std::cout << key << "@" << sCurrentSection << " = " << val << std::endl;
+            std::string sFullKey = key;
+            sFullKey += "@";
+            sFullKey += sCurrentSection;
+            this->mValues[sFullKey] = val;
         }
 
     }
@@ -69,4 +73,9 @@ std::string ini::trim(const std::string sString) {
     else
         sCleanLine.erase(std::remove(std::begin(sCleanLine), std::end(sCleanLine), ' '), std::end(sCleanLine));
     return sCleanLine;
+}
+
+std::string ini::getString(std::string sSection, const std::string sKey, const std::string sDefault) {
+
+    return std::string();
 }
