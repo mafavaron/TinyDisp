@@ -11,12 +11,15 @@
 ini::ini(void) {
     this->sIniFileName.empty();
     this->svSection.clear();
-    this->svKey.clear();
-    this->svValue.clear();
     this->mValues.clear();
 }
 
 ini::ini(const std::string sFileName) {
+
+    // Pre-cleaning
+    this->sIniFileName.empty();
+    this->svSection.clear();
+    this->mValues.clear();
 
     // Main loop: Iterate through input file, line by line
     std::ifstream iniFile(sFileName);
@@ -54,8 +57,6 @@ ini::ini(const std::string sFileName) {
 ini::~ini() {
     this->sIniFileName.empty();
     this->svSection.clear();
-    this->svKey.clear();
-    this->svValue.clear();
     this->mValues.clear();
 }
 
