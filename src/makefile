@@ -1,8 +1,8 @@
-metpro : metpro.o meteo.o processing.o pbl_met.a
-	gfortran -o metpro metpro.o meteo.o processing.o pbl_met.a
+metpro : metpre.o meteo.o processing.o pbl_met.a
+	gfortran -o metpre metpre.o meteo.o processing.o pbl_met.a
 	
-metpro.o : metpro.f90 processing.mod pbl_met.mod
-	gfortran -c metpro.f90
+metpre.o : metpre.f90 processing.mod pbl_met.mod
+	gfortran -c metpre.f90
 	
 processing.o processing.mod : processing.f90 meteo.mod pbl_met.mod
 	gfortran -c processing.f90
