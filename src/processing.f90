@@ -1,8 +1,6 @@
-module Configuration
+module Processing
 	
 	use pbl_met
-	use pbl_simil
-	use Emission
 	use Meteo
 	
 	implicit none
@@ -13,30 +11,15 @@ module Configuration
 		! General
 		integer				:: debug
 		character(len=256)	:: diag
-		integer				:: frameInterval
-		character(len=256)	:: frameFile
-		character(len=256)	:: profilePath
-		integer				:: iExecutionMode	! 0: Gaussian kernel; 1:Direct count "at ground"; 2:Direct count regardless of Z value
-		! Grid data
-		real(8)				:: x0
-		real(8)				:: y0
-		integer				:: nx
-		integer 			:: ny
-		real(8)				:: dx
-		real(8)				:: dy
-		integer				:: nz
-		real(8)				:: dz
 		! Timing
 		integer				:: Tmed		! Averaging time (s)
 		integer				:: Nstep	! Number of substeps in an averaging period
-		integer				:: Np		! Number of particles released per source per substep
-		integer				:: MaxAge	! Maximum particle age (s)
-		! Static and dynamic emissions
-		character(len=256)	:: Filemis	
-		character(len=256)	:: Fileprofemi	
+		! Grid data
+		integer				:: nz
+		real(8)				:: dz
 		! Meteo data files
 		character(len=256)	:: Filemeteo
-		character(len=256)	:: FilemeteoOut	! May be an empty string
+		character(len=256)	:: FilemeteoOut
 		character(len=256)	:: metDiaFile
 		! Site parameters of meteorological file
 		real(8)				:: zlev
@@ -45,21 +28,12 @@ module Configuration
 		real(8)				:: zt
 		real(8)				:: gamma
 		integer				:: hemisphere	! 0:Southern, 1:Northern
-		! Output
-		character(len=256)	:: Fileout
-		character(len=256)	:: FileMean
-		character(len=256)	:: FileGridAvg
-		character(len=256)	:: FileGridMax
-		real(8)				:: fat
 		! Computed parameters
 		real(8)				:: x1
 		real(8)				:: y1
 		real(8)				:: zmax
-		integer				:: maxpart
-		! Emissions space
-		type(PointSource), dimension(:), allocatable	:: tvPointStatic
 		! Meteo data
-		type(MetData)									:: tMeteo
+		type(MetData)		:: tMeteo
 	contains
 		procedure			:: read               => cfgRead
 		procedure			:: getNumTimeSteps    => cfgGetTimeSteps
@@ -172,30 +146,6 @@ contains
 			if(this % debug > 0) print *, "alamo:: error: Invalid 'diag_file' in [General]"
 			return
 		end if
-		iErrCode = cfg % getInteger("General", "frame_interval", this % frameInterval, 0)
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'frame_interval' in [General]"
-			return
-		end if
-		iErrCode = cfg % getString("General", "frame_name", this % frameFile, "")
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'frame_name' in [General]"
-			return
-		end if
-		iErrCode = cfg % getString("General", "profile_path", this % profilePath, "")
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'profile_path' in [General]"
-			return
-		end if
-		iErrCode = cfg % getInteger("General", "exec_mode", this % iExecutionMode, 0)
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'exec_mode' in [General]"
-			return
-		end if
 		! -1- Timing
 		iErrCode = cfg % getInteger("Timing", "avgtime", this % Tmed, 3600)
 		if(iErrCode /= 0) then
@@ -207,31 +157,6 @@ contains
 		if(iErrCode /= 0) then
 			iRetCode = 2
 			if(this % debug > 0) print *, "alamo:: error: Invalid 'nstep' in [Timing]"
-			return
-		end if
-		iErrCode = cfg % getInteger("Timing", "npart", this % Np, 100)
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'npart' in [Timing]"
-			return
-		end if
-		iErrCode = cfg % getInteger("Timing", "maxage", this % MaxAge, 5*3600)
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'maxage' in [Timing]"
-			return
-		end if
-		! -1- Emission
-		iErrCode = cfg % getString("Emission", "static", this % Filemis, "")
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'static' in [Emission]"
-			return
-		end if
-		iErrCode = cfg % getString("Emission", "dynamic", this % Fileprofemi, "")
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'dynamic' in [Emission]"
 			return
 		end if
 		! -1- Meteo
@@ -289,67 +214,6 @@ contains
 			if(this % debug > 0) print *, "alamo:: error: Invalid 'hemisphere' in [Meteo]"
 			return
 		end if
-		! -1- Output
-		iErrCode = cfg % getString("Output", "conc", this % Fileout, "")
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'conc' in [Output]"
-			return
-		end if
-		iErrCode = cfg % getString("Output", "mean", this % FileMean, "")
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'mean' in [Output]"
-			return
-		end if
-		iErrCode = cfg % getString("Output", "gridAvg", this % FileGridAvg, "")
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'gridMax' in [Output]"
-			return
-		end if
-		iErrCode = cfg % getString("Output", "gridMax", this % FileGridMax, "")
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'gridMax' in [Output]"
-			return
-		end if
-		iErrCode = cfg % getReal8("Output", "x0", this % x0, -9999.9d0)
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'x0' in [Output]"
-			return
-		end if
-		iErrCode = cfg % getReal8("Output", "y0", this % y0, -9999.9d0)
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'y0' in [Output]"
-			return
-		end if
-		iErrCode = cfg % getInteger("Output", "nx", this % nx, -9999)
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'nx' in [Output]"
-			return
-		end if
-		iErrCode = cfg % getInteger("Output", "ny", this % ny, -9999)
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'ny' in [Output]"
-			return
-		end if
-		iErrCode = cfg % getReal8("Output", "dx", this % dx, -9999.9d0)
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'nx' in [Output]"
-			return
-		end if
-		iErrCode = cfg % getReal8("Output", "dy", this % dy, -9999.9d0)
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'ny' in [Output]"
-			return
-		end if
 		iErrCode = cfg % getInteger("Output", "nz", this % nz, -9999)
 		if(iErrCode /= 0) then
 			iRetCode = 2
@@ -360,12 +224,6 @@ contains
 		if(iErrCode /= 0) then
 			iRetCode = 2
 			if(this % debug > 0) print *, "alamo:: error: Invalid 'dz' in [Output]"
-			return
-		end if
-		iErrCode = cfg % getReal8("Output", "factor", this % fat, -9999.9d0)
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'factor' in [Output]"
 			return
 		end if
 		
@@ -381,33 +239,7 @@ contains
 			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'nstep' in [Timing]"
 			return
 		end if
-		if(this % Np < 1) then
-			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'npart' in [Timing]"
-			return
-		end if
-		if(this % MaxAge < 1) then
-			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'maxage' in [Timing]"
-			return
-		end if
 		if(this % debug > 1) print *, "alamo:: info: [Timing] section check done"
-		! -1- Output
-		if(this % x0 < -9990.d0 .or. this % y0 < -9990.d0) then
-			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'x0' or 'y0' in [Output]"
-			return
-		end if
-		if(this % nx <= 0 .or. this % ny <= 0) then
-			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'nx' or 'ny' in [Output]"
-			return
-		end if
-		if(this % dx <= 0.d0 .or. this % dy <= 0.d0) then
-			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'dx' or 'dy' in [Output]"
-			return
-		end if
 		if(this % nz <= 1) then
 			iRetCode = 3
 			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'nz' in [Output]"
@@ -418,53 +250,8 @@ contains
 			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'dz' in [Output]"
 			return
 		end if
-		if(this % fat <= 0.d0) then
-			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'factor' in [Output]"
-			return
-		end if
-		this % x1   = this % x0 + this % dx * (this % nx - 1)
-		this % y1   = this % y0 + this % dy * (this % ny - 1)
 		this % zmax = this % dz * (this % nz - 1)
 		if(this % debug > 1) print *, "alamo:: info: [Output] section check done"
-		! -1- Static emissions
-		if(allocated(this % tvPointStatic)) deallocate(this % tvPointStatic)
-		if(this % Filemis /= ' ') then
-			open(iLUN1, file=this % Filemis, status='old', action='read', iostat=iErrCode)
-			if(iErrCode /= 0) then
-				iRetCode = 3
-				if(this % debug > 0) print *, "alamo:: error: File 'static' in [Emission] is missing / cannot be opened"
-				return
-			end if
-			iNumData = 0
-			do
-				read(iLUN1, "(a)", iostat=iErrCode) sBuffer
-				if(iErrCode /= 0) exit
-				iNumData = iNumData + 1
-			end do
-			if(iNumData <= 0) then
-				iRetCode = 3
-				if(this % debug > 0) print *, "alamo:: error: File 'static' in [Emission] exists but is empty"
-				close(iLUN1)
-				return
-			end if
-			rewind(iLUN1)
-			allocate(this % tvPointStatic(iNumData))
-			do iData = 1, iNumData
-				iErrCode = this % tvPointStatic(iData) % read(iLUN1)
-				if(this % tvPointStatic(iData) % isOutOfDomain(this % x0,this % x1,this % y0,this % y1,this % zmax)) then
-					iRetCode = 3
-					if(this % debug > 0) &
-						print *, "alamo:: error: ", iData, "-th emission in file 'static' in [Emission] is off domain"
-					close(iLUN1)
-					return
-				end if
-			end do
-			close(iLUN1)
-			if(this % debug > 1) print *, "alamo:: info: [Emission] section check done for static sources"
-		else
-			allocate(this % tvPointStatic(0))
-		end if
 		! -1- Meteorological data
 		if(this % zlev < 0.d0) then
 			iRetCode = 3
@@ -503,23 +290,6 @@ contains
 			return
 		end if
 		if(this % debug > 1) print *, "alamo:: info: [Meteo] section check done"
-		! -1- General
-		if(this % frameInterval < 0) then
-			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'frame_interval' in [General]"
-			return
-		end if
-		if(this % iExecutionMode < 0 .or. this % iExecutionMode > 2) then
-			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'exec_mode' in [General]"
-			return
-		end if
-		
-		if(this % debug > 1) print *, "alamo:: info: [General] section check done"
-		
-		! Compute the number of particles per step
-		this % maxpart = this % Np * size(this % tvPointStatic) * this % Nstep * this % MaxAge / this % Tmed
-		if(this % debug > 1) print *, "alamo:: info: Maximum number of particles equal to ", this % maxpart
 	
 		! Leave
 		this % lIsFull = .true.
@@ -1085,4 +855,4 @@ contains
 		
 	end function metpDump
 	
-end module Configuration
+end module Processing
