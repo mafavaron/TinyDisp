@@ -326,12 +326,6 @@ contains
 			close(iLUN)
 		end if
 			
-		! Construct profiles
-		
 	end function metRead
 	
-	! **********************
-	! * Auxiliary routines *
-	! **********************
-
 end module Meteo
