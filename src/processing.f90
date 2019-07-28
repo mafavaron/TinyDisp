@@ -143,87 +143,87 @@ contains
 		iErrCode = cfg % getString("General", "diafile", this % diag, "")
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'diag_file' in [General]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid 'diag_file' in [General]"
 			return
 		end if
 		! -1- Timing
 		iErrCode = cfg % getInteger("Timing", "avgtime", this % Tmed, 3600)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'avgtime' in [Timing]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid 'avgtime' in [Timing]"
 			return
 		end if
 		iErrCode = cfg % getInteger("Timing", "nstep", this % Nstep, 360)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'nstep' in [Timing]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid 'nstep' in [Timing]"
 			return
 		end if
 		! -1- Meteo
 		iErrCode = cfg % getString("Meteo", "inpfile", this % Filemeteo, "")
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'inpfile' in [Meteo]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid 'inpfile' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getString("Meteo", "outfile", this % FilemeteoOut, "")
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'inpfile' in [Meteo]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid 'inpfile' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getString("Meteo", "diafile", this % metDiaFile, "")
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'inpfile' in [Meteo]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid 'inpfile' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getReal8("Meteo", "height", this % zlev, -9999.9d0)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'height' in [Meteo]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid 'height' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getReal8("Meteo", "z0", this % z0, 0.02d0)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'z0' in [Meteo]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid 'z0' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getReal8("Meteo", "zr", this % zr, 10.d0)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'zr' in [Meteo]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid 'zr' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getReal8("Meteo", "zt", this % zt, 2.d0)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'zt' in [Meteo]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid 'zt' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getReal8("Meteo", "gamma", this % gamma, -0.0098d0)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'gamma' in [Meteo]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid 'gamma' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getInteger("Meteo", "hemisphere", this % hemisphere, 1)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'hemisphere' in [Meteo]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid 'hemisphere' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getInteger("Output", "nz", this % nz, -9999)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'nz' in [Output]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid 'nz' in [Output]"
 			return
 		end if
 		iErrCode = cfg % getReal8("Output", "dz", this % dz, -9999.9d0)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "alamo:: error: Invalid 'dz' in [Output]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid 'dz' in [Output]"
 			return
 		end if
 		
@@ -231,65 +231,65 @@ contains
 		! -1- Timing
 		if(this % Tmed <= 0 .or. this % Tmed > 3600 .or. mod(3600, this % Tmed) /= 0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'avgtime' in [Timing]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'avgtime' in [Timing]"
 			return
 		end if
 		if(this % Nstep < 1 .or. mod(this % Tmed, this % Nstep) /= 0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'nstep' in [Timing]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'nstep' in [Timing]"
 			return
 		end if
-		if(this % debug > 1) print *, "alamo:: info: [Timing] section check done"
+		if(this % debug > 1) print *, "metpre:: info: [Timing] section check done"
 		if(this % nz <= 1) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'nz' in [Output]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'nz' in [Output]"
 			return
 		end if
 		if(this % dz <= 0.d0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'dz' in [Output]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'dz' in [Output]"
 			return
 		end if
 		this % zmax = this % dz * (this % nz - 1)
-		if(this % debug > 1) print *, "alamo:: info: [Output] section check done"
+		if(this % debug > 1) print *, "metpre:: info: [Output] section check done"
 		! -1- Meteorological data
 		if(this % zlev < 0.d0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'height' in [Meteo]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'height' in [Meteo]"
 			return
 		end if
 		if(this % z0 < 0.d0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'z0' in [Meteo]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'z0' in [Meteo]"
 			return
 		end if
 		if(this % zr <= 0.d0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'zr' in [Meteo]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'zr' in [Meteo]"
 			return
 		end if
 		if(this % zt <= 0.d0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'zt' in [Meteo]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'zt' in [Meteo]"
 			return
 		end if
 		if(this % gamma >= 0.d0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'gamma' in [Meteo]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'gamma' in [Meteo]"
 			return
 		end if
 		if(this % hemisphere < 0 .or. this % hemisphere > 1) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Invalid value of 'hemisphere' in [Meteo]"
+			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'hemisphere' in [Meteo]"
 			return
 		end if
 		iErrCode = this % tMeteo % read(iLUN1, this % Filemeteo, this % Tmed, this % Nstep, this % FilemeteoOut)
 		if(iErrCode /= 0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "alamo:: error: Meteo data not read, with return code ", iErrCode
+			if(this % debug > 0) print *, "metpre:: error: Meteo data not read, with return code ", iErrCode
 			return
 		end if
-		if(this % debug > 1) print *, "alamo:: info: [Meteo] section check done"
+		if(this % debug > 1) print *, "metpre:: info: [Meteo] section check done"
 	
 		! Leave
 		this % lIsFull = .true.
