@@ -837,17 +837,13 @@ contains
 		write(sFileName, "(a,'/',a,'.csv')") trim(sProfilePath), sDateTime
 		
 		! Write profiles
-		open(iLUN, file=sFileName, status='unknown', action='write', iostat=iErrCode)
+		open(iLUN, file=sFileName, status='unknown', action='write', access='stream', iostat=iErrCode)
 		if(iErrCode /= 0) then
 			iRetCode = 2
 			return
 		end if
-		write(iLUN, "(a6, 21(',',a11))") &
-			'z', 'u', 'v', 'T', 'su2', 'sv2', 'sw2', 'dsw2', &
-			'eps', 'alpha', 'beta', 'gamma', 'delta', 'alpha.u', 'alpha.v', &
-			'delta.u', 'delta.v', 'delta.t', 'A.u', 'A.v', 'A', 'B'
 		do i = 1, size(this % z)
-			write(iLUN, "(f6.1, 21(',',f11.6))") &
+			write(iLUN) &
 				this % z(i), &
 				this % u(i), this % v(i), &
 				this % T(i), &
