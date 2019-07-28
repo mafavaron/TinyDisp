@@ -14,6 +14,10 @@ program Meteo_Preprocessor
 	character(len=256)	:: sConfigFile
 	integer				:: iRetCode
 	type(Config)		:: tConfig
+	type(MetProfiles)	:: tMetProfiles
+	integer				:: iStep
+	integer				:: iSubStep
+	integer				:: i
 	
 	! Get parameters
 	if(command_argument_count() /= 1) then
@@ -38,5 +42,28 @@ program Meteo_Preprocessor
 		print *, "metpre:: error: Input file not opened - Return code = ", iRetCode
 		stop
 	end if
+	
+	! Main loop: iterate over "steps" (meteo records)
+	do iStep = 1, tConfig % getNumTimeSteps()
+		
+		! Iterate over interpolation substeps
+		do iSubStep = 1, tConfig % getNumTimeSubSteps()
+			i = i + 1
+			
+			! Gather meteo profiles for current time step, and dump them if requested
+			iRetCode = tMetProfiles % create(cfg, i)
+			if(iRetCode /= 0) then
+				print *, 'metpre:: error: Profile not created - Return code = ', iRetCode
+				stop
+			end if
+			iRetCode = tMetProfiles % dump(110, tConfig % profilePath)
+			if(iRetCode /= 0) then
+				print *, 'metpre:: error: Profile not dumped - Return code = ', iRetCode
+				stop
+			end if
+			
+		end do
+		
+	end do
 
 end program Meteo_Preprocessor
