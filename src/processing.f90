@@ -11,6 +11,7 @@ module Processing
 		! General
 		integer				:: debug
 		character(len=256)	:: diag
+		character(len=256)	:: profilePath
 		! Timing
 		integer				:: Tmed		! Averaging time (s)
 		integer				:: Nstep	! Number of substeps in an averaging period
@@ -144,6 +145,12 @@ contains
 		if(iErrCode /= 0) then
 			iRetCode = 2
 			if(this % debug > 0) print *, "metpre:: error: Invalid 'diag_file' in [General]"
+			return
+		end if
+		iErrCode = cfg % getString("General", "profile_path", this % profilePath, "")
+		if(iErrCode /= 0) then
+			iRetCode = 2
+			if(this % debug > 0) print *, "metpre:: error: Invalid 'profile_path' in [General]"
 			return
 		end if
 		! -1- Timing
