@@ -38,4 +38,8 @@ TinyDisp is a work-in-progress, and will likely remain so until possible.
 Development will occur according to an evolutionary path. At any moment, it is guaranteed the code is compilable and, to the extent allowed by the source as-it-will-be at the moment, testable. Major functional achievements, turning the model into something "useful", will be communicated as soon as possible.
 
 # Relationship to other open-source projects
-TinyDisp may incorporate open-source code: dependencies will be made evident and credits attributed, both in source code and in the Wiki.
+TinyDisp uses the following open-source code:
+* 'ini.h/ini.c' and 'INIReader.h/INIReader.cpp' (https://github.com/benhoyt/inih)
+* _pbl_met_ (https://github.com/serv_terr/pbl_met)
+I Our appreciation goes to their authors and maintainers.
+
