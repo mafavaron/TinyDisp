@@ -1,3 +1,15 @@
+td : td.o ini.o INIReader.o
+	nvcc -o td td.o ini.o INIReader.o
+	
+td.o : td.cu ini.h INIReader.h
+	nvcc -c td.cu
+
+INIReader.o : INIReader.cu ini.h
+	nvcc -c INIReader.cu
+
+ini.o : ini.cu
+	nvcc -c ini.cu
+
 metpro : metpre.o meteo.o processing.o pbl_met.a
 	gfortran -o metpre metpre.o meteo.o processing.o pbl_met.a
 	
