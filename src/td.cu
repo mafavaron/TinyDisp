@@ -19,4 +19,7 @@ int main(int argc, char** argv) {
 	thrust::device_vector<float> dvec_x(N);
 	thrust::device_vector<float> dvec_y(N);
 
+	float *ptr_x = thrust::raw_pointer_cast(&dvec_x[0]);
+	float *ptr_y = thrust::raw_pointer_cast(&dvec_y[0]);
+
 }
