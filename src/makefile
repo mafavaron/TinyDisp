@@ -1,29 +1,24 @@
-td : td.o ini.o INIReader.o
-	nvcc -o td td.o ini.o INIReader.o
+NVCC=nvcc
+NVCC_FLAGS = -g -G -Xcompiler -Wall --std=c++11 --expt-extended-lambda
+LIBS = -lcurand
+
+td.exe : td.cu
+	$(NVCC) $(NVCC_FLAGS) $^ -o $@ $(LIBS)
 	
-td.o : td.cu ini.h INIReader.h
-	nvcc -c td.cu
-
-INIReader.o : INIReader.cu ini.h
-	nvcc -c INIReader.cu
-
-ini.o : ini.cu
-	nvcc -c ini.cu
-
 metpro : metpre.o meteo.o processing.o pbl_met.a
-	gfortran -o metpre metpre.o meteo.o processing.o pbl_met.a
+	pgfortran -o metpre metpre.o meteo.o processing.o pbl_met.a
 	
 metpre.o : metpre.f90 processing.mod pbl_met.mod
-	gfortran -c metpre.f90
+	pgfortran -c metpre.f90
 	
 processing.o processing.mod : processing.f90 meteo.mod pbl_met.mod
-	gfortran -c processing.f90
+	pgfortran -c processing.f90
 	
 meteo.o meteo.mod : meteo.f90 pbl_met.mod
-	gfortran -c meteo.f90
+	pgfortran -c meteo.f90
 
 clean :
-	rm *.mod
-	rm *.o
-	rm -f metpro
+	del *.mod
+	del *.o
+	del -f metpro
 	
