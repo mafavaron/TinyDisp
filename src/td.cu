@@ -22,4 +22,8 @@ int main(int argc, char** argv) {
 	float *ptr_x = thrust::raw_pointer_cast(&dvec_x[0]);
 	float *ptr_y = thrust::raw_pointer_cast(&dvec_y[0]);
 
+	// Simulate particles emission
+	curandGenerateUniform(gen, ptr_x, N);
+	curandGenerateUniform(gen, ptr_y, N);
+
 }
