@@ -41,6 +41,17 @@ int main(int argc, char** argv) {
 	std::string sFramePath = cfg.GetString(sSection, sName, sDefault);
 	sName = "exec_mode";
 	int iExecMode = cfg.GetInteger(sSection, sName, 0);
+	// -1- Timing
+	sSection = "Timing";
+	sName = "avgtime";
+	int iAvgTime = cfg.GetInteger(sSection, sName, 0);
+	sName = "nstep";
+	int iNumStep = cfg.GetInteger(sSection, sName, 0);
+	sName = "npart";
+	int iNumPart = cfg.GetInteger(sSection, sName, 0);
+	sName = "maxage";
+	int iMaxAge = cfg.GetInteger(sSection, sName, 0);
+
 
 	curandGenerator_t gen;
 	curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
