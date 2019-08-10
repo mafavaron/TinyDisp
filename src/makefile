@@ -1,9 +1,15 @@
 NVCC=nvcc
-NVCC_FLAGS = -g -G -Xcompiler --std c++11 --expt-extended-lambda
+NVCC_FLAGS = -g -G -Xcompiler --std=c++11 --expt-extended-lambda
 LIBS = -lcurand
 
-td.exe : td.cu
+td.exe : td.cu ini.obj INIReader.obj
 	$(NVCC) $(NVCC_FLAGS) $^ -o $@ $(LIBS)
+
+ini.obj : ini.c
+	$(NVCC) -g -G -c ini.c -o ini.obj
+
+INIReader.obj : INIReader.cpp ini.h
+	$(NVCC) -g -G -c INIReader.cpp -o INIReader.obj
 
 metpro : metpre.o meteo.o processing.o pbl_met.a
 	pgfortran -o metpre metpre.o meteo.o processing.o pbl_met.a
