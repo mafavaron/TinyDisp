@@ -26,7 +26,12 @@ int main(int argc, char** argv) {
 	}
 	std::string sCfgFileName = argv[1];
 
+	// Read configuration
 	INIReader cfg = INIReader(sCfgFileName);
+	std::string sSection = "General";
+	std::string sName    = "debug_level";
+	int iDebugLevel = cfg.GetInteger(sSection, sName, 4);
+	std::cout << iDebugLevel << std::endl;
 
 	curandGenerator_t gen;
 	curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
