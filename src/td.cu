@@ -9,6 +9,8 @@
 #include <math.h>
 #include <string>
 
+#include "INIReader.h"
+
 #define N (1<<20)
 
 int main(int argc, char** argv) {
@@ -23,6 +25,8 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 	std::string sCfgFileName = argv[1];
+
+	INIReader cfg = INIReader(sCfgFileName);
 
 	curandGenerator_t gen;
 	curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
