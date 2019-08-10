@@ -28,10 +28,19 @@ int main(int argc, char** argv) {
 
 	// Read configuration
 	INIReader cfg = INIReader(sCfgFileName);
+	// -1- General
 	std::string sSection = "General";
 	std::string sName    = "debug_level";
 	int iDebugLevel = cfg.GetInteger(sSection, sName, 4);
-	std::cout << iDebugLevel << std::endl;
+	sName = "diafile";
+	std::string sDefault = "";
+	std::string sDiaFile = cfg.GetString(sSection, sName, sDefault);
+	sName = "frame_interval";
+	int iFrameInterval = cfg.GetInteger(sSection, sName, 0);
+	sName = "frame_path";
+	std::string sFramePath = cfg.GetString(sSection, sName, sDefault);
+	sName = "exec_mode";
+	int iExecMode = cfg.GetInteger(sSection, sName, 0);
 
 	curandGenerator_t gen;
 	curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
