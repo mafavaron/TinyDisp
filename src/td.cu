@@ -77,6 +77,26 @@ int main(int argc, char** argv) {
 	double rGamma = cfg.GetReal(sSection, sName, 0.0);
 	sName = "hemisphere";
 	int iHemisphere = cfg.GetInteger(sSection, sName, 0);
+	// -1- Output
+	sSection = "Output";
+	sName = "conc";
+	std::string sConcFile = cfg.GetString(sSection, sName, sDefault);
+	sName = "x0";
+	double rY0 = cfg.GetReal(sSection, sName, 0.0);
+	sName = "y0";
+	double rX0 = cfg.GetReal(sSection, sName, 0.0);
+	sName = "nx";
+	int iNx = cfg.GetInteger(sSection, sName, 0);
+	sName = "ny";
+	int iNy = cfg.GetInteger(sSection, sName, 0);
+	sName = "dx";
+	double rDx = cfg.GetReal(sSection, sName, 0.0);
+	sName = "dy";
+	double rDy = cfg.GetReal(sSection, sName, 0.0);
+	sName = "nz";
+	int iNz = cfg.GetInteger(sSection, sName, 0);
+	sName = "dz";
+	double rDz = cfg.GetReal(sSection, sName, 0.0);
 
 	curandGenerator_t gen;
 	curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
