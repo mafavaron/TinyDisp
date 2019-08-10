@@ -57,6 +57,26 @@ int main(int argc, char** argv) {
 	std::string sStatic = cfg.GetString(sSection, sName, sDefault);
 	sName = "dynamic";
 	std::string sDynamic = cfg.GetString(sSection, sName, sDefault);
+	// -1- Meteo
+	sSection = "Meteo";
+	sName = "inpfile";
+	std::string sMetInpFile = cfg.GetString(sSection, sName, sDefault);
+	sName = "outfile";
+	std::string sMetOutFile = cfg.GetString(sSection, sName, sDefault);
+	sName = "diafile";
+	std::string sMetDiaFile = cfg.GetString(sSection, sName, sDefault);
+	sName = "height";
+	double rHeight = cfg.GetReal(sSection, sName, 0.0);
+	sName = "z0";
+	double rZ0 = cfg.GetReal(sSection, sName, 0.0);
+	sName = "zr";
+	double rZr = cfg.GetReal(sSection, sName, 0.0);
+	sName = "zt";
+	double rZt = cfg.GetReal(sSection, sName, 0.0);
+	sName = "gamma";
+	double rGamma = cfg.GetReal(sSection, sName, 0.0);
+	sName = "hemisphere";
+	int iHemisphere = cfg.GetInteger(sSection, sName, 0);
 
 	curandGenerator_t gen;
 	curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
