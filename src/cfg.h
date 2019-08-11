@@ -1,7 +1,11 @@
 #ifndef __CFG__
 
+#include <string>
+
 class Cfg {
 private:
+  // Internal status
+  int         iState;
   // General
   int         iDebugLevel;
   std::string sDiaFile;
@@ -37,6 +41,9 @@ private:
   int         iNz;
   double      rDz;
 public:
-}
+  Cfg();
+  Cfg(const std::string& sCfgFileName);
+  ~Cfg();
+};
 
 #endif
