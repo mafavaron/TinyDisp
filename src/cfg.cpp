@@ -126,21 +126,58 @@ Cfg::~Cfg() {
 
 int Cfg::Validate(void) {
 
-  int iState = 1; // Assume success (will falsify on failure)
+  int iRetCode = 0; // Assume success (will falsify on failure)
 
   // Check "General" section validity
   if(this->iDebugLevel < 0) this->iDebugLevel = 0;
   if(this->iFrameInterval > 0) {
     if(this->sFramePath.empty()) {
-      iState = 0;
+      iRetCode = 1;
       this->iState = 0;
-      return iState;
+      return iRetCode;
     }
   }
   if(this->iExecMode < 0 || this->iExecMode > 1) {
-    iState = 0;
+    iRetCode = 2;
     this->iState = 0;
-    return iState;
+    return iRetCode;
+  }
+
+  // Check "Timing" section validity
+  if(this->iAvgTime < 1 || this->iAvgTime > 3600) {
+    iRetCode = 3;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(3600 % this->iAvgTime != 0) {
+    iState = 4;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(this->iNumStep < 1 || this->iNumStep > this->iAvgTime) {
+    iState = 5;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(this->iAvgTime % this->iNumStep != 0) {
+    iState = 6;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(this->iNumPart < 1) {
+    iState = 7;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(this->iMaxAge < this->iAvgTime) {
+    iState = 8;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(this->iAvgTime % this->iMaxAge != 0) {
+    iState = 9;
+    this->iState = 0;
+    return iRetCode;
   }
 
 }
