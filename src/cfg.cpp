@@ -122,3 +122,25 @@ Cfg::Cfg(const std::string& sCfgFileName) {
 
 Cfg::~Cfg() {
 }
+
+
+int Cfg::Validate(void) {
+
+  int iState = 1; // Assume success (will falsify on failure)
+
+  // Check "General" section validity
+  if(this->iDebugLevel < 0) this->iDebugLevel = 0;
+  if(this->iFrameInterval > 0) {
+    if(this->sFramePath.empty()) {
+      iState = 0;
+      this->iState = 0;
+      return iState;
+    }
+  }
+  if(this->iExecMode < 0 || this->iExecMode > 1) {
+    iState = 0;
+    this->iState = 0;
+    return iState;
+  }
+
+}
