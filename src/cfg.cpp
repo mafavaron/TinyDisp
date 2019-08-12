@@ -180,4 +180,16 @@ int Cfg::Validate(void) {
     return iRetCode;
   }
 
+  // Check "Emission" section validity
+  if(this->sStatic.empty() && this->sDynamic.empty()) {
+    iState = 10;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(this->sStatic == this->sDynamic) {
+    iState = 11;
+    this->iState = 0;
+    return iRetCode;
+  }
+
 }
