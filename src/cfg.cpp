@@ -219,4 +219,40 @@ int Cfg::Validate(void) {
     return iRetCode;
   }
 
+  // Check "Output" section validity
+  if(this->iNx < 1) {
+    iState = 17;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(this->iNy < 1) {
+    iState = 18;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(this->iNz < 1) {
+    iState = 19;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(this->rDx <= 0.0) {
+    iState = 20;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(this->rDy <= 0.0) {
+    iState = 21;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(this->rDz <= 0.0) {
+    iState = 22;
+    this->iState = 0;
+    return iRetCode;
+  }
+
+  // Leave: successful completion
+  this->iState = 1;
+  return iRetCode;
+
 }
