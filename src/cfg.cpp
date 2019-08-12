@@ -192,4 +192,31 @@ int Cfg::Validate(void) {
     return iRetCode;
   }
 
+  // Check "Meteo" section validity
+  if(this->sMetInpFile.empty()) {
+    iState = 12;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(this->rZ0 <= 0.0) {
+    iState = 13;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(this->rZr <= 0.0) {
+    iState = 14;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(this->rZt <= 0.0) {
+    iState = 15;
+    this->iState = 0;
+    return iRetCode;
+  }
+  if(this->iHemisphere < 0 || this->iHemisphere > 1) {
+    iState = 16;
+    this->iState = 0;
+    return iRetCode;
+  }
+
 }
