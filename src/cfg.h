@@ -44,6 +44,7 @@ public:
   Cfg();
   Cfg(const std::string& sCfgFileName);
   ~Cfg();
+  int Validate(void);
 };
 
 #endif
