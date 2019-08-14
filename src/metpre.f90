@@ -52,7 +52,7 @@ program Meteo_Preprocessor
 			i = i + 1
 
 			! Gather meteo profiles for current time step, and dump them if requested
-			iRetCode = tMetProfiles % create(cfg, i)
+			iRetCode = tMetProfiles % create(tConfig, i)
 			if(iRetCode /= 0) then
 				print *, 'metpre:: error: Profile not created - Return code = ', iRetCode
 				stop
