@@ -256,3 +256,8 @@ int Cfg::Validate(void) {
   return iRetCode;
 
 }
+
+
+int Cfg::GetState(void) {
+  return this->iState;
+}
