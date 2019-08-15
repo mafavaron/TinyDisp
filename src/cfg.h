@@ -41,10 +41,14 @@ private:
   int         iNz;
   double      rDz;
 public:
+  // Constructors, destructor
   Cfg();
   Cfg(const std::string& sCfgFileName);
   ~Cfg();
+  // Parameter check
   int Validate(void);
+  // Access to components
+  int GetState(void);
 };
 
 #endif
