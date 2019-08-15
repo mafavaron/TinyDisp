@@ -43,6 +43,13 @@ program Meteo_Preprocessor
 		stop
 	end if
 
+	! Initialize the write
+	iRetCode = tMetProfiles % initialize(tConfig, 110)
+	if(iRetCode /= 0) then
+		print *, 'metpre:: error: Profile not dumped - Return code = ', iRetCode
+		stop
+	end if
+
 	! Main loop: iterate over "steps" (meteo records)
 	i = 0
 	do iStep = 1, tConfig % getNumTimeSteps()
@@ -57,7 +64,7 @@ program Meteo_Preprocessor
 				print *, 'metpre:: error: Profile not created - Return code = ', iRetCode
 				stop
 			end if
-			iRetCode = tMetProfiles % dump(110, tConfig % profilePath)
+			iRetCode = tMetProfiles % dump(110)
 			if(iRetCode /= 0) then
 				print *, 'metpre:: error: Profile not dumped - Return code = ', iRetCode
 				stop
@@ -66,5 +73,8 @@ program Meteo_Preprocessor
 		end do
 
 	end do
+
+	! Leave
+	close(110)
 
 end program Meteo_Preprocessor
