@@ -1,34 +1,48 @@
 module Processing
-	
+
 	use pbl_met
 	use Meteo
-	
+
 	implicit none
-	
+
 	type Config
 		! Status
 		logical				:: lIsFull = .false.
 		! General
-		integer				:: debug
-		character(len=256)	:: diag
-		character(len=256)	:: profilePath
+		integer							:: iDebugLevel
+		character(len=256)	:: sDiaFile
+		integer							:: iFrameInterval
+		character(len=256)	:: sFramePath
+		integer							:: iExecMode
 		! Timing
-		integer				:: Tmed		! Averaging time (s)
-		integer				:: Nstep	! Number of substeps in an averaging period
-		! Grid data
-		integer				:: nz
-		real(8)				:: dz
-		! Meteo data files
-		character(len=256)	:: Filemeteo
-		character(len=256)	:: FilemeteoOut
-		character(len=256)	:: metDiaFile
+		integer							:: iAvgTime
+		integer							:: iNumStep
+		integer							:: iNumPart
+		integer							:: iMaxAge
+		! Emission
+		character(len=256)	:: sStatic
+		character(len=256)	:: sDynamic
+		! Meteo
+		character(len=256)	:: sMetInpFile
+		character(len=256)	:: sMetOutFile
+		character(len=256)	:: sMetDiaFile
+		real(8)							:: rHeight
+		real(8)							:: rZ0
+		real(8)							:: rZr
+		real(8)							:: rZt
+		real(8)							:: rGamma
+		integer							:: iHemisphere	! 0:Southern, 1:Northern
+		! Output
+		character(len=256)	:: sConcFile
+		real(8)							:: rX0
+		real(8)							:: rY0
+		integer							:: iNx
+		integer							:: iNy
+		integer							:: iNz
+		real(8)							:: rDx
+		real(8)							:: rDy
+		real(8)							:: rDz
 		! Site parameters of meteorological file
-		real(8)				:: zlev
-		real(8)				:: z0
-		real(8)				:: zr
-		real(8)				:: zt
-		real(8)				:: gamma
-		integer				:: hemisphere	! 0:Southern, 1:Northern
 		! Computed parameters
 		real(8)				:: x1
 		real(8)				:: y1
@@ -41,8 +55,8 @@ module Processing
 		procedure			:: getNumTimeSubSteps => cfgGetTimeSubSteps
 		procedure			:: getNumMeteo        => cfgGetMeteoSize
 	end type Config
-	
-	
+
+
 	type MetProfiles
 		! Time stamp
 		real(8)								:: rEpoch	! Time stamp of current profile set
@@ -77,8 +91,8 @@ module Processing
 		procedure	:: evaluate  => metpEvaluate
 		procedure	:: dump      => metpDump
 	end type MetProfiles
-	
-	
+
+
 	type MetProfValues
 		real(8)	:: rEpoch	! Time stamp of current profile set
 		real(8)	:: z		! Levels' height above ground (m)
@@ -104,275 +118,269 @@ module Processing
 		real(8)	:: A		! exp(alfa*dt)
 		real(8)	:: B		! exp(beta*dt)
 	end type MetProfValues
-	
+
 contains
 
 	function cfgRead(this, iLUN, iLUN1, sFileName) result(iRetCode)
-	
+
 		! Routine arguments
 		class(Config), intent(out)		:: this
 		integer, intent(in)				:: iLUN
 		integer, intent(in)				:: iLUN1
 		character(len=*), intent(in)	:: sFileName
 		integer							:: iRetCode
-		
+
 		! Locals
 		integer				:: iErrCode
 		type(IniFile)		:: cfg
 		character(len=128)	:: sBuffer
 		integer				:: iNumData
 		integer				:: iData
-		
+
 		! Assume success (will falsify on failure)
 		iRetCode = 0
 		this % lIsFull = .false.
-		
+
 		! Get configuration file, and prepare to parse it
 		iErrCode = cfg % read(10, sFileName)
 		if(iErrCode /= 0) then
 			iRetCode = 1
 			return
 		end if
-		
+
 		! Gather configuration data
 		! -1- General
-		iErrCode = cfg % getInteger("General", "debug_level", this % debug, 0)
+		iErrCode = cfg % getInteger("General", "debug_level", this % iDebugLevel, 0)
 		if(iErrCode /= 0) then
 			iRetCode = 2
 			return
 		end if
-		iErrCode = cfg % getString("General", "diafile", this % diag, "")
+		iErrCode = cfg % getString("General", "diafile", this % sDiaFile, "")
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "metpre:: error: Invalid 'diag_file' in [General]"
-			return
-		end if
-		iErrCode = cfg % getString("General", "profile_path", this % profilePath, "")
-		if(iErrCode /= 0) then
-			iRetCode = 2
-			if(this % debug > 0) print *, "metpre:: error: Invalid 'profile_path' in [General]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'diag_file' in [General]"
 			return
 		end if
 		! -1- Timing
-		iErrCode = cfg % getInteger("Timing", "avgtime", this % Tmed, 3600)
+		iErrCode = cfg % getInteger("Timing", "avgtime", this % iAvgTime, 3600)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "metpre:: error: Invalid 'avgtime' in [Timing]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'avgtime' in [Timing]"
 			return
 		end if
-		iErrCode = cfg % getInteger("Timing", "nstep", this % Nstep, 360)
+		iErrCode = cfg % getInteger("Timing", "Nstep", this % iNumStep, 360)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "metpre:: error: Invalid 'nstep' in [Timing]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'nstep' in [Timing]"
 			return
 		end if
 		! -1- Meteo
-		iErrCode = cfg % getString("Meteo", "inpfile", this % Filemeteo, "")
+		iErrCode = cfg % getString("Meteo", "inpfile", this % sMetInpFile, "")
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "metpre:: error: Invalid 'inpfile' in [Meteo]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'inpfile' in [Meteo]"
 			return
 		end if
-		iErrCode = cfg % getString("Meteo", "outfile", this % FilemeteoOut, "")
+		iErrCode = cfg % getString("Meteo", "outfile", this % sMetOutFile, "")
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "metpre:: error: Invalid 'inpfile' in [Meteo]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'inpfile' in [Meteo]"
 			return
 		end if
-		iErrCode = cfg % getString("Meteo", "diafile", this % metDiaFile, "")
+		iErrCode = cfg % getString("Meteo", "diafile", this % sMetDiaFile, "")
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "metpre:: error: Invalid 'inpfile' in [Meteo]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'inpfile' in [Meteo]"
 			return
 		end if
-		iErrCode = cfg % getReal8("Meteo", "height", this % zlev, -9999.9d0)
+		iErrCode = cfg % getReal8("Meteo", "height", this % rHeight, -9999.9d0)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "metpre:: error: Invalid 'height' in [Meteo]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'height' in [Meteo]"
 			return
 		end if
-		iErrCode = cfg % getReal8("Meteo", "z0", this % z0, 0.02d0)
+		iErrCode = cfg % getReal8("Meteo", "z0", this % rZ0, 0.02d0)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "metpre:: error: Invalid 'z0' in [Meteo]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'z0' in [Meteo]"
 			return
 		end if
-		iErrCode = cfg % getReal8("Meteo", "zr", this % zr, 10.d0)
+		iErrCode = cfg % getReal8("Meteo", "zr", this % rZr, 10.d0)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "metpre:: error: Invalid 'zr' in [Meteo]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'zr' in [Meteo]"
 			return
 		end if
-		iErrCode = cfg % getReal8("Meteo", "zt", this % zt, 2.d0)
+		iErrCode = cfg % getReal8("Meteo", "zt", this % rZt, 2.d0)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "metpre:: error: Invalid 'zt' in [Meteo]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'zt' in [Meteo]"
 			return
 		end if
-		iErrCode = cfg % getReal8("Meteo", "gamma", this % gamma, -0.0098d0)
+		iErrCode = cfg % getReal8("Meteo", "gamma", this % rGamma, -0.0098d0)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "metpre:: error: Invalid 'gamma' in [Meteo]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'gamma' in [Meteo]"
 			return
 		end if
-		iErrCode = cfg % getInteger("Meteo", "hemisphere", this % hemisphere, 1)
+		iErrCode = cfg % getInteger("Meteo", "iHemisphere", this % iHemisphere, 1)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "metpre:: error: Invalid 'hemisphere' in [Meteo]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'iHemisphere' in [Meteo]"
 			return
 		end if
-		iErrCode = cfg % getInteger("Output", "nz", this % nz, -9999)
+		iErrCode = cfg % getInteger("Output", "nz", this % iNz, -9999)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "metpre:: error: Invalid 'nz' in [Output]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'nz' in [Output]"
 			return
 		end if
-		iErrCode = cfg % getReal8("Output", "dz", this % dz, -9999.9d0)
+		iErrCode = cfg % getReal8("Output", "dz", this % rDz, -9999.9d0)
 		if(iErrCode /= 0) then
 			iRetCode = 2
-			if(this % debug > 0) print *, "metpre:: error: Invalid 'dz' in [Output]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'dz' in [Output]"
 			return
 		end if
-		
+
 		! Validate configuration data
 		! -1- Timing
-		if(this % Tmed <= 0 .or. this % Tmed > 3600 .or. mod(3600, this % Tmed) /= 0) then
+		if(this % iAvgTime <= 0 .or. this % iAvgTime > 3600 .or. mod(3600, this % iAvgTime) /= 0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'avgtime' in [Timing]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid value of 'avgtime' in [Timing]"
 			return
 		end if
-		if(this % Nstep < 1 .or. mod(this % Tmed, this % Nstep) /= 0) then
+		if(this % iNumStep < 1 .or. mod(this % iAvgTime, this % iNumStep) /= 0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'nstep' in [Timing]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid value of 'nstep' in [Timing]"
 			return
 		end if
-		if(this % debug > 1) print *, "metpre:: info: [Timing] section check done"
-		if(this % nz <= 1) then
+		if(this % iDebugLevel > 1) print *, "metpre:: info: [Timing] section check done"
+		if(this % iNz <= 1) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'nz' in [Output]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid value of 'nz' in [Output]"
 			return
 		end if
-		if(this % dz <= 0.d0) then
+		if(this % rDz <= 0.d0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'dz' in [Output]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid value of 'dz' in [Output]"
 			return
 		end if
-		this % zmax = this % dz * (this % nz - 1)
-		if(this % debug > 1) print *, "metpre:: info: [Output] section check done"
+		this % zmax = this % rDz * (this % iNz - 1)
+		if(this % iDebugLevel > 1) print *, "metpre:: info: [Output] section check done"
 		! -1- Meteorological data
-		if(this % zlev < 0.d0) then
+		if(this % rHeight < 0.d0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'height' in [Meteo]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid value of 'height' in [Meteo]"
 			return
 		end if
-		if(this % z0 < 0.d0) then
+		if(this % rZ0 < 0.d0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'z0' in [Meteo]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid value of 'z0' in [Meteo]"
 			return
 		end if
-		if(this % zr <= 0.d0) then
+		if(this % rZr <= 0.d0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'zr' in [Meteo]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid value of 'zr' in [Meteo]"
 			return
 		end if
-		if(this % zt <= 0.d0) then
+		if(this % rZt <= 0.d0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'zt' in [Meteo]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid value of 'zt' in [Meteo]"
 			return
 		end if
-		if(this % gamma >= 0.d0) then
+		if(this % rGamma >= 0.d0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'gamma' in [Meteo]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid value of 'gamma' in [Meteo]"
 			return
 		end if
-		if(this % hemisphere < 0 .or. this % hemisphere > 1) then
+		if(this % iHemisphere < 0 .or. this % iHemisphere > 1) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "metpre:: error: Invalid value of 'hemisphere' in [Meteo]"
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid value of 'iHemisphere' in [Meteo]"
 			return
 		end if
-		iErrCode = this % tMeteo % read(iLUN1, this % Filemeteo, this % Tmed, this % Nstep, this % FilemeteoOut)
+		iErrCode = this % tMeteo % read(iLUN1, this % sMetInpFile, this % iAvgTime, this % iNumStep, this % sMetOutFile)
 		if(iErrCode /= 0) then
 			iRetCode = 3
-			if(this % debug > 0) print *, "metpre:: error: Meteo data not read, with return code ", iErrCode
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Meteo data not read, with return code ", iErrCode
 			return
 		end if
-		if(this % debug > 1) print *, "metpre:: info: [Meteo] section check done"
-	
+		if(this % iDebugLevel > 1) print *, "metpre:: info: [Meteo] section check done"
+
 		! Leave
 		this % lIsFull = .true.
-		
+
 	end function cfgRead
-	
-	
+
+
 	function cfgGetMeteoSize(this) result(iMeteoSize)
-	
+
 		! Routine arguments
 		class(Config), intent(in)	:: this
 		integer						:: iMeteoSize
-		
+
 		! Locals
 		! --none--
-		
+
 		! Get the information piece desired
 		if(this % lIsFull) then
 			iMeteoSize = size(this % tMeteo % rvExtEpoch)
 		else
 			iMeteoSize = 0
 		end if
-		
+
 	end function cfgGetMeteoSize
-	
-	
+
+
 	function cfgGetTimeSteps(this) result(iMeteoSize)
-	
+
 		! Routine arguments
 		class(Config), intent(in)	:: this
 		integer						:: iMeteoSize
-		
+
 		! Locals
 		! --none--
-		
+
 		! Get the information piece desired
 		if(this % lIsFull) then
 			iMeteoSize = size(this % tMeteo % rvEpoch)
 		else
 			iMeteoSize = 0
 		end if
-		
+
 	end function cfgGetTimeSteps
-	
-	
+
+
 	function cfgGetTimeSubSteps(this) result(iMeteoSize)
-	
+
 		! Routine arguments
 		class(Config), intent(in)	:: this
 		integer						:: iMeteoSize
-		
+
 		! Locals
 		! --none--
-		
+
 		! Get the information piece desired
 		if(this % lIsFull) then
 			iMeteoSize = size(this % tMeteo % rvExtEpoch) / size(this % tMeteo % rvEpoch)
 		else
 			iMeteoSize = 0
 		end if
-		
+
 	end function cfgGetTimeSubSteps
-	
-	
+
+
 	function metpClean(this) result(iRetCode)
-	
+
 		! Routine arguments
 		class(MetProfiles), intent(out)		:: this
 		integer								:: iRetCode
-		
+
 		! Locals
 		! --none--
-		
+
 		! Assume success (will falsify on failure)
 		iRetCode = 0
-		
+
 		! Clean-up workspace
 		if(allocated(this % z))      deallocate(this % z)
 		if(allocated(this % u))      deallocate(this % u)
@@ -396,29 +404,29 @@ contains
 		if(allocated(this % Av))     deallocate(this % Av)
 		if(allocated(this % A))      deallocate(this % A)
 		if(allocated(this % B))      deallocate(this % B)
-		
+
 	end function metpClean
-	
-	
+
+
 	function metpAlloc(this, iNumData) result(iRetCode)
-	
+
 		! Routine arguments
 		class(MetProfiles), intent(out)		:: this
 		integer, intent(in)					:: iNumData
 		integer								:: iRetCode
-		
+
 		! Locals
 		integer		:: iErrCode
-		
+
 		! Assume success (will falsify on failure)
 		iRetCode = 0
-		
+
 		! Check parameters
 		if(iNumData <= 0) then
 			iRetCode = 1
 			return
 		end if
-		
+
 		! Reserve workspace
 		allocate( &
 			this % z(iNumData), &
@@ -449,22 +457,22 @@ contains
 			iRetCode = 2
 			return
 		end if
-		
+
 	end function metpAlloc
-	
-	
+
+
 	function metpCreate( &
 		this, &
 		cfg, &
 		i &		! Index of current row in 'met'
 	) result(iRetCode)
-	
+
 		! Routine arguments
 		class(MetProfiles), intent(out)		:: this
 		type(Config), intent(in)			:: cfg
 		integer, intent(in)					:: i
 		integer								:: iRetCode
-		
+
 		! Locals
 		integer	:: n		! Max number of met data
 		integer	:: m		! Number of levels
@@ -487,24 +495,24 @@ contains
 		real(8)	:: dt
 		type(DateTime)	:: tStamp
 		character(len=23)	:: sTimeStamp
-		
+
 		! Constants
 		real(8), parameter	:: K    = 0.4d0		! von Karman constant
 		real(8), parameter	:: G    = 9.81d0	! Universal gravity constant
 		real(8), parameter	:: P0   = 1013.d0	! Pressure assumed at 0m MSL
-		
+
 		! Assume success (will falsify on failure)
 		iRetCode = 0
-		
+
 		! Check critical parameters
 		n = size(cfg % tMeteo % rvExtEpoch)
 		if(i < 1 .or. i > n) then
 			iRetCode = 1
 			return
 		end if
-		
+
 		! Initialize
-		m = cfg % nz
+		m = cfg % iNz
 		iErrCode = this % clean()
 		if(iErrCode /= 0) then
 			iRetCode = 2
@@ -515,19 +523,19 @@ contains
 			iRetCode = 3
 			return
 		end if
-		this % z = [(cfg % z0 + (j-1) * cfg % dz, j = 1, m)]
+		this % z = [(cfg % rZ0 + (j-1) * cfg % rDz, j = 1, m)]
 		Ta = cfg % tMeteo % rvExtTemp(i) + 273.15d0
-		
+
 		! Assign time stamp
 		this % rEpoch = cfg % tMeteo % rvExtEpoch(i)
-		
+
 		! Estimate ground pressure at site
-		Pres = P0 * exp(-0.0342d0 * cfg % zlev / Ta)
+		Pres = P0 * exp(-0.0342d0 * cfg % rHeight / Ta)
 
 		! Estimation of RhoCp and wT (harmless, and not passed as 'met' data to avoid clutter)
 		rc = 350.125d0 * Pres / Ta
 		wT = cfg % tMeteo % rvExtH0(i) / rc
-		
+
 		! Reciprocal of Obukhov length
 		hL = -K*G/Ta * wT / cfg % tMeteo % rvExtUstar(i)**3
 
@@ -536,15 +544,15 @@ contains
 
 		! Deardoff velocity
 		ws = wStar(real(Ta,kind=4), real(cfg % tMeteo % rvExtH0(i),kind=4), real(cfg % tMeteo % rvExtZi(i),kind=4))
-		
+
 		! Estimate wind and temperature profiles, based on SL similarity
 		iErrCode = WindProfile( &
-			cfg % hemisphere, &
+			cfg % iHemisphere, &
 			this % z, &
-			cfg % zr, &
+			cfg % rZr, &
 			cfg % tMeteo % rvExtVel(i), &
 			cfg % tMeteo % rvExtDir(i), &
-			cfg % z0, &
+			cfg % rZ0, &
 			cfg % tMeteo % rvExtZi(i), &
 			cfg % tMeteo % rvExtUstar(i), &
 			hL, &
@@ -557,10 +565,10 @@ contains
 		end if
 		iErrCode = TempProfile( &
 			this % z, &
-			cfg % z0, &
-			cfg % zt, &
+			cfg % rZ0, &
+			cfg % rZt, &
 			Ta, &
-			-cfg % gamma, &
+			-cfg % rGamma, &
 			cfg % tMeteo % rvExtZi(i), &
 			Ts, &
 			cfg % tMeteo % rvExtUstar(i), &
@@ -571,13 +579,13 @@ contains
 			iRetCode = 5
 			return
 		end if
-		
+
 		! Estimate vertical and horizontal sigmas
 		iErrCode = VerticalWindVarProfile( &
 			this % z, &
 			cfg % tMeteo % rvExtUstar(i), &
 			ws, &
-			cfg % z0, &
+			cfg % rZ0, &
 			cfg % tMeteo % rvExtZi(i), &
 			this % sw2, &
 			this % dsw2 &
@@ -604,7 +612,7 @@ contains
 			this % z, &
 			cfg % tMeteo % rvExtUstar(i), &
 			ws, &
-			cfg % z0, &
+			cfg % rZ0, &
 			cfg % tMeteo % rvExtZi(i), &
 			this % eps &
 		)
@@ -632,56 +640,56 @@ contains
 				ssw2_2 = 2.d0 * this % sw2(j)
 				if(this % z(j) <= cfg % tMeteo % rvExtZi(i)) then
 					! Inside the PBL
-					
+
 					! Langevin coefficients for W component
-					this % alfa(j)   = this % dsw2(j) / ssw2_2 
-					this % beta(j)   = -C0ww / ssw2_2 		
+					this % alfa(j)   = this % dsw2(j) / ssw2_2
+					this % beta(j)   = -C0ww / ssw2_2
 					this % gamma(j)  = 0.5d0 * this % dsw2(j)
 					this % delta(j)  = sqrt(C0ww)
-					
+
 					! Optimal time step
 					this % deltat(j) = 0.1d0 * ssw2_2 / C0ww
-					
+
 					! Langevin coefficients for U, V component
 					this % alfa_u(j) = -C0uu / (2.d0 * this % su2(j))
 					this % alfa_v(j) = -C0vv / (2.d0 * this % sv2(j))
 					this % deltau(j) = sqrt(C0uu)
 					this % deltav(j) = sqrt(C0vv)
-					
+
 				else
 					! Above the PBL
-				
+
 					! Langevin coefficients for W component
 					this % alfa(j)   = 0.d0
-					this % beta(j)   = -C0ww / ssw2_2 		
+					this % beta(j)   = -C0ww / ssw2_2
 					this % gamma(j)  = 0.d0
 					this % delta(j)  = sqrt(C0ww)
-					
+
 					! Optimal time step
 					this % deltat(j) = 100.d0	! Not used, in reality: just an indication
-					
+
 					! Langevin coefficients for U, V component
 					this % alfa_u(j) = -C0uu / (2.d0 * this % su2(j))
 					this % alfa_v(j) = -C0vv / (2.d0 * this % sv2(j))
 					this % deltau(j) = sqrt(C0uu)
 					this % deltav(j) = sqrt(C0vv)
-					
+
 				end if
-				
+
 			else
 				! Stable
 
 				! Langevin coefficients for W component
 				C0ww             = C0w * this % eps(j)
 				ssw2_2           = 2.d0 * this % sw2(j)
-				this % alfa(j)   = this % dsw2(j) / ssw2_2 
-				this % beta(j)   = -C0ww / ssw2_2 		
+				this % alfa(j)   = this % dsw2(j) / ssw2_2
+				this % beta(j)   = -C0ww / ssw2_2
 				this % gamma(j)  = 0.5d0 * this % dsw2(j)
 				this % delta(j)  = sqrt(C0ww)
-				
+
 				! Optimal time step
 				this % deltat(j) = 0.1d0 * ssw2_2/C0ww
-			
+
 				! Langevin coefficients for U, V component
 				C0uu             = C0u * this % eps(j)
 				C0vv             = C0v * this % eps(j)
@@ -689,20 +697,20 @@ contains
 				this % alfa_v(j) = -C0vv / (2.d0 * this % sv2(j))
 				this % deltau(j) = sqrt(C0uu)
 				this % deltav(j) = sqrt(C0vv)
-				
+
 			end if
-			
+
 		end do
-		
+
 		! Convenience values
-		dt        = real(cfg % Tmed, kind=8) / real(cfg % Nstep, kind=8)
+		dt        = real(cfg % iAvgTime, kind=8) / real(cfg % iNumStep, kind=8)
 		this % Au = exp(this % alfa_u * dt)
 		this % Av = exp(this % alfa_v * dt)
 		this % A  = exp(this % alfa * dt)
 		this % B  = exp(this % beta * dt)
-		
+
 		! Diagnostic printouts (provisional)
-		if(cfg % debug >= 3) then
+		if(cfg % iDebugLevel >= 3) then
 			iErrCode = tStamp % fromEpoch(cfg % tMeteo % rvExtEpoch(i))
 			sTimeStamp = tStamp % ToISO()
 			print *, "Meteo profiles range report for step at ", sTimeStamp
@@ -729,7 +737,7 @@ contains
 			print *, "B>      ", minval(this % B), maxval(this % B)
 			print *
 		end if
-		
+
 	end function metpCreate
 
 
@@ -739,23 +747,23 @@ contains
 		zp, &		! Reference height at which to evaluate
 		met &
 	) result(iRetCode)
-	
+
 		! Routine arguments
 		class(MetProfiles), intent(in)		:: this
 		type(Config), intent(in)			:: cfg
 		real(8), intent(in)					:: zp
 		type(MetProfValues), intent(out)	:: met
 		integer								:: iRetCode
-		
+
 		! Locals
 		integer	:: n
 		real(8)	:: zpp
 		integer	:: izFrom
 		integer	:: izTo
-		
+
 		! Assume success (will falsify on failure
 		iRetCode = 0
-		
+
 		! Identify the indices bounding the desired height
 		n = size(this % z)
 		if(zp <= this % z(1)) then
@@ -765,17 +773,17 @@ contains
 			izFrom = n
 			izTo   = n
 		else ! Entry condition: z(1) < zp < z(n)
-			izFrom = floor((zp - cfg % z0) / cfg % dz) + 1
-			izTo   = ceiling((zp - cfg % z0) / cfg % dz) + 1
+			izFrom = floor((zp - cfg % rZ0) / cfg % rDz) + 1
+			izTo   = ceiling((zp - cfg % rZ0) / cfg % rDz) + 1
 			if(izFrom < 1 .or. izFrom > n) then
 				print *, 'iZfrom = ', izFrom
-				print *, '         ', zp, cfg % z0, cfg % dz
+				print *, '         ', zp, cfg % rZ0, cfg % rDz
 			end if
 		end if
-		
+
 		! Evaluate linear interpolation coefficients
-		zpp = (zp - this % z(izFrom)) / cfg % dz
-		
+		zpp = (zp - this % z(izFrom)) / cfg % rDz
+
 		! Compute linear interpolation
 		met % u      = this % u(izFrom)      + zpp * (this % u(izTo)      - this % u(izFrom))
 		met % v      = this % v(izFrom)      + zpp * (this % v(izTo)      - this % v(izFrom))
@@ -800,48 +808,67 @@ contains
 
 	end function metpEvaluate
 
-	
-	function metpDump(this, iLUN, sProfilePath) result(iRetCode)
-	
+
+	function metpDump(this, tConfig, iLUN) result(iRetCode)
+
 		! Routine arguments
 		class(MetProfiles), intent(in)	:: this
-		integer, intent(in)				:: iLUN
-		character(len=*), intent(in)	:: sProfilePath
-		integer							:: iRetCode
-		
+		type(Config), intent(in)				:: tConfig
+		integer, intent(in)							:: iLUN
+		integer													:: iRetCode
+
 		! Locals
-		integer				:: iErrCode
-		character(len=256)	:: sFileName
-		character(len=23)	:: sDateTime
-		type(DateTime)		:: tTimeStamp
-		integer				:: i
-		
+		integer	:: iErrCode
+		integer	:: i
+
 		! Assume success (will falsify on failure)
 		iRetCode = 0
-		
-		! Check something should really be done
-		if(sProfilePath == " ") return
-			
-		! Generate file name
-		iErrCode = tTimeStamp % fromEpoch(this % rEpoch)
-		if(iErrCode /= 0) then
-			iRetCode = 1
-			return
-		end if
-		sDateTime = tTimeStamp % toISO()
-		do i = 1, len_trim(sDateTime)
-			if(sDateTime(i:i) == ' ') then
-				sDateTime(i:i) = '_'
-			end if
-		end do
-		write(sFileName, "(a,'/',a,'.csv')") trim(sProfilePath), sDateTime
-		
+
 		! Write profiles
-		open(iLUN, file=sFileName, status='unknown', action='write', access='stream', iostat=iErrCode)
+		! -1- Try accessing file and write header
+		! -2- Access
+		open(iLUN, file=tConfig % sMetOutFile, status='unknown', action='write', access='stream', iostat=iErrCode)
 		if(iErrCode /= 0) then
 			iRetCode = 2
 			return
 		end if
+		! -2- Header
+		! -3- General
+		write(iLUN) tConfig % iDebugLevel
+		write(iLUN) tConfig % sDiaFile
+		write(iLUN) tConfig % iFrameInterval
+		write(iLUN) tConfig % sFramePath
+		write(iLUN) tConfig % iExecMode
+		! -3- Timing
+		write(iLUN) tConfig % iAvgTime
+		write(iLUN) tConfig % iNumStep
+		write(iLUN) tConfig % iNumPart
+		write(iLUN) tConfig % iMaxAge
+		! -3- Emission
+		write(iLUN) tConfig % sStatic
+		write(iLUN) tConfig % sDynamic
+		! -3- Meteo
+		write(iLUN) tConfig % sMetInpFile
+		write(iLUN) tConfig % sMetOutFile
+		write(iLUN) tConfig % sMetDiaFile
+		write(iLUN) tConfig % rHeight
+		write(iLUN) tConfig % rZ0
+		write(iLUN) tConfig % rZr
+		write(iLUN) tConfig % rZt
+		write(iLUN) tConfig % rGamma
+		write(iLUN) tConfig % iHemisphere
+		! -3- Output
+		write(iLUN) tConfig % sConcFile
+		write(iLUN) tConfig % rX0
+		write(iLUN) tConfig % rY0
+		write(iLUN) tConfig % iNx
+		write(iLUN) tConfig % iNy
+		write(iLUN) tConfig % iNz
+		write(iLUN) tConfig % rDx
+		write(iLUN) tConfig % rDy
+		write(iLUN) tConfig % rDz
+		! -3- Computed
+		! -1- Write meteo data part
 		do i = 1, size(this % z)
 			write(iLUN) &
 				this % z(i), &
@@ -855,7 +882,7 @@ contains
 				this % Au(i), this % Av(i), this % A(i), this % B(i)
 		end do
 		close(iLUN)
-		
+
 	end function metpDump
-	
+
 end module Processing
