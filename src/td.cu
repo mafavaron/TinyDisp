@@ -38,11 +38,19 @@ int main(int argc, char** argv) {
 		return 3;
 	}
 
-	// Get meteo test_data
-
 	// Get emission data
 
-	// Generate particle pool
+	// Generate particle pool, and prepare for simulation
+
+	// Main loop
+
+		// Get meteo test_data
+
+		// Move particles
+
+		// Write particles to movie file, if requested
+
+		// Count ground concentrations, if required, and write them to concentration file
 
 	curandGenerator_t gen;
 	curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
