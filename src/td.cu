@@ -26,6 +26,24 @@ int main(int argc, char** argv) {
 	}
 	std::string sCfgFileName = argv[1];
 
+	// Read configuration
+	Cfg tConfig = Cfg(sCfgFileName);
+	if(tConfig.GetState() <= 0) {
+		std::cerr << "Configuration file read failure" << std::endl;
+		return 2;
+	}
+	int iRetCode = tConfig.Validate();
+	if(iRetCode <= 0) {
+		std::cerr << "Configuration file validation failure, with code " << iRetCode << std::endl;
+		return 3;
+	}
+
+	// Get meteo test_data
+
+	// Get emission data
+
+	// Generate particle pool
+
 	curandGenerator_t gen;
 	curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
 	curandSetPseudoRandomGeneratorSeed(gen, 42ULL);
