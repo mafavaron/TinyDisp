@@ -1,6 +1,6 @@
 #include "cfg.h"
-#include "INIReader.h"
-
+#include <iostream>
+#include <fstream>
 #include <string>
 
 Cfg::Cfg() {
@@ -40,79 +40,67 @@ Cfg::Cfg() {
 }
 
 
-Cfg::Cfg(const std::string& sCfgFileName) {
+Cfg::Cfg(const std::string& sMetFileName) {
+
+  // Assume an invalid configuration
+  this->iState = 1;
 
   // Read configuration
-  INIReader cfg = INIReader(sCfgFileName);
-  // -1- General
-  std::string sSection = "General";
-  std::string sName    = "debug_level";
-  this->iDebugLevel = cfg.GetInteger(sSection, sName, 4);
-  sName = "diafile";
-  std::string sDefault = "";
-  this->sDiaFile = cfg.GetString(sSection, sName, sDefault);
-  sName = "frame_interval";
-  this->iFrameInterval = cfg.GetInteger(sSection, sName, 0);
-  sName = "frame_path";
-  this->sFramePath = cfg.GetString(sSection, sName, sDefault);
-  sName = "exec_mode";
-  this->iExecMode = cfg.GetInteger(sSection, sName, 0);
-  // -1- Timing
-  sSection = "Timing";
-  sName = "avgtime";
-  this->iAvgTime = cfg.GetInteger(sSection, sName, 0);
-  sName = "nstep";
-  this->iNumStep = cfg.GetInteger(sSection, sName, 0);
-  sName = "npart";
-  this->iNumPart = cfg.GetInteger(sSection, sName, 0);
-  sName = "maxage";
-  this->iMaxAge = cfg.GetInteger(sSection, sName, 0);
-  // -1- Emission
-  sSection = "Emission";
-  sName = "static";
-  this->sStatic = cfg.GetString(sSection, sName, sDefault);
-  sName = "dynamic";
-  this->sDynamic = cfg.GetString(sSection, sName, sDefault);
-  // -1- Meteo
-  sSection = "Meteo";
-  sName = "inpfile";
-  this->sMetInpFile = cfg.GetString(sSection, sName, sDefault);
-  sName = "outfile";
-  this->sMetOutFile = cfg.GetString(sSection, sName, sDefault);
-  sName = "diafile";
-  this->sMetDiaFile = cfg.GetString(sSection, sName, sDefault);
-  sName = "height";
-  this->rHeight = cfg.GetReal(sSection, sName, 0.0);
-  sName = "z0";
-  this->rZ0 = cfg.GetReal(sSection, sName, 0.0);
-  sName = "zr";
-  this->rZr = cfg.GetReal(sSection, sName, 0.0);
-  sName = "zt";
-  this->rZt = cfg.GetReal(sSection, sName, 0.0);
-  sName = "gamma";
-  this->rGamma = cfg.GetReal(sSection, sName, 0.0);
-  sName = "hemisphere";
-  this->iHemisphere = cfg.GetInteger(sSection, sName, 0);
-  // -1- Output
-  sSection = "Output";
-  sName = "conc";
-  this->sConcFile = cfg.GetString(sSection, sName, sDefault);
-  sName = "x0";
-  this->rX0 = cfg.GetReal(sSection, sName, 0.0);
-  sName = "y0";
-  this->rY0 = cfg.GetReal(sSection, sName, 0.0);
-  sName = "nx";
-  this->iNx = cfg.GetInteger(sSection, sName, 0);
-  sName = "ny";
-  this->iNy = cfg.GetInteger(sSection, sName, 0);
-  sName = "dx";
-  this->rDx = cfg.GetReal(sSection, sName, 0.0);
-  sName = "dy";
-  this->rDy = cfg.GetReal(sSection, sName, 0.0);
-  sName = "nz";
-  this->iNz = cfg.GetInteger(sSection, sName, 0);
-  sName = "dz";
-  this->rDz = cfg.GetReal(sSection, sName, 0.0);
+  std::ifstream cfg;
+  cfg.open(sMetFileName, std::ios::in | std::ios::binary);
+  if(cfg.is_open()) {
+
+    char* buffer;
+    buffer = new char[257];
+    buffer[256] = '\0';
+
+    // General
+    cfg.read((char*)&this->iDebugLevel, sizeof(&(this->iDebugLevel)));
+    cfg.read(buffer, 256);
+    this->sDiaFile = buffer;
+    cfg.read((char*)&this->iFrameInterval, sizeof(&(this->iFrameInterval)));
+    cfg.read(buffer, 256);
+    this->sFramePath = buffer;
+    cfg.read((char*)&this->iExecMode, sizeof(&(this->iExecMode)));
+
+    // Timing
+    cfg.read((char*)&this->iAvgTime, sizeof(&(this->iAvgTime)));
+    cfg.read((char*)&this->iNumStep, sizeof(&(this->iNumStep)));
+    cfg.read((char*)&this->iNumPart, sizeof(&(this->iNumPart)));
+    cfg.read((char*)&this->iMaxAge, sizeof(&(this->iMaxAge)));
+
+    // Emission
+    cfg.read(buffer, 256);
+    this->sStatic = buffer;
+    cfg.read(buffer, 256);
+    this->sDynamic = buffer;
+
+    // Meteo
+    cfg.read(buffer, 256);
+    this->sMetInpFile = buffer;
+    cfg.read(buffer, 256);
+    this->sMetOutFile = buffer;
+    cfg.read(buffer, 256);
+    this->sMetDiaFile = buffer;
+    cfg.read((char*)&this->rZ0, sizeof(&(this->rZ0)));
+    cfg.read((char*)&this->rZr, sizeof(&(this->rZr)));
+    cfg.read((char*)&this->rZt, sizeof(&(this->rZt)));
+    cfg.read((char*)&this->rGamma, sizeof(&(this->rGamma)));
+    cfg.read((char*)&this->iHemisphere, sizeof(&(this->iHemisphere)));
+
+    // Output
+    cfg.read(buffer, 256);
+    this->sConcFile = buffer;
+    cfg.read((char*)&this->rX0, sizeof(&(this->rX0)));
+    cfg.read((char*)&this->rY0, sizeof(&(this->rY0)));
+    cfg.read((char*)&this->iNx, sizeof(&(this->iNx)));
+    cfg.read((char*)&this->iNy, sizeof(&(this->iNy)));
+    cfg.read((char*)&this->iNz, sizeof(&(this->iNz)));
+    cfg.read((char*)&this->rDx, sizeof(&(this->rDx)));
+    cfg.read((char*)&this->rDy, sizeof(&(this->rDy)));
+    cfg.read((char*)&this->rDz, sizeof(&(this->rDz)));
+
+  }
 
   // Assign internal state
   this->iState = 0;
