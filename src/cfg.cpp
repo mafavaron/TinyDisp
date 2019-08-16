@@ -1,7 +1,4 @@
 #include "cfg.h"
-#include <iostream>
-#include <fstream>
-#include <string>
 
 Cfg::Cfg() {
 
@@ -40,14 +37,12 @@ Cfg::Cfg() {
 }
 
 
-Cfg::Cfg(const std::string& sMetFileName) {
+Cfg::Cfg(std::ifstream& cfg) {
 
   // Assume an invalid configuration
   this->iState = 1;
 
   // Read configuration
-  std::ifstream cfg;
-  cfg.open(sMetFileName, std::ios::in | std::ios::binary);
   if(cfg.is_open()) {
 
     char* buffer;
@@ -55,10 +50,10 @@ Cfg::Cfg(const std::string& sMetFileName) {
     buffer[256] = '\0';
 
     // General
-    cfg.read((char*)&this->iDebugLevel, sizeof(&(this->iDebugLevel)));
+    cfg.read((char*)&this->iDebugLevel, sizeof(int));
     cfg.read(buffer, 256);
     this->sDiaFile = buffer;
-    cfg.read((char*)&this->iFrameInterval, sizeof(&(this->iFrameInterval)));
+    cfg.read((char*)&this->iFrameInterval, sizeof(int));
     cfg.read(buffer, 256);
     this->sFramePath = buffer;
     cfg.read((char*)&this->iExecMode, sizeof(&(this->iExecMode)));
