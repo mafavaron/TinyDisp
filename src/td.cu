@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 		return 2;
 	}
 	int iRetCode = tConfig.Validate();
-	if(iRetCode <= 0) {
+	if(iRetCode != 0) {
 		std::cerr << "Configuration file validation failure, with code " << iRetCode << std::endl;
 		return 3;
 	}
