@@ -53,9 +53,11 @@ Cfg::Cfg(std::ifstream& cfg) {
     cfg.read((char*)&this->iDebugLevel, sizeof(int));
     cfg.read(buffer, 256);
     this->sDiaFile = buffer;
+    this->sDiaFile = this->sDiaFile.erase(this->sDiaFile.find_last_not_of(" \n\r\t")+1);
     cfg.read((char*)&this->iFrameInterval, sizeof(int));
     cfg.read(buffer, 256);
     this->sFramePath = buffer;
+    this->sFramePath = this->sFramePath.erase(this->sFramePath.find_last_not_of(" \n\r\t")+1);
     cfg.read((char*)&this->iExecMode, sizeof(int));
 
     // Timing
@@ -67,16 +69,21 @@ Cfg::Cfg(std::ifstream& cfg) {
     // Emission
     cfg.read(buffer, 256);
     this->sStatic = buffer;
+    this->sStatic = this->sStatic.erase(this->sStatic.find_last_not_of(" \n\r\t")+1);
     cfg.read(buffer, 256);
     this->sDynamic = buffer;
+    this->sDynamic = this->sDynamic.erase(this->sDynamic.find_last_not_of(" \n\r\t")+1);
 
     // Meteo
     cfg.read(buffer, 256);
     this->sMetInpFile = buffer;
+    this->sMetInpFile = this->sMetInpFile.erase(this->sMetInpFile.find_last_not_of(" \n\r\t")+1);
     cfg.read(buffer, 256);
     this->sMetOutFile = buffer;
+    this->sMetOutFile = this->sMetOutFile.erase(this->sMetOutFile.find_last_not_of(" \n\r\t")+1);
     cfg.read(buffer, 256);
     this->sMetDiaFile = buffer;
+    this->sMetDiaFile = this->sMetDiaFile.erase(this->sMetDiaFile.find_last_not_of(" \n\r\t")+1);
     cfg.read((char*)&this->rHeight, sizeof(double));
     cfg.read((char*)&this->rZ0, sizeof(double));
     cfg.read((char*)&this->rZr, sizeof(double));
@@ -87,6 +94,7 @@ Cfg::Cfg(std::ifstream& cfg) {
     // Output
     cfg.read(buffer, 256);
     this->sConcFile = buffer;
+    this->sConcFile = this->sConcFile.erase(this->sConcFile.find_last_not_of(" \n\r\t")+1);
     cfg.read((char*)&this->rX0, sizeof(double));
     cfg.read((char*)&this->rY0, sizeof(double));
     cfg.read((char*)&this->iNx, sizeof(int));
