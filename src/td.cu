@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <string>
+#include <iostream>
+#include <fstream>
 
 #include "cfg.h"
 
@@ -19,15 +21,17 @@ int main(int argc, char** argv) {
 	if(argc != 2) {
 		std::cerr << "td - The TinyDisp Particle Dispersion Model" << std::endl << std::endl;
 		std::cerr << "Usage:" << std::endl << std::endl;
-		std::cerr << "  [./]td <InpFileName>" << std::endl << std::endl;
+		std::cerr << "  [./]td <MeteoFileName>" << std::endl << std::endl;
 		std::cerr << "Copyright 2019 by Mauri Favaron" << std::endl;
 		std::cerr << "                  This is open-source software, covered by the MIT license" << std::endl << std::endl;
 		return 1;
 	}
-	std::string sCfgFileName = argv[1];
+	std::string sMetFileName = argv[1];
 
 	// Read configuration
-	Cfg tConfig = Cfg(sCfgFileName);
+	std::ifstream fMeteoInputFile;
+  fMeteoInputFile.open(sMetFileName, std::ios::in | std::ios::binary);
+	Cfg tConfig = Cfg(fMeteoInputFile);
 	if(tConfig.GetState() <= 0) {
 		std::cerr << "Configuration file read failure" << std::endl;
 		return 2;
