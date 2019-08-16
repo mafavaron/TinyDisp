@@ -42,6 +42,7 @@ module Processing
 		real(8)							:: rDx
 		real(8)							:: rDy
 		real(8)							:: rDz
+		real(8)							:: rFactor
 		! Site parameters of meteorological file
 		! Computed parameters
 		real(8)							:: x1
@@ -162,84 +163,174 @@ contains
 			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'diag_file' in [General]"
 			return
 		end if
+		iErrCode = cfg % getInteger("General", "frame_interval", this % iFrameInterval, 0)
+		if(iErrCode /= 0) then
+			iRetCode = 4
+			return
+		end if
+		iErrCode = cfg % getString("General", "frame_path", this % sFramePath, "")
+		if(iErrCode /= 0) then
+			iRetCode = 5
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'frame_path' in [General]"
+			return
+		end if
+		iErrCode = cfg % getInteger("General", "exec_mode", this % iExecMode, 0)
+		if(iErrCode /= 0) then
+			iRetCode = 6
+			return
+		end if
 		! -1- Timing
 		iErrCode = cfg % getInteger("Timing", "avgtime", this % iAvgTime, 3600)
 		if(iErrCode /= 0) then
-			iRetCode = 4
+			iRetCode = 7
 			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'avgtime' in [Timing]"
 			return
 		end if
 		iErrCode = cfg % getInteger("Timing", "nstep", this % iNumStep, 360)
 		if(iErrCode /= 0) then
-			iRetCode = 5
+			iRetCode = 8
 			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'nstep' in [Timing]"
+			return
+		end if
+		iErrCode = cfg % getInteger("Timing", "npart", this % iNumPart, 1)
+		if(iErrCode /= 0) then
+			iRetCode = 9
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'npart' in [Timing]"
+			return
+		end if
+		iErrCode = cfg % getInteger("Timing", "maxage", this % iMaxAge, 0)
+		if(iErrCode /= 0) then
+			iRetCode = 10
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'maxage' in [Timing]"
+			return
+		end if
+		! -1- Emission
+		iErrCode = cfg % getString("Emission", "static", this % sStatic, "")
+		if(iErrCode /= 0) then
+			iRetCode = 11
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'static' in [Emission]"
+			return
+		end if
+		iErrCode = cfg % getString("Emission", "dynamic", this % sDynamic, "")
+		if(iErrCode /= 0) then
+			iRetCode = 12
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'dynamic' in [Emission]"
 			return
 		end if
 		! -1- Meteo
 		iErrCode = cfg % getString("Meteo", "inpfile", this % sMetInpFile, "")
 		if(iErrCode /= 0) then
-			iRetCode = 6
+			iRetCode = 13
 			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'inpfile' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getString("Meteo", "outfile", this % sMetOutFile, "")
 		if(iErrCode /= 0) then
-			iRetCode = 7
+			iRetCode = 14
 			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'inpfile' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getString("Meteo", "diafile", this % sMetDiaFile, "")
 		if(iErrCode /= 0) then
-			iRetCode = 8
+			iRetCode = 15
 			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'inpfile' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getReal8("Meteo", "height", this % rHeight, -9999.9d0)
 		if(iErrCode /= 0) then
-			iRetCode = 9
+			iRetCode = 16
 			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'height' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getReal8("Meteo", "z0", this % rZ0, 0.02d0)
 		if(iErrCode /= 0) then
-			iRetCode = 10
+			iRetCode = 17
 			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'z0' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getReal8("Meteo", "zr", this % rZr, 10.d0)
 		if(iErrCode /= 0) then
-			iRetCode = 11
+			iRetCode = 18
 			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'zr' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getReal8("Meteo", "zt", this % rZt, 2.d0)
 		if(iErrCode /= 0) then
-			iRetCode = 12
+			iRetCode = 19
 			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'zt' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getReal8("Meteo", "gamma", this % rGamma, -0.0098d0)
 		if(iErrCode /= 0) then
-			iRetCode = 13
+			iRetCode = 20
 			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'gamma' in [Meteo]"
 			return
 		end if
 		iErrCode = cfg % getInteger("Meteo", "hemisphere", this % iHemisphere, 1)
 		if(iErrCode /= 0) then
-			iRetCode = 14
+			iRetCode = 21
 			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'iHemisphere' in [Meteo]"
+			return
+		end if
+		! -1- Output
+		iErrCode = cfg % getString("Output", "conc", this % sConcFile, "")
+		if(iErrCode /= 0) then
+			iRetCode = 22
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'conc' in [Output]"
+			return
+		end if
+		iErrCode = cfg % getReal8("Output", "x0", this % rX0, -9999.9d0)
+		if(iErrCode /= 0) then
+			iRetCode = 23
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'x0' in [Output]"
+			return
+		end if
+		iErrCode = cfg % getReal8("Output", "y0", this % rY0, -9999.9d0)
+		if(iErrCode /= 0) then
+			iRetCode = 24
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'y0' in [Output]"
+			return
+		end if
+		iErrCode = cfg % getInteger("Output", "nx", this % iNx, -9999)
+		if(iErrCode /= 0) then
+			iRetCode = 25
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'nx' in [Output]"
+			return
+		end if
+		iErrCode = cfg % getInteger("Output", "ny", this % iNy, -9999)
+		if(iErrCode /= 0) then
+			iRetCode = 26
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'ny' in [Output]"
+			return
+		end if
+		iErrCode = cfg % getReal8("Output", "dx", this % rDx, -9999.9d0)
+		if(iErrCode /= 0) then
+			iRetCode = 27
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'dx' in [Output]"
+			return
+		end if
+		iErrCode = cfg % getReal8("Output", "dy", this % rDy, -9999.9d0)
+		if(iErrCode /= 0) then
+			iRetCode = 28
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'dy' in [Output]"
 			return
 		end if
 		iErrCode = cfg % getInteger("Output", "nz", this % iNz, -9999)
 		if(iErrCode /= 0) then
-			iRetCode = 15
+			iRetCode = 29
 			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'nz' in [Output]"
 			return
 		end if
 		iErrCode = cfg % getReal8("Output", "dz", this % rDz, -9999.9d0)
 		if(iErrCode /= 0) then
-			iRetCode = 16
+			iRetCode = 30
 			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'dz' in [Output]"
+			return
+		end if
+		iErrCode = cfg % getReal8("Output", "factor", this % rFactor, -9999.9d0)
+		if(iErrCode /= 0) then
+			iRetCode = 30
+			if(this % iDebugLevel > 0) print *, "metpre:: error: Invalid 'factor' in [Output]"
 			return
 		end if
 
@@ -867,6 +958,7 @@ contains
 				write(iLUN) tConfig % rDx
 				write(iLUN) tConfig % rDy
 				write(iLUN) tConfig % rDz
+				write(iLUN) tConfig % rFactor
 				! -3- Computed
 
 	end function metpInitialize
