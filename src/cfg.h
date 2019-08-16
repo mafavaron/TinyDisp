@@ -1,5 +1,7 @@
 #ifndef __CFG__
 
+#include <iostream>
+#include <fstream>
 #include <string>
 
 class Cfg {
@@ -43,7 +45,7 @@ private:
 public:
   // Constructors, destructor
   Cfg();
-  Cfg(const std::string& sCfgFileName);
+  Cfg(std::ifstream& cfg);
   ~Cfg();
   // Parameter check
   int Validate(void);
