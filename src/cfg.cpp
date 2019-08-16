@@ -58,17 +58,11 @@ Cfg::Cfg(std::ifstream& cfg) {
     this->sFramePath = buffer;
     cfg.read((char*)&this->iExecMode, sizeof(int));
 
-    std::cout << this->iDebugLevel << " " << this->iFrameInterval << " " << this->iExecMode << std::endl;
-    std::cout << "Dia: " << this->sDiaFile << std::endl;
-    std::cout << "Frm: " << this->sFramePath << std::endl;
-
     // Timing
     cfg.read((char*)&this->iAvgTime, sizeof(int));
     cfg.read((char*)&this->iNumStep, sizeof(int));
     cfg.read((char*)&this->iNumPart, sizeof(int));
     cfg.read((char*)&this->iMaxAge, sizeof(int));
-
-    std::cout << this->iAvgTime << " " << this->iNumStep << " " << this->iNumPart << " " << this->iMaxAge << std::endl;
 
     // Emission
     cfg.read(buffer, 256);
@@ -102,9 +96,6 @@ Cfg::Cfg(std::ifstream& cfg) {
     cfg.read((char*)&this->rDy, sizeof(double));
     cfg.read((char*)&this->rDz, sizeof(double));
     cfg.read((char*)&this->rFactor, sizeof(double));
-
-    std::cout << this->rDx << " " << this->rDy << " " << this->rDz << std::endl;
-    std::cout << this->rFactor << std::endl;
 
   }
   else {
