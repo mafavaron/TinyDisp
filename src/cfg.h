@@ -42,6 +42,7 @@ private:
   double      rDy;
   int         iNz;
   double      rDz;
+  double      rFactor;
 public:
   // Constructors, destructor
   Cfg();
