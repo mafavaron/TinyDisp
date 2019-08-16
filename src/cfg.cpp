@@ -59,6 +59,8 @@ Cfg::Cfg(std::ifstream& cfg) {
     cfg.read((char*)&this->iExecMode, sizeof(int));
 
     std::cout << this->iDebugLevel << " " << this->iFrameInterval << " " << this->iExecMode << std::endl;
+    std::cout << "Dia: " << this->sDiaFile << std::endl;
+    std::cout << "Frm: " << this->sFramePath << std::endl;
 
     // Timing
     cfg.read((char*)&this->iAvgTime, sizeof(int));
