@@ -56,13 +56,17 @@ Cfg::Cfg(std::ifstream& cfg) {
     cfg.read((char*)&this->iFrameInterval, sizeof(int));
     cfg.read(buffer, 256);
     this->sFramePath = buffer;
-    cfg.read((char*)&this->iExecMode, sizeof(&(this->iExecMode)));
+    cfg.read((char*)&this->iExecMode, sizeof(int));
+
+    std::cout << this->iDebugLevel << " " << this->iFrameInterval << " " << this->iExecMode << std::endl;
 
     // Timing
-    cfg.read((char*)&this->iAvgTime, sizeof(&(this->iAvgTime)));
-    cfg.read((char*)&this->iNumStep, sizeof(&(this->iNumStep)));
-    cfg.read((char*)&this->iNumPart, sizeof(&(this->iNumPart)));
-    cfg.read((char*)&this->iMaxAge, sizeof(&(this->iMaxAge)));
+    cfg.read((char*)&this->iAvgTime, sizeof(int));
+    cfg.read((char*)&this->iNumStep, sizeof(int));
+    cfg.read((char*)&this->iNumPart, sizeof(int));
+    cfg.read((char*)&this->iMaxAge, sizeof(int));
+
+    std::cout << this->iAvgTime << " " << this->iNumStep << " " << this->iNumPart << " " << this->iMaxAge << std::endl;
 
     // Emission
     cfg.read(buffer, 256);
@@ -77,23 +81,25 @@ Cfg::Cfg(std::ifstream& cfg) {
     this->sMetOutFile = buffer;
     cfg.read(buffer, 256);
     this->sMetDiaFile = buffer;
-    cfg.read((char*)&this->rZ0, sizeof(&(this->rZ0)));
-    cfg.read((char*)&this->rZr, sizeof(&(this->rZr)));
-    cfg.read((char*)&this->rZt, sizeof(&(this->rZt)));
-    cfg.read((char*)&this->rGamma, sizeof(&(this->rGamma)));
-    cfg.read((char*)&this->iHemisphere, sizeof(&(this->iHemisphere)));
+    cfg.read((char*)&this->rZ0, sizeof(double));
+    cfg.read((char*)&this->rZr, sizeof(double));
+    cfg.read((char*)&this->rZt, sizeof(double));
+    cfg.read((char*)&this->rGamma, sizeof(double));
+    cfg.read((char*)&this->iHemisphere, sizeof(int));
 
     // Output
     cfg.read(buffer, 256);
     this->sConcFile = buffer;
-    cfg.read((char*)&this->rX0, sizeof(&(this->rX0)));
-    cfg.read((char*)&this->rY0, sizeof(&(this->rY0)));
-    cfg.read((char*)&this->iNx, sizeof(&(this->iNx)));
-    cfg.read((char*)&this->iNy, sizeof(&(this->iNy)));
-    cfg.read((char*)&this->iNz, sizeof(&(this->iNz)));
-    cfg.read((char*)&this->rDx, sizeof(&(this->rDx)));
-    cfg.read((char*)&this->rDy, sizeof(&(this->rDy)));
-    cfg.read((char*)&this->rDz, sizeof(&(this->rDz)));
+    cfg.read((char*)&this->rX0, sizeof(double));
+    cfg.read((char*)&this->rY0, sizeof(double));
+    cfg.read((char*)&this->iNx, sizeof(int));
+    cfg.read((char*)&this->iNy, sizeof(int));
+    cfg.read((char*)&this->iNz, sizeof(int));
+    cfg.read((char*)&this->rDx, sizeof(double));
+    cfg.read((char*)&this->rDy, sizeof(double));
+    cfg.read((char*)&this->rDz, sizeof(double));
+
+    std::cout << this->rDx << " " << this->rDy << " " << this->rDz << std::endl;
 
   }
 
