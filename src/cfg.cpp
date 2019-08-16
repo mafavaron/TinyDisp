@@ -100,8 +100,10 @@ Cfg::Cfg(std::ifstream& cfg) {
     cfg.read((char*)&this->rDx, sizeof(double));
     cfg.read((char*)&this->rDy, sizeof(double));
     cfg.read((char*)&this->rDz, sizeof(double));
+    cfg.read((char*)&this->rFactor, sizeof(double));
 
     std::cout << this->rDx << " " << this->rDy << " " << this->rDz << std::endl;
+    std::cout << this->rFactor << std::endl;
 
   }
 
