@@ -83,6 +83,7 @@ Cfg::Cfg(std::ifstream& cfg) {
     this->sMetOutFile = buffer;
     cfg.read(buffer, 256);
     this->sMetDiaFile = buffer;
+    cfg.read((char*)&this->rHeight, sizeof(double));
     cfg.read((char*)&this->rZ0, sizeof(double));
     cfg.read((char*)&this->rZr, sizeof(double));
     cfg.read((char*)&this->rZt, sizeof(double));
@@ -106,9 +107,9 @@ Cfg::Cfg(std::ifstream& cfg) {
     std::cout << this->rFactor << std::endl;
 
   }
-
-  // Assign internal state
-  this->iState = 0;
+  else {
+    this->iState = 0;
+  }
 
 }
 
