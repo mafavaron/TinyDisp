@@ -34,12 +34,9 @@ private:
   vector<double> A		 // exp(alfa*dt)
   vector<double> B		 // exp(beta*dt)
 public:
-  procedure	:: clean      => metpClean
-  procedure	:: alloc      => metpAlloc
-  procedure	:: initialize => metpInitialize
-  procedure	:: create     => metpCreate
-  procedure	:: evaluate   => metpEvaluate
-  procedure	:: dump       => metpDump
+  Meteo(int n);
+  ~Meteo();
+  Get(std::ifstream& cfg);
 };
 
 #endif
