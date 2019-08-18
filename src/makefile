@@ -2,11 +2,14 @@ NVCC=nvcc
 NVCC_FLAGS = -g -G -Xcompiler --std=c++11 --expt-extended-lambda
 LIBS = -lcurand
 
-td.exe : td.cu cfg.obj
+td.exe : td.cu cfg.obj meteodata.obj
 	$(NVCC) $(NVCC_FLAGS) $^ -o $@ $(LIBS)
 
 cfg.obj : cfg.cpp
 	$(NVCC) -g -G -c cfg.cpp -o cfg.obj
+
+meteodata.obj : meteodata.cpp
+	$(NVCC) -g -G -c meteodata.cpp -o meteodata.obj
 
 metpre.exe : metpre.obj meteo.obj processing.obj pbl_met.lib
 	pgfortran -o metpre.exe metpre.obj meteo.obj processing.obj pbl_met.lib
