@@ -1,7 +1,7 @@
 #include "meteodata.h"
 
 MeteoData::MeteoData(int n) {
-  std::vector::reserve(this->z);
+  this->z.reserve(n);
 };
 
 
