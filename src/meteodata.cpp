@@ -1,6 +1,6 @@
 #include "meteodata.h"
 
-MeteoData::MeteoData(int n) {
+MeteoData::MeteoData(const int n) {
   this->z.reserve(n);
   this->u.reserve(n);
   this->v.reserve(n);
@@ -30,10 +30,17 @@ MeteoData::MeteoData(int n) {
 MeteoData::~MeteoData() {};
 
 
-int MeteoData::Get(std::ifstream& cfg) {
+int MeteoData::Get(std::ifstream& cfg, const int n) {
 
   // Assume success (will falsify on failure)
   int iRetCode = 0;
+
+  // Get oen record< if present
+  if(cfg.is_open()) {
+    for(int i=0; i<n; i++) {
+      cfg.read((char*)&this->iDebugLevel, sizeof(int));
+    }
+  }
 
   return iRetCode;
 
