@@ -13,6 +13,7 @@ private:
   std::vector<double> z;		  // Levels' height above ground (m)
   std::vector<double> u;		  // U components (m/s)
   std::vector<double> v;		  // V components (m/s)
+  std::vector<double> w;		  // W components (m/s)
   std::vector<double> T;		  // Temperatures (K)
   std::vector<double> su2;		// var(U) values (m2/s2)
   std::vector<double> sv2;		// var(V) values (m2/s2)
