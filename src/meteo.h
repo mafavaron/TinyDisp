@@ -36,7 +36,7 @@ private:
 public:
   Meteo(int n);
   ~Meteo();
-  Get(std::ifstream& cfg);
+  int Get(std::ifstream& cfg);
 };
 
 #endif
