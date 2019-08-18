@@ -1,11 +1,18 @@
-#include "meteo.h"
+#include "meteodata.h"
 
-Meteo::Meteo(int n) {
-  
+MeteoData::MeteoData(int n) {
+  std::vector::reserve(this->z);
 };
 
 
-Meteo::~Meteo();
+MeteoData::~MeteoData() {};
 
 
-int Meteo::Get(std::ifstream& cfg);
+int MeteoData::Get(std::ifstream& cfg) {
+
+  // Assume success (will falsify on failure)
+  int iRetCode = 0;
+
+  return iRetCode;
+
+};
