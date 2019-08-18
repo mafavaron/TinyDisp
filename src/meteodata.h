@@ -5,37 +5,37 @@
 #include <string>
 #include <vector>
 
-class Meteo {
+class MeteoData {
 private:
   // Time stamp
-  double				 rEpoch	// Time stamp of current profile set
+  double				      rEpoch;	// Time stamp of current profile set
   // Primitive profiles
-  vector<double> z		  // Levels' height above ground (m)
-  vector<double> u		  // U components (m/s)
-  vector<double> v		  // V components (m/s)
-  vector<double> T		  // Temperatures (K)
-  vector<double> su2		// var(U) values (m2/s2)
-  vector<double> sv2		// var(V) values (m2/s2)
-  vector<double> sw2		// var(W) values (m2/s2)
-  vector<double> dsw2		// d var(W) / dz (m/s2)
-  vector<double> eps		// TKE dissipation rate
-  vector<double> alfa		// Langevin equation coefficient
-  vector<double> beta		// Langevin equation coefficient
-  vector<double> gamma	// Langevin equation coefficient
-  vector<double> delta	// Langevin equation coefficient
-  vector<double> alfa_u	// Langevin equation coefficient
-  vector<double> alfa_v	// Langevin equation coefficient
-  vector<double> deltau	// Langevin equation coefficient
-  vector<double> deltav	// Langevin equation coefficient
-  vector<double> deltat	// Langevin equation coefficient
+  std::vector<double> z;		  // Levels' height above ground (m)
+  std::vector<double> u;		  // U components (m/s)
+  std::vector<double> v;		  // V components (m/s)
+  std::vector<double> T;		  // Temperatures (K)
+  std::vector<double> su2;		// var(U) values (m2/s2)
+  std::vector<double> sv2;		// var(V) values (m2/s2)
+  std::vector<double> sw2;		// var(W) values (m2/s2)
+  std::vector<double> dsw2;		// d var(W) / dz (m/s2)
+  std::vector<double> eps;		// TKE dissipation rate
+  std::vector<double> alfa;		// Langevin equation coefficient
+  std::vector<double> beta;		// Langevin equation coefficient
+  std::vector<double> gamma;	// Langevin equation coefficient
+  std::vector<double> delta;	// Langevin equation coefficient
+  std::vector<double> alfa_u;	// Langevin equation coefficient
+  std::vector<double> alfa_v;	// Langevin equation coefficient
+  std::vector<double> deltau;	// Langevin equation coefficient
+  std::vector<double> deltav;	// Langevin equation coefficient
+  std::vector<double> deltat;	// Langevin equation coefficient
   // Convenience derived values
-  vector<double> Au		 // exp(alfa_u*dt)
-  vector<double> Av		 // exp(alfa_v*dt)
-  vector<double> A		 // exp(alfa*dt)
-  vector<double> B		 // exp(beta*dt)
+  std::vector<double> Au;		 // exp(alfa_u*dt)
+  std::vector<double> Av;		 // exp(alfa_v*dt)
+  std::vector<double> A;		 // exp(alfa*dt)
+  std::vector<double> B;		 // exp(beta*dt)
 public:
-  Meteo(int n);
-  ~Meteo();
+  MeteoData(int n);
+  ~MeteoData();
   int Get(std::ifstream& cfg);
 };
 
