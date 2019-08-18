@@ -36,7 +36,7 @@ int MeteoData::Get(std::ifstream& cfg, const int n) {
   int iRetCode = 0;
 
   // Get oen record< if present
-  if(cfg.is_open()) {
+  if(cfg.peek() != EOF) {
     this->z.clear();
     this->u.clear();
     this->v.clear();
@@ -86,6 +86,9 @@ int MeteoData::Get(std::ifstream& cfg, const int n) {
       cfg.read((char*)&this->A[i], sizeof(double));
       cfg.read((char*)&this->B[i], sizeof(double));
     }
+  }
+  else {
+    iRetCode = -1; // End-of-file, a special case of successful return
   }
 
   return iRetCode;
