@@ -979,6 +979,7 @@ contains
 		iRetCode = 0
 
 		! -1- Write meteo data part
+		write(iLUN) this % rEpoch
 		do i = 1, size(this % z)
 			write(iLUN) &
 				this % z(i), &
