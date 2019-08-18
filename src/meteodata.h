@@ -35,9 +35,9 @@ private:
   std::vector<double> A;		 // exp(alfa*dt)
   std::vector<double> B;		 // exp(beta*dt)
 public:
-  MeteoData(int n);
+  MeteoData(const int n);
   ~MeteoData();
-  int Get(std::ifstream& cfg);
+  int Get(std::ifstream& cfg, const int n);
 };
 
 #endif
