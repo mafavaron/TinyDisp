@@ -1,4 +1,4 @@
-#ifndef __METEO__
+#ifndef __METEODATA__
 
 #include <iostream>
 #include <fstream>
