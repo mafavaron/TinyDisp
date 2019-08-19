@@ -53,6 +53,9 @@ public:
   // Access to components
   int GetState(void);
   int GetNumZ(void);
+  double GetDomainCenterX(void);
+  double GetDomainCenterY(void);
+  int GetPartPoolSize(void);
 };
 
 #endif
