@@ -10,6 +10,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <time.h>
 
 #include "cfg.h"
 #include "meteodata.h"
@@ -54,7 +55,11 @@ int main(int argc, char** argv) {
 		// Get meteo data
 		iRetCode = met.Read(fMeteoInputFile, tConfig.GetNumZ());
 		if(iRetCode != 0) break;
-		std::cout << met.GetTimeStamp() << std::endl;
+		time_t iEpoch = (time_t)met.GetTimeStamp();
+		struct tm * tStamp = gmtime(&iEpoch);
+		char buffer[64];
+		strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", tStamp);
+		std::cout << buffer << std::endl;
 
 		// Move particles
 
