@@ -12,6 +12,7 @@
 #include <fstream>
 
 #include "cfg.h"
+#include "meteodata.h"
 
 #define N (1<<20)
 
@@ -47,14 +48,21 @@ int main(int argc, char** argv) {
 	// Generate particle pool, and prepare for simulation
 
 	// Main loop
+	MeteoData met(tConfig.GetNumZ());
+	while(true) {
 
-		// Get meteo test_data
+		// Get meteo data
+		iRetCode = met.Read(fMeteoInputFile, tConfig.GetNumZ());
+		if(iRetCode != 0) break;
+		std::cout << met.GetTimeStamp() << std::endl;
 
 		// Move particles
 
 		// Write particles to movie file, if requested
 
 		// Count ground concentrations, if required, and write them to concentration file
+
+	}
 
 	curandGenerator_t gen;
 	curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
