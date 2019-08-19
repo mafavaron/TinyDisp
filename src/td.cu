@@ -15,8 +15,6 @@
 #include "cfg.h"
 #include "meteodata.h"
 
-#define N (1<<20)
-
 int main(int argc, char** argv) {
 
 	// Get input parameters
@@ -47,12 +45,16 @@ int main(int argc, char** argv) {
 	// Get emission data
 	// For the moment, assume a unit emission from a pointwise source places at domain center
 	// and 5m height above ground.
-	double rXs = tConfig.rX0 + (tConfig.rDx * tConfig.iNx) / 2.0;
-	double rYs = tConfig.rY0 + (tConfig.rDy * tConfig.iNy) / 2.0;
+	double rXs = tConfig.GetDomainCenterX();
+	double rYs = tConfig.GetDomainCenterY();
 	double rZs = 5.0;
 	double rEs = 1.0;
 
 	// Generate particle pool, and prepare for simulation
+	int N = tConfig.GetPartPoolSize();
+	thrust::device_vector<float> rvdPartX(N);
+	thrust::device_vector<float> rvdPartY(N);
+	thrust::device_vector<float> rvdPartZ(N);
 
 	// Main loop
 	MeteoData met(tConfig.GetNumZ());
