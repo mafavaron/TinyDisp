@@ -30,7 +30,7 @@ MeteoData::MeteoData(const int n) {
 MeteoData::~MeteoData() {};
 
 
-int MeteoData::Get(std::ifstream& cfg, const int n) {
+int MeteoData::Read(std::ifstream& cfg, const int n) {
 
   // Assume success (will falsify on failure)
   int iRetCode = 0;
@@ -94,3 +94,8 @@ int MeteoData::Get(std::ifstream& cfg, const int n) {
   return iRetCode;
 
 };
+
+
+double MeteoData::GetTimeStamp() {
+  return this->rEpoch;
+}
