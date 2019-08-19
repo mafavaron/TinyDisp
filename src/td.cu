@@ -45,6 +45,12 @@ int main(int argc, char** argv) {
 	}
 
 	// Get emission data
+	// For the moment, assume a unit emission from a pointwise source places at domain center
+	// and 5m height above ground.
+	double rXs = tConfig.rX0 + (tConfig.rDx * tConfig.iNx) / 2.0;
+	double rYs = tConfig.rY0 + (tConfig.rDy * tConfig.iNy) / 2.0;
+	double rZs = 5.0;
+	double rEs = 1.0;
 
 	// Generate particle pool, and prepare for simulation
 
