@@ -37,7 +37,8 @@ private:
 public:
   MeteoData(const int n);
   ~MeteoData();
-  int Get(std::ifstream& cfg, const int n);
+  int Read(std::ifstream& cfg, const int n);
+  double GetTimeStamp();
 };
 
 #endif
