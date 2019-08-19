@@ -254,3 +254,8 @@ int Cfg::Validate(void) {
 int Cfg::GetState(void) {
   return this->iState;
 }
+
+
+int Cfg::GetNumZ(void) {
+  return this->iNz;
+}
