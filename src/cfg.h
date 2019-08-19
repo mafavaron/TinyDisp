@@ -52,6 +52,7 @@ public:
   int Validate(void);
   // Access to components
   int GetState(void);
+  int GetNumZ(void);
 };
 
 #endif
