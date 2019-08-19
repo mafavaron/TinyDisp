@@ -259,3 +259,18 @@ int Cfg::GetState(void) {
 int Cfg::GetNumZ(void) {
   return this->iNz;
 }
+
+
+double Cfg::GetDomainCenterX(void) {
+  return this->rX0 + (this->rDx * this->iNx) / 2.0;
+}
+
+
+double Cfg::GetDomainCenterY(void) {
+  return this->rY0 + (this->rDy * this->iNy) / 2.0;
+}
+
+
+int Cfg::GetPartPoolSize(void) {
+  return this->iMaxAge * this->iNumPart / this->iNumStep;
+}
