@@ -2,7 +2,11 @@
 A lightweight particle atmospheric dispersion model.
 
 ## Core motivations
-Extant Lagrangian particle models are complex pieces of software, and their use often demands large scale computing power. TinyDisp has been designed with a small footprint in mind, and this makes the model ideal for teaching, testing and research.
+Extant Lagrangian particle models are complex pieces of software, and their use demands large scale computing power. On the other side, particle models tend to be constituted by two independent logical sections:
+* A "meteorological" part, whose purpose is getting and making available meteorological fields.
+* A "dispersion" part, whose reason-to-be is the generation, movement and count of particles.
+
+TinyDisp has been designed with a small footprint in mind, and this makes the model ideal for teaching, testing and research.
 
 Small footprint does not necessarily mean _lightweight_ however: as any particle model, TinyDisp accuracy gets larger with increasing particle number.
 
