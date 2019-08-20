@@ -99,3 +99,58 @@ int MeteoData::Read(std::ifstream& cfg, const int n) {
 double MeteoData::GetTimeStamp() {
   return this->rEpoch;
 }
+
+
+int MeteoData::Evaluate(const float rReferenceZ, const double rZ0, const double rDz, MeteoItem* tMet) {
+
+  // Assume success (will falsify on failure
+  int iRetCode = 0;
+
+  // Identify the indices bounding the desired height
+  int n = this->z.size();
+  int izFrom;
+  int izTo;
+  if(rReferenceZ <= this->z[0]) {
+    izFrom = 0;
+    izTo   = 0;
+  }
+  else if(rReferenceZ >= this->z[n-1]) {
+    izFrom = n - 1;
+    izTo   = n - 1;
+  }
+  else {  // Entry condition: z(1) < zp < z(n)
+    izFrom = floor((rReferenceZ - rZ0) / rDz);
+    izTo   = ceil((rReferenceZ - rZ0) / rDz);
+    if(izFrom < 0) izFrom = 0;
+    if(izFrom > n-1) izFrom = n-1;
+  }
+
+  // Evaluate linear interpolation coefficients
+  double zpp = (rReferenceZ - this->z[izFrom]) / rDz;
+
+  // Compute linear interpolation
+  tMet->u      = this->u[izFrom]      + zpp * (this->u[izTo]      - this->u[izFrom]);
+  tMet->v      = this->v[izFrom]      + zpp * (this->v[izTo]      - this->v[izFrom]);
+  tMet->su2    = this->su2[izFrom]    + zpp * (this->su2[izTo]    - this->su2[izFrom]);
+  tMet->sv2    = this->sv2[izFrom]    + zpp * (this->sv2[izTo]    - this->sv2[izFrom]);
+  tMet->sw2    = this->sw2[izFrom]    + zpp * (this->sw2[izTo]    - this->sw2[izFrom]);
+  tMet->dsw2   = this->dsw2[izFrom]   + zpp * (this->dsw2[izTo]   - this->dsw2[izFrom]);
+  tMet->eps    = this->eps[izFrom]    + zpp * (this->eps[izTo]    - this->eps[izFrom]);
+  tMet->alfa   = this->alfa[izFrom]   + zpp * (this->alfa[izTo]   - this->alfa[izFrom]);
+  tMet->beta   = this->beta[izFrom]   + zpp * (this->beta[izTo]   - this->beta[izFrom]);
+  tMet->gamma  = this->gamma[izFrom]  + zpp * (this->gamma[izTo]  - this->gamma[izFrom]);
+  tMet->delta  = this->delta[izFrom]  + zpp * (this->delta[izTo]  - this->delta[izFrom]);
+  tMet->alfa_u = this->alfa_u[izFrom] + zpp * (this->alfa_u[izTo] - this->alfa_u[izFrom]);
+  tMet->alfa_v = this->alfa_v[izFrom] + zpp * (this->alfa_v[izTo] - this->alfa_v[izFrom]);
+  tMet->deltau = this->deltau[izFrom] + zpp * (this->deltau[izTo] - this->deltau[izFrom]);
+  tMet->deltav = this->deltav[izFrom] + zpp * (this->deltav[izTo] - this->deltav[izFrom]);
+  tMet->deltat = this->deltat[izFrom] + zpp * (this->deltat[izTo] - this->deltat[izFrom]);
+  tMet->Au     = this->Au[izFrom]     + zpp * (this->Au[izTo]     - this->Au[izFrom]);
+  tMet->Av     = this->Av[izFrom]     + zpp * (this->Av[izTo]     - this->Av[izFrom]);
+  tMet->A      = this->A[izFrom]      + zpp * (this->A[izTo]      - this->A[izFrom]);
+  tMet->B      = this->B[izFrom]      + zpp * (this->B[izTo]      - this->B[izFrom]);
+
+  // Leave
+  return iRetCode;
+
+}
