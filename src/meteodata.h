@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include "meteoitem.h"
 
 class MeteoData {
 private:
@@ -39,6 +40,7 @@ public:
   ~MeteoData();
   int Read(std::ifstream& cfg, const int n);
   double GetTimeStamp();
+  int Evaluate(const float rReferenceZ, const double rZ0, const double rDz, MeteoItem* tMet);
 };
 
 #endif
