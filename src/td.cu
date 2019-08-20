@@ -45,10 +45,14 @@ int main(int argc, char** argv) {
 	// Get emission data
 	// For the moment, assume a unit emission from a pointwise source places at domain center
 	// and 5m height above ground.
-	double rXs = tConfig.GetDomainCenterX();
-	double rYs = tConfig.GetDomainCenterY();
-	double rZs = 5.0;
-	double rEs = 1.0;
+	std::vector<double> rXs;
+	rXs.push_back(tConfig.GetDomainCenterX());
+	std::vector<double> rYs;
+	rYs.push_back(tConfig.GetDomainCenterY());
+	std::vector<double> rZs;
+	rZs.push_back(5.0);
+	std::vector<double> rEs;
+	rEs.push_back(1.0);
 
 	// Generate particle pool, and prepare for simulation
 	int iPartIdx = -1;
@@ -82,7 +86,7 @@ int main(int argc, char** argv) {
 	thrust::fill(rvdPartT.begin(), rvdPartT.end(), 0.f);
 	thrust::fill(rvdPartSh.begin(), rvdPartSh.end(), 0.f);
 	thrust::fill(rvdPartSz.begin(), rvdPartSz.end(), 0.f);
-	thrust::fill(rvdPartEmissionTime.begin(), rvdPartEmissionTime.end(), 0.f);
+	thrust::fill(rvdPartEmissionTime.begin(), rvdPartEmissionTime.end(), -1.f);
 
 	// Main loop
 	MeteoData met(tConfig.GetNumZ());
@@ -91,6 +95,8 @@ int main(int argc, char** argv) {
 		// Get meteo data
 		iRetCode = met.Read(fMeteoInputFile, tConfig.GetNumZ());
 		if(iRetCode != 0) break;
+
+		// Print the current time stamp
 		time_t iEpoch = (time_t)met.GetTimeStamp();
 		struct tm * tStamp = gmtime(&iEpoch);
 		char buffer[64];
