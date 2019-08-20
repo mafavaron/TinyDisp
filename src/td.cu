@@ -51,10 +51,38 @@ int main(int argc, char** argv) {
 	double rEs = 1.0;
 
 	// Generate particle pool, and prepare for simulation
+	int iPartIdx = -1;
+	int iPartNum = 0;
 	int N = tConfig.GetPartPoolSize();
 	thrust::device_vector<float> rvdPartX(N);
 	thrust::device_vector<float> rvdPartY(N);
 	thrust::device_vector<float> rvdPartZ(N);
+	thrust::device_vector<float> rvdPartU(N);
+	thrust::device_vector<float> rvdPartV(N);
+	thrust::device_vector<float> rvdPartW(N);
+	thrust::device_vector<float> rvdPartQ(N);
+	thrust::device_vector<float> rvdPartT(N);
+	thrust::device_vector<float> rvdPartSh(N);
+	thrust::device_vector<float> rvdPartSz(N);
+	thrust::device_vector<float> rvdPartEmissionTime(N);	// -1.0 for not yet filled particles
+
+	// Create random number generator, for use within loop
+	curandGenerator_t gen;
+	curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+	curandSetPseudoRandomGeneratorSeed(gen, 42ULL);
+
+	// Assign data vectors their initial values
+	thrust::fill(rvdPartX.begin(), rvdPartX.end(), 0.f);
+	thrust::fill(rvdPartY.begin(), rvdPartY.end(), 0.f);
+	thrust::fill(rvdPartZ.begin(), rvdPartZ.end(), 0.f);
+	thrust::fill(rvdPartU.begin(), rvdPartU.end(), 0.f);
+	thrust::fill(rvdPartV.begin(), rvdPartV.end(), 0.f);
+	thrust::fill(rvdPartW.begin(), rvdPartW.end(), 0.f);
+	thrust::fill(rvdPartQ.begin(), rvdPartQ.end(), 0.f);
+	thrust::fill(rvdPartT.begin(), rvdPartT.end(), 0.f);
+	thrust::fill(rvdPartSh.begin(), rvdPartSh.end(), 0.f);
+	thrust::fill(rvdPartSz.begin(), rvdPartSz.end(), 0.f);
+	thrust::fill(rvdPartEmissionTime.begin(), rvdPartEmissionTime.end(), 0.f);
 
 	// Main loop
 	MeteoData met(tConfig.GetNumZ());
@@ -69,6 +97,8 @@ int main(int argc, char** argv) {
 		strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", tStamp);
 		std::cout << buffer << std::endl;
 
+		// Generate new particles
+
 		// Move particles
 
 		// Write particles to movie file, if requested
@@ -76,10 +106,6 @@ int main(int argc, char** argv) {
 		// Count ground concentrations, if required, and write them to concentration file
 
 	}
-
-	curandGenerator_t gen;
-	curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
-	curandSetPseudoRandomGeneratorSeed(gen, 42ULL);
 
 	thrust::device_vector<float> dvec_x(N);
 	thrust::device_vector<float> dvec_y(N);
