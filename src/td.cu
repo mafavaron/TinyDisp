@@ -104,6 +104,12 @@ int main(int argc, char** argv) {
 		std::cout << buffer << std::endl;
 
 		// Generate new particles
+		for(int iSource = 0; iSource < rEs.size(); iSource++) {
+
+			// Get source altitude, and evaluate the meteo profile at it
+			float rZ = rZs[iSource];
+			
+		}
 
 		// Move particles
 
