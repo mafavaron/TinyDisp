@@ -1,4 +1,5 @@
 #ifndef __METEODATA__
+#define __METEODATA__
 
 #include <iostream>
 #include <fstream>
