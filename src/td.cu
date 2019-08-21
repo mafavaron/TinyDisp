@@ -14,6 +14,7 @@
 
 #include "cfg.h"
 #include "meteodata.h"
+#include "meteoitem.h"
 
 int main(int argc, char** argv) {
 
@@ -108,7 +109,9 @@ int main(int argc, char** argv) {
 
 			// Get source altitude, and evaluate the meteo profile at it
 			float rZ = rZs[iSource];
-			
+			MeteoItem tMet;
+			iRetCode = met.Evaluate(rZ, tConfig.GetZ0(), tConfig.GetDz(), &tMet);
+
 		}
 
 		// Move particles
