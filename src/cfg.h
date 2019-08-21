@@ -1,4 +1,5 @@
 #ifndef __CFG__
+#define __CFG__
 
 #include <iostream>
 #include <fstream>
@@ -56,6 +57,8 @@ public:
   double GetDomainCenterX(void);
   double GetDomainCenterY(void);
   int GetPartPoolSize(void);
+  double GetZ0(void);
+  double GetDz(void);
 };
 
 #endif
