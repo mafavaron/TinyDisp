@@ -289,3 +289,8 @@ double Cfg::GetDz(void) {
 int Cfg::GetPartToEmitPerSource(void) {
   return this->iNumPart;
 }
+
+
+int Cfg::GetTimeSubstepDuration(void) {
+  return this->iAvgTime / this->iNumStep;
+}
