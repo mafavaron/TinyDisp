@@ -59,6 +59,7 @@ public:
   int GetPartPoolSize(void);
   double GetZ0(void);
   double GetDz(void);
+  int GetPartToEmitPerSource(void);
 };
 
 #endif
