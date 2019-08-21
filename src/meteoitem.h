@@ -1,4 +1,5 @@
 #ifndef __METEOITEM__
+#define __METEOITEM__
 
 class MeteoItem {
 public:
@@ -26,6 +27,8 @@ public:
   double Av;		  // exp(alfa_v*dt)
   double A;		    // exp(alfa*dt)
   double B;		    // exp(beta*dt)
+  MeteoItem() {};
+  ~MeteoItem() {};
 };
 
 #endif
