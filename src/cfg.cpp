@@ -274,3 +274,13 @@ double Cfg::GetDomainCenterY(void) {
 int Cfg::GetPartPoolSize(void) {
   return this->iMaxAge * this->iNumPart / this->iNumStep;
 }
+
+
+double Cfg::GetZ0(void) {
+  return this->rZ0;
+}
+
+
+double Cfg::GetDz(void) {
+  return this->rDz;
+}
