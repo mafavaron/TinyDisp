@@ -112,6 +112,29 @@ int main(int argc, char** argv) {
 			MeteoItem tMet;
 			iRetCode = met.Evaluate(rZ, tConfig.GetZ0(), tConfig.GetDz(), &tMet);
 
+			// Generate particles, directly in device memory
+			for(int iPart = 0; iPart < tConfig.GetPartToEmitPerSource(); iPart++) {
+
+				// Set counter and next particle index, forcing them to their reasonable constraints
+				iPartIdx++;
+				iPartIdx = (iPartIdx >= N) ? 0 : iPartIdx;
+				iPartNum++;
+				iPartNum = (iPartNum > N) ? N : iPartNum;
+
+				// Actual particle generation
+				rvdPartX[iPartIdx] = rXs[iSource];
+				rvdPartY[iPartIdx] = rYs[iSource];
+				rvdPartZ[iPartIdx] = rZs[iSource];
+				rvdPartU[iPartIdx] = 0.0f;
+				rvdPartV[iPartIdx] = 0.0f;
+				rvdPartW[iPartIdx] = 0.0f;
+				rvdPartQ[iPartIdx] = (rEs[iSource] / tConfig.GetPartToEmitPerSource()) * tConfig.GetTimeSubstepDuration();
+				rvdPartT[iPartIdx] = 0.0f;
+				rvdPartSh[iPartIdx] = 0.0f;
+				rvdPartSz[iPartIdx] = 0.0f;
+				rvdPartEmissionTime[iPartIdx] = met.GetTimeStamp();
+			}
+
 		}
 
 		// Move particles
