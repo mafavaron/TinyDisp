@@ -60,6 +60,7 @@ public:
   double GetZ0(void);
   double GetDz(void);
   int GetPartToEmitPerSource(void);
+  int GetTimeSubstepDuration(void);
 };
 
 #endif
