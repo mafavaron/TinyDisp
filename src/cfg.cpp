@@ -284,3 +284,8 @@ double Cfg::GetZ0(void) {
 double Cfg::GetDz(void) {
   return this->rDz;
 }
+
+
+int Cfg::GetPartToEmitPerSource(void) {
+  return this->iNumPart;
+}
