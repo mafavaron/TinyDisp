@@ -8,6 +8,10 @@ A third component is represented by the model configuration file (common to the 
 
 # Running the TinyDisp parts
 
+To run the meteorological data preparer the following command should be used from a terminal window:
+
+
+
 # The main TinyDisp configuration file
 
 The main TinyDisp configuration file is an INI text file containing all the basic data specifying a TinyDisp run. As any INI file, the main configuration input articulates in _sections_, described in this chapter' sections.
