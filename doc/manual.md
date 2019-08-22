@@ -10,7 +10,15 @@ A third component is represented by the model configuration file (common to the 
 
 To run the meteorological data preparer the following command should be used from a terminal window:
 
+./metpre <TinyDisp_Ini_File>
 
+To run the dispersion model, the following command should be used (also in a terminal window):
+
+./td <Meteo_File>
+
+<TinyDisp_Ini_File> represents the name of the main input file to TinyDisp, and <Meteo_File> is the meteorological file produced by _metpre_, and referenced in <TinyDisp_Ini_File>.
+
+The two startup commands refer to the UNIX (OS/X and Linux) case. In Windows, he "./" prefix may be omitted.
 
 # The main TinyDisp configuration file
 
