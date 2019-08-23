@@ -59,6 +59,7 @@ public:
   int GetPartPoolSize(void);
   double GetZ0(void);
   double GetDz(void);
+  int GetNz(void);
   int GetPartToEmitPerSource(void);
   int GetTimeSubstepDuration(void);
 };
