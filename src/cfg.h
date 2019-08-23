@@ -60,6 +60,9 @@ public:
   double GetX0(void);
   double GetDx(void);
   int GetNx(void);
+  double GetY0(void);
+  double GetDy(void);
+  int GetNy(void);
   double GetZ0(void);
   double GetDz(void);
   int GetNz(void);
