@@ -57,6 +57,9 @@ public:
   double GetDomainCenterX(void);
   double GetDomainCenterY(void);
   int GetPartPoolSize(void);
+  double GetX0(void);
+  double GetDx(void);
+  int GetNx(void);
   double GetZ0(void);
   double GetDz(void);
   int GetNz(void);
