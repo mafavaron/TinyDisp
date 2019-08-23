@@ -157,6 +157,10 @@ int main(int argc, char** argv) {
 		}
 
 		// Move particles
+		float rDeltaT = tConfig.GetTimeSubstepDuration();
+		for(int iPart = 0; iPart < iPartNum; iPart++) {
+			
+		}
 
 		// Write particles to movie file, if requested
 
