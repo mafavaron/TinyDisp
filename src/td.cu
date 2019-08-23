@@ -89,6 +89,24 @@ int main(int argc, char** argv) {
 	thrust::fill(rvdPartSz.begin(), rvdPartSz.end(), 0.f);
 	thrust::fill(rvdPartEmissionTime.begin(), rvdPartEmissionTime.end(), -1.f);
 
+	// Define larger-than-domain particle playground volume
+	float rXmin = tConfig.GetX0();
+	float rXmax = rXmin + tConfig.GetNx() * tConfig.GetDx();
+	float rYmin = tConfig.GetY0();
+	float rYmax = rYmin + tConfig.GetNy() * tConfig.GetDy();
+	float rZmin = 0.0f;
+	float rZmax = rZmin + tConfig.GetNz() * tConfig.GetDz();
+	float ampliX = rXmax - rXmin;
+	float ampliY = rYmax - rYmin;
+	float ampliZ = rZmax - rZmin;
+	float x0   = rXmin - ampliX / 2.0;
+	float x1   = rXmax + ampliX / 2.0;
+	float y0   = rYmin - ampliY / 2.0;
+	float y1   = rYmax + ampliY / 2.0;
+	float zbot = rZmin - ampliZ / 2.0;
+	float ztop = rZmax + ampliZ / 2.0;
+	zbot = (zbot < 0.0f)?0.0f:zbot;
+
 	// Main loop
 	MeteoData met(tConfig.GetNumZ());
 	while(true) {
@@ -133,6 +151,7 @@ int main(int argc, char** argv) {
 				rvdPartSh[iPartIdx] = 0.0f;
 				rvdPartSz[iPartIdx] = 0.0f;
 				rvdPartEmissionTime[iPartIdx] = met.GetTimeStamp();
+
 			}
 
 		}
