@@ -291,6 +291,21 @@ int Cfg::GetNx(void) {
 }
 
 
+double Cfg::GetY0(void) {
+  return this->rY0;
+}
+
+
+double Cfg::GetDy(void) {
+  return this->rDy;
+}
+
+
+int Cfg::GetNy(void) {
+  return this->iNy;
+}
+
+
 double Cfg::GetZ0(void) {
   return this->rZ0;
 }
