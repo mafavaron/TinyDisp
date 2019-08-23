@@ -276,6 +276,21 @@ int Cfg::GetPartPoolSize(void) {
 }
 
 
+double Cfg::GetX0(void) {
+  return this->rX0;
+}
+
+
+double Cfg::GetDx(void) {
+  return this->rDx;
+}
+
+
+int Cfg::GetNx(void) {
+  return this->iNx;
+}
+
+
 double Cfg::GetZ0(void) {
   return this->rZ0;
 }
