@@ -14,7 +14,6 @@
 
 #include "cfg.h"
 #include "meteodata.h"
-#include "meteoitem.h"
 
 int main(int argc, char** argv) {
 
@@ -74,7 +73,6 @@ int main(int argc, char** argv) {
 	// Reserve space for meteo information
   thrust::device_vector<float> rvdU;		  // Widn U components (m/s)
   thrust::device_vector<float> rvdV;		  // Wind V components (m/s)
-  thrust::device_vector<float> rvdW;		  // Wind W components (m/s)
   thrust::device_vector<float> rvdT;		  // Temperatures (K)
   thrust::device_vector<float> rvdSu2;		// var(U) values (m2/s2)
   thrust::device_vector<float> rvdSv2;		// var(V) values (m2/s2)
@@ -99,7 +97,6 @@ int main(int argc, char** argv) {
 	// to allow easy access during met profile propagation
 	float *ptr_rvdU = thrust::raw_pointer_cast(&rvdU[0]);
 	float *ptr_rvdV = thrust::raw_pointer_cast(&rvdV[0]);
-	float *ptr_rvdW = thrust::raw_pointer_cast(&rvdW[0]);
 	float *ptr_rvdT = thrust::raw_pointer_cast(&rvdT[0]);
 	float *ptr_rvdSu2 = thrust::raw_pointer_cast(&rvdSu2[0]);
 	float *ptr_rvdSv2 = thrust::raw_pointer_cast(&rvdSv2[0]);
@@ -175,11 +172,6 @@ int main(int argc, char** argv) {
 		// Generate new particles
 		for(int iSource = 0; iSource < rEs.size(); iSource++) {
 
-			// Get source altitude, and evaluate the meteo profile at it
-			float rZ = rZs[iSource];
-			MeteoItem tMet;
-			iRetCode = met.Evaluate(rZ, tConfig.GetZ0(), tConfig.GetDz(), &tMet);
-
 			// Generate particles, directly in device memory
 			for(int iPart = 0; iPart < tConfig.GetPartToEmitPerSource(); iPart++) {
 
@@ -204,6 +196,20 @@ int main(int argc, char** argv) {
 
 			}
 
+		}
+
+		// Associate particles their meteo data
+		for(int iPart = 0; iPart < iPartNum; iPart++) {
+			iRetCode = met.Evaluate(
+				rZ, tConfig.GetZ0(), tConfig.GetDz(), iPart,
+				ptr_rvdU, ptr_rvdU, ptr_rvdT,
+				ptr_rvdSu2, ptr_rvdSv2, ptr_rvdSw2, ptr_rvdDsw2,
+				ptr_rvdEps, ptr_rvdAlfa, ptr_rvdBeta, ptr_rvdGamma, ptr_rvdDelta,
+				ptr_rvdAlfa_u, ptr_rvdAlfa_v,
+				ptr_rvdDeltau, ptr_rvdDeltav, ptr_rvdDeltat,
+				ptr_rvdAu, ptr_rvdAv,
+				ptr_rvdA, ptr_rvdB
+			);
 		}
 
 		// Move particles
