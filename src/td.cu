@@ -71,6 +71,33 @@ int main(int argc, char** argv) {
 	thrust::device_vector<float> rvdPartSz(N);
 	thrust::device_vector<float> rvdPartEmissionTime(N);	// -1.0 for not yet filled particles
 
+	// Reserve space for meteo information
+  thrust::device_vector<float> rvdU;		  // Widn U components (m/s)
+  thrust::device_vector<float> rvdV;		  // Wind V components (m/s)
+  thrust::device_vector<float> rvdW;		  // Wind W components (m/s)
+  thrust::device_vector<float> rvdT;		  // Temperatures (K)
+  thrust::device_vector<float> rvdSu2;		// var(U) values (m2/s2)
+  thrust::device_vector<float> rvdSv2;		// var(V) values (m2/s2)
+  thrust::device_vector<float> rvdSw2;		// var(W) values (m2/s2)
+  thrust::device_vector<float> rvdDsw2;		// d var(W) / dz (m/s2)
+  thrust::device_vector<float> rvdEps;		// TKE dissipation rate
+  thrust::device_vector<float> rvdAlfa;		// Langevin equation coefficient
+  thrust::device_vector<float> rvdBeta;		// Langevin equation coefficient
+  thrust::device_vector<float> rvdGamma;	// Langevin equation coefficient
+  thrust::device_vector<float> rvdDelta;	// Langevin equation coefficient
+  thrust::device_vector<float> rvdAlfa_u;	// Langevin equation coefficient
+  thrust::device_vector<float> rvdAlfa_v;	// Langevin equation coefficient
+  thrust::device_vector<float> rvdDeltau;	// Langevin equation coefficient
+  thrust::device_vector<float> rvdDeltav;	// Langevin equation coefficient
+  thrust::device_vector<float> rvdDeltat;	// Langevin equation coefficient
+  thrust::device_vector<float> rvdAu;			// exp(alfa_u*dt)
+  thrust::device_vector<float> rvdAv;			// exp(alfa_v*dt)
+  thrust::device_vector<float> rvdA;			// exp(alfa*dt)
+  thrust::device_vector<float> rvdB;			// exp(beta*dt)
+
+	// Associate host pointers to meteo (device) vectors
+	float *ptr_rvdU = thrust::raw_pointer_cast(&rvdU[0]);
+
 	// Create random number generator, for use within loop
 	curandGenerator_t gen;
 	curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
@@ -157,9 +184,11 @@ int main(int argc, char** argv) {
 		}
 
 		// Move particles
+
+		// Set meteorological environment
 		float rDeltaT = tConfig.GetTimeSubstepDuration();
 		for(int iPart = 0; iPart < iPartNum; iPart++) {
-			
+			iRetCode =
 		}
 
 		// Write particles to movie file, if requested
