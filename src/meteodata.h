@@ -43,7 +43,7 @@ public:
   double GetTimeStamp();
   int Evaluate(
     const float rReferenceZ, const double rZ0, const double rDz, const int iPart,
-    float* U, float* V, float* W, float* T,
+    float* U, float* V, float* T,
     float* sU2, float* sV2, float* sW2, float* dsW2,
     float* alfa, float* beta, float* gamma, float* delta,
     float* alfa_u, float* alfa_v,
