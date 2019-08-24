@@ -95,8 +95,30 @@ int main(int argc, char** argv) {
   thrust::device_vector<float> rvdA;			// exp(alfa*dt)
   thrust::device_vector<float> rvdB;			// exp(beta*dt)
 
-	// Associate host pointers to meteo (device) vectors
+	// Associate host pointers to meteo (device) vectors,
+	// to allow easy access during met profile propagation
 	float *ptr_rvdU = thrust::raw_pointer_cast(&rvdU[0]);
+	float *ptr_rvdV = thrust::raw_pointer_cast(&rvdV[0]);
+	float *ptr_rvdW = thrust::raw_pointer_cast(&rvdW[0]);
+	float *ptr_rvdT = thrust::raw_pointer_cast(&rvdT[0]);
+	float *ptr_rvdSu2 = thrust::raw_pointer_cast(&rvdSu2[0]);
+	float *ptr_rvdSv2 = thrust::raw_pointer_cast(&rvdSv2[0]);
+	float *ptr_rvdSw2 = thrust::raw_pointer_cast(&rvdSw2[0]);
+	float *ptr_rvdDsw2 = thrust::raw_pointer_cast(&rvdDsw2[0]);
+	float *ptr_rvdEps = thrust::raw_pointer_cast(&rvdEps[0]);
+	float *ptr_rvdAlfa = thrust::raw_pointer_cast(&rvdAlfa[0]);
+	float *ptr_rvdBeta = thrust::raw_pointer_cast(&rvdBeta[0]);
+	float *ptr_rvdGamma = thrust::raw_pointer_cast(&rvdGamma[0]);
+	float *ptr_rvdDelta = thrust::raw_pointer_cast(&rvdDelta[0]);
+	float *ptr_rvdAlfa_u = thrust::raw_pointer_cast(&rvdAlfa_u[0]);
+	float *ptr_rvdAlfa_v = thrust::raw_pointer_cast(&rvdAlfa_v[0]);
+	float *ptr_rvdDeltau = thrust::raw_pointer_cast(&rvdDeltau[0]);
+	float *ptr_rvdDeltav = thrust::raw_pointer_cast(&rvdDeltav[0]);
+	float *ptr_rvdDeltat = thrust::raw_pointer_cast(&rvdDeltat[0]);
+	float *ptr_rvdAu = thrust::raw_pointer_cast(&rvdAu[0]);
+	float *ptr_rvdAv = thrust::raw_pointer_cast(&rvdAv[0]);
+	float *ptr_rvdA = thrust::raw_pointer_cast(&rvdA[0]);
+	float *ptr_rvdB = thrust::raw_pointer_cast(&rvdB[0]);
 
 	// Create random number generator, for use within loop
 	curandGenerator_t gen;
@@ -125,6 +147,7 @@ int main(int argc, char** argv) {
 	float rZmax = rZmin + tConfig.GetNz() * tConfig.GetDz();
 	float ampliX = rXmax - rXmin;
 	float ampliY = rYmax - rYmin;
+
 	float ampliZ = rZmax - rZmin;
 	float x0   = rXmin - ampliX / 2.0;
 	float x1   = rXmax + ampliX / 2.0;
