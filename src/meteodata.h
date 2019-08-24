@@ -5,7 +5,6 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include "meteoitem.h"
 
 class MeteoData {
 private:
