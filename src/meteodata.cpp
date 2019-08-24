@@ -101,7 +101,15 @@ double MeteoData::GetTimeStamp() {
 }
 
 
-int MeteoData::Evaluate(const float rReferenceZ, const double rZ0, const double rDz, MeteoItem* tMet) {
+int MeteoData::Evaluate(
+  const float rReferenceZ, const double rZ0, const double rDz, const int iPart,
+  float* U, float* V, float* T,
+  float* sU2, float* sV2, float* sW2, float* dsW2,
+  float* alfa, float* beta, float* gamma, float* delta,
+  float* alfa_u, float* alfa_v,
+  float* deltau, float* deltav, float* deltat,
+  float* Au, float* Av, float* A, float* U
+) {
 
   // Assume success (will falsify on failure
   int iRetCode = 0;
@@ -129,26 +137,26 @@ int MeteoData::Evaluate(const float rReferenceZ, const double rZ0, const double 
   double zpp = (rReferenceZ - this->z[izFrom]) / rDz;
 
   // Compute linear interpolation
-  tMet->u      = this->u[izFrom]      + zpp * (this->u[izTo]      - this->u[izFrom]);
-  tMet->v      = this->v[izFrom]      + zpp * (this->v[izTo]      - this->v[izFrom]);
-  tMet->su2    = this->su2[izFrom]    + zpp * (this->su2[izTo]    - this->su2[izFrom]);
-  tMet->sv2    = this->sv2[izFrom]    + zpp * (this->sv2[izTo]    - this->sv2[izFrom]);
-  tMet->sw2    = this->sw2[izFrom]    + zpp * (this->sw2[izTo]    - this->sw2[izFrom]);
-  tMet->dsw2   = this->dsw2[izFrom]   + zpp * (this->dsw2[izTo]   - this->dsw2[izFrom]);
-  tMet->eps    = this->eps[izFrom]    + zpp * (this->eps[izTo]    - this->eps[izFrom]);
-  tMet->alfa   = this->alfa[izFrom]   + zpp * (this->alfa[izTo]   - this->alfa[izFrom]);
-  tMet->beta   = this->beta[izFrom]   + zpp * (this->beta[izTo]   - this->beta[izFrom]);
-  tMet->gamma  = this->gamma[izFrom]  + zpp * (this->gamma[izTo]  - this->gamma[izFrom]);
-  tMet->delta  = this->delta[izFrom]  + zpp * (this->delta[izTo]  - this->delta[izFrom]);
-  tMet->alfa_u = this->alfa_u[izFrom] + zpp * (this->alfa_u[izTo] - this->alfa_u[izFrom]);
-  tMet->alfa_v = this->alfa_v[izFrom] + zpp * (this->alfa_v[izTo] - this->alfa_v[izFrom]);
-  tMet->deltau = this->deltau[izFrom] + zpp * (this->deltau[izTo] - this->deltau[izFrom]);
-  tMet->deltav = this->deltav[izFrom] + zpp * (this->deltav[izTo] - this->deltav[izFrom]);
-  tMet->deltat = this->deltat[izFrom] + zpp * (this->deltat[izTo] - this->deltat[izFrom]);
-  tMet->Au     = this->Au[izFrom]     + zpp * (this->Au[izTo]     - this->Au[izFrom]);
-  tMet->Av     = this->Av[izFrom]     + zpp * (this->Av[izTo]     - this->Av[izFrom]);
-  tMet->A      = this->A[izFrom]      + zpp * (this->A[izTo]      - this->A[izFrom]);
-  tMet->B      = this->B[izFrom]      + zpp * (this->B[izTo]      - this->B[izFrom]);
+  U[iPart]      = this->u[izFrom]      + zpp * (this->u[izTo]      - this->u[izFrom]);
+  V[iPart]      = this->v[izFrom]      + zpp * (this->v[izTo]      - this->v[izFrom]);
+  sU2[iPart]    = this->su2[izFrom]    + zpp * (this->su2[izTo]    - this->su2[izFrom]);
+  sV2[iPart]    = this->sv2[izFrom]    + zpp * (this->sv2[izTo]    - this->sv2[izFrom]);
+  sW2[iPart]    = this->sw2[izFrom]    + zpp * (this->sw2[izTo]    - this->sw2[izFrom]);
+  dSw2[iPart]   = this->dsw2[izFrom]   + zpp * (this->dsw2[izTo]   - this->dsw2[izFrom]);
+  eps[i]    = this->eps[izFrom]    + zpp * (this->eps[izTo]    - this->eps[izFrom]);
+  alfa[i]   = this->alfa[izFrom]   + zpp * (this->alfa[izTo]   - this->alfa[izFrom]);
+  beta[i]   = this->beta[izFrom]   + zpp * (this->beta[izTo]   - this->beta[izFrom]);
+  gamma[i]  = this->gamma[izFrom]  + zpp * (this->gamma[izTo]  - this->gamma[izFrom]);
+  delta[i]  = this->delta[izFrom]  + zpp * (this->delta[izTo]  - this->delta[izFrom]);
+  alfa_u[i] = this->alfa_u[izFrom] + zpp * (this->alfa_u[izTo] - this->alfa_u[izFrom]);
+  alfa_v[i] = this->alfa_v[izFrom] + zpp * (this->alfa_v[izTo] - this->alfa_v[izFrom]);
+  deltau[i] = this->deltau[izFrom] + zpp * (this->deltau[izTo] - this->deltau[izFrom]);
+  deltav[i] = this->deltav[izFrom] + zpp * (this->deltav[izTo] - this->deltav[izFrom]);
+  deltat[i] = this->deltat[izFrom] + zpp * (this->deltat[izTo] - this->deltat[izFrom]);
+  Au[i]     = this->Au[izFrom]     + zpp * (this->Au[izTo]     - this->Au[izFrom]);
+  Av[i]     = this->Av[izFrom]     + zpp * (this->Av[izTo]     - this->Av[izFrom]);
+  A[i]      = this->A[izFrom]      + zpp * (this->A[izTo]      - this->A[izFrom]);
+  B[i]      = this->B[izFrom]      + zpp * (this->B[izTo]      - this->B[izFrom]);
 
   // Leave
   return iRetCode;
