@@ -143,20 +143,20 @@ int MeteoData::Evaluate(
   sV2[iPart]    = this->sv2[izFrom]    + zpp * (this->sv2[izTo]    - this->sv2[izFrom]);
   sW2[iPart]    = this->sw2[izFrom]    + zpp * (this->sw2[izTo]    - this->sw2[izFrom]);
   dSw2[iPart]   = this->dsw2[izFrom]   + zpp * (this->dsw2[izTo]   - this->dsw2[izFrom]);
-  eps[i]    = this->eps[izFrom]    + zpp * (this->eps[izTo]    - this->eps[izFrom]);
-  alfa[i]   = this->alfa[izFrom]   + zpp * (this->alfa[izTo]   - this->alfa[izFrom]);
-  beta[i]   = this->beta[izFrom]   + zpp * (this->beta[izTo]   - this->beta[izFrom]);
-  gamma[i]  = this->gamma[izFrom]  + zpp * (this->gamma[izTo]  - this->gamma[izFrom]);
-  delta[i]  = this->delta[izFrom]  + zpp * (this->delta[izTo]  - this->delta[izFrom]);
-  alfa_u[i] = this->alfa_u[izFrom] + zpp * (this->alfa_u[izTo] - this->alfa_u[izFrom]);
-  alfa_v[i] = this->alfa_v[izFrom] + zpp * (this->alfa_v[izTo] - this->alfa_v[izFrom]);
-  deltau[i] = this->deltau[izFrom] + zpp * (this->deltau[izTo] - this->deltau[izFrom]);
-  deltav[i] = this->deltav[izFrom] + zpp * (this->deltav[izTo] - this->deltav[izFrom]);
-  deltat[i] = this->deltat[izFrom] + zpp * (this->deltat[izTo] - this->deltat[izFrom]);
-  Au[i]     = this->Au[izFrom]     + zpp * (this->Au[izTo]     - this->Au[izFrom]);
-  Av[i]     = this->Av[izFrom]     + zpp * (this->Av[izTo]     - this->Av[izFrom]);
-  A[i]      = this->A[izFrom]      + zpp * (this->A[izTo]      - this->A[izFrom]);
-  B[i]      = this->B[izFrom]      + zpp * (this->B[izTo]      - this->B[izFrom]);
+  eps[iPart]    = this->eps[izFrom]    + zpp * (this->eps[izTo]    - this->eps[izFrom]);
+  alfa[iPart]   = this->alfa[izFrom]   + zpp * (this->alfa[izTo]   - this->alfa[izFrom]);
+  beta[iPart]   = this->beta[izFrom]   + zpp * (this->beta[izTo]   - this->beta[izFrom]);
+  gamma[iPart]  = this->gamma[izFrom]  + zpp * (this->gamma[izTo]  - this->gamma[izFrom]);
+  delta[iPart]  = this->delta[izFrom]  + zpp * (this->delta[izTo]  - this->delta[izFrom]);
+  alfa_u[iPart] = this->alfa_u[izFrom] + zpp * (this->alfa_u[izTo] - this->alfa_u[izFrom]);
+  alfa_v[iPart] = this->alfa_v[izFrom] + zpp * (this->alfa_v[izTo] - this->alfa_v[izFrom]);
+  deltau[iPart] = this->deltau[izFrom] + zpp * (this->deltau[izTo] - this->deltau[izFrom]);
+  deltav[iPart] = this->deltav[izFrom] + zpp * (this->deltav[izTo] - this->deltav[izFrom]);
+  deltat[iPart] = this->deltat[izFrom] + zpp * (this->deltat[izTo] - this->deltat[izFrom]);
+  Au[iPart]     = this->Au[izFrom]     + zpp * (this->Au[izTo]     - this->Au[izFrom]);
+  Av[iPart]     = this->Av[izFrom]     + zpp * (this->Av[izTo]     - this->Av[izFrom]);
+  A[iPart]      = this->A[izFrom]      + zpp * (this->A[izTo]      - this->A[izFrom]);
+  B[iPart]      = this->B[izFrom]      + zpp * (this->B[izTo]      - this->B[izFrom]);
 
   // Leave
   return iRetCode;
