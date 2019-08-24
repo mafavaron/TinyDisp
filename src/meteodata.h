@@ -41,7 +41,15 @@ public:
   ~MeteoData();
   int Read(std::ifstream& cfg, const int n);
   double GetTimeStamp();
-  int Evaluate(const float rReferenceZ, const double rZ0, const double rDz, MeteoItem* tMet);
+  int Evaluate(
+    const float rReferenceZ, const double rZ0, const double rDz, const int iPart,
+    float* U, float* V, float* W, float* T,
+    float* sU2, float* sV2, float* sW2, float* dsW2,
+    float* alfa, float* beta, float* gamma, float* delta,
+    float* alfa_u, float* alfa_v,
+    float* deltau, float* deltav, float* deltat,
+    float* Au, float* Av, float* A, float* U
+  );
 };
 
 #endif
