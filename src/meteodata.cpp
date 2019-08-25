@@ -105,10 +105,10 @@ int MeteoData::Evaluate(
   const float rReferenceZ, const double rZ0, const double rDz, const int iPart,
   float* U, float* V, float* T,
   float* sU2, float* sV2, float* sW2, float* dsW2,
-  float* alfa, float* beta, float* gamma, float* delta,
+  float* eps, float* alfa, float* beta, float* gamma, float* delta,
   float* alfa_u, float* alfa_v,
   float* deltau, float* deltav, float* deltat,
-  float* Au, float* Av, float* A, float* U
+  float* Au, float* Av, float* A, float* B
 ) {
 
   // Assume success (will falsify on failure
@@ -142,7 +142,7 @@ int MeteoData::Evaluate(
   sU2[iPart]    = this->su2[izFrom]    + zpp * (this->su2[izTo]    - this->su2[izFrom]);
   sV2[iPart]    = this->sv2[izFrom]    + zpp * (this->sv2[izTo]    - this->sv2[izFrom]);
   sW2[iPart]    = this->sw2[izFrom]    + zpp * (this->sw2[izTo]    - this->sw2[izFrom]);
-  dSw2[iPart]   = this->dsw2[izFrom]   + zpp * (this->dsw2[izTo]   - this->dsw2[izFrom]);
+  dsW2[iPart]   = this->dsw2[izFrom]   + zpp * (this->dsw2[izTo]   - this->dsw2[izFrom]);
   eps[iPart]    = this->eps[izFrom]    + zpp * (this->eps[izTo]    - this->eps[izFrom]);
   alfa[iPart]   = this->alfa[izFrom]   + zpp * (this->alfa[izTo]   - this->alfa[izFrom]);
   beta[iPart]   = this->beta[izFrom]   + zpp * (this->beta[izTo]   - this->beta[izFrom]);
