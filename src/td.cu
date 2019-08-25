@@ -22,6 +22,7 @@ __device__ float windSpeed(float u, float v) {
 
 
 __global__ void moveKernel(
+	const float deltaT, const float Zi, const float H0,
 	float* partX, float* partY, float* partZ,
 	float* partU, float* partV, float* partW,
 	float* partQ, float* partT,
@@ -33,6 +34,28 @@ __global__ void moveKernel(
 	float* deltau, float* deltav, float* deltat,
 	float* Au, float* Av, float* A, float* B
 ) {
+
+	// Assign current particle index
+	const int i = blockIdx.x * blockDim.x + threadIdx.x;
+
+	// Check something is to be made on this particle
+	if(partEmissionTime[i] < 0.f) return;
+
+	// Compute wind directing cosines, and use them to
+	// actuate horizontal movement
+	float vel = windSpeed(U[i], V[i]);
+	float cosa, sina;
+	if(vel > 0.f) {
+		cosa = U[i] / vel;
+		sina = V[i] / vel;
+	}
+	else {
+		cosa = 0.f;
+		sina = 0.f;
+	}
+	partX[i] += (U[i] + partU[i]*cosa - partV[i]*sina) * deltaT;
+	partY[i] += (V[i] + partU[i]*sina + partV[i]*cosa) * deltaT;
+	partZ[i] += partW[i] * deltaT;
 
 }
 
