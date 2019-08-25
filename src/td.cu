@@ -57,6 +57,16 @@ __global__ void moveKernel(
 	partY[i] += (V[i] + partU[i]*sina + partV[i]*cosa) * deltaT;
 	partZ[i] += partW[i] * deltaT;
 
+	// Apply reflection on ground and mixing height, assimung no-partial-èenetration
+	if(partZ[i] < 0.f) {
+		partZ[i] = -partZ[i];
+		partW[i] = -partW[i];
+	}
+	if(partZ[i] > Zi && H0 > 0.f) {
+		partZ[i] = 2.f*Zi - partZ[i];
+		partW[i] = -partW[i];
+	}
+
 }
 
 
