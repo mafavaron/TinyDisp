@@ -21,6 +21,22 @@ __device__ float windSpeed(float u, float v) {
 }
 
 
+__global__ void moveKernel(
+	float* partX, float* partY, float* partZ,
+	float* partU, float* partV, float* partW,
+	float* partQ, float* partT,
+	float* partSh, float* partSz, float* partEmissionTime,
+	float* U, float* V, float* T,
+	float* sU2, float* sV2, float* sW2, float* dsW2,
+	float* eps, float* alfa, float* beta, float* gamma, float* delta,
+	float* alfa_u, float* alfa_v,
+	float* deltau, float* deltav, float* deltat,
+	float* Au, float* Av, float* A, float* B
+) {
+
+}
+
+
 int main(int argc, char** argv) {
 
 	// Get input parameters
