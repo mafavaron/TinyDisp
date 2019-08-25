@@ -15,6 +15,12 @@
 #include "cfg.h"
 #include "meteodata.h"
 
+
+__device__ float windSpeed(float u, float v) {
+	return sqrt(u*u + v*v);
+}
+
+
 int main(int argc, char** argv) {
 
 	// Get input parameters
@@ -70,8 +76,21 @@ int main(int argc, char** argv) {
 	thrust::device_vector<float> rvdPartSz(N);
 	thrust::device_vector<float> rvdPartEmissionTime(N);	// -1.0 for not yet filled particles
 
+	// Associate pointers to particle device vectors
+	float *ptr_rvdPartX = thrust::raw_pointer_cast(&rvdPartX[0]);
+	float *ptr_rvdPartY = thrust::raw_pointer_cast(&rvdPartY[0]);
+	float *ptr_rvdPartZ = thrust::raw_pointer_cast(&rvdPartZ[0]);
+	float *ptr_rvdPartU = thrust::raw_pointer_cast(&rvdPartU[0]);
+	float *ptr_rvdPartV = thrust::raw_pointer_cast(&rvdPartV[0]);
+	float *ptr_rvdPartW = thrust::raw_pointer_cast(&rvdPartW[0]);
+	float *ptr_rvdPartQ = thrust::raw_pointer_cast(&rvdPartQ[0]);
+	float *ptr_rvdPartT = thrust::raw_pointer_cast(&rvdPartT[0]);
+	float *ptr_rvdPartSh = thrust::raw_pointer_cast(&rvdPartSh[0]);
+	float *ptr_rvdPartSz = thrust::raw_pointer_cast(&rvdPartSz[0]);
+	float *ptr_rvdPartEmissionTime = thrust::raw_pointer_cast(&rvdPartEmissionTime[0]);
+
 	// Reserve space for meteo information
-  thrust::device_vector<float> rvdU;		  // Widn U components (m/s)
+  thrust::device_vector<float> rvdU;		  // Wind U components (m/s)
   thrust::device_vector<float> rvdV;		  // Wind V components (m/s)
   thrust::device_vector<float> rvdT;		  // Temperatures (K)
   thrust::device_vector<float> rvdSu2;		// var(U) values (m2/s2)
@@ -92,6 +111,7 @@ int main(int argc, char** argv) {
   thrust::device_vector<float> rvdAv;			// exp(alfa_v*dt)
   thrust::device_vector<float> rvdA;			// exp(alfa*dt)
   thrust::device_vector<float> rvdB;			// exp(beta*dt)
+	thrust::device_vector<float> rvdVel;	  // Widn speed (m/s)
 
 	// Associate host pointers to meteo (device) vectors,
 	// to allow easy access during met profile propagation
@@ -201,8 +221,8 @@ int main(int argc, char** argv) {
 		// Associate particles their meteo data
 		for(int iPart = 0; iPart < iPartNum; iPart++) {
 			iRetCode = met.Evaluate(
-				rZ, tConfig.GetZ0(), tConfig.GetDz(), iPart,
-				ptr_rvdU, ptr_rvdU, ptr_rvdT,
+				rvdPartZ[iPart], tConfig.GetZ0(), tConfig.GetDz(), iPart,
+				ptr_rvdU, ptr_rvdV, ptr_rvdT,
 				ptr_rvdSu2, ptr_rvdSv2, ptr_rvdSw2, ptr_rvdDsw2,
 				ptr_rvdEps, ptr_rvdAlfa, ptr_rvdBeta, ptr_rvdGamma, ptr_rvdDelta,
 				ptr_rvdAlfa_u, ptr_rvdAlfa_v,
@@ -213,12 +233,6 @@ int main(int argc, char** argv) {
 		}
 
 		// Move particles
-
-		// Set meteorological environment
-		float rDeltaT = tConfig.GetTimeSubstepDuration();
-		for(int iPart = 0; iPart < iPartNum; iPart++) {
-			iRetCode =
-		}
 
 		// Write particles to movie file, if requested
 
