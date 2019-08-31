@@ -6,4 +6,8 @@ Nz[z_, Zi_] := Floor[z/Zi]
 
 and
 
-Rz[z_, Zi_] := z - Floor[z/Zi]
+In[3]:= Rz[z_, Zi_] := z - Floor[z/Zi] Zi
+
+In[4]:= Rz[{1, 12.3, 123.4}, 10]
+
+Out[4]= {1, 2.3, 3.4}
