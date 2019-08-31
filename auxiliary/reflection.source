@@ -1,0 +1,9 @@
+Let "Zi" represent a positive height above a "ground" with coordinate 0, and let "z" be a generic real.
+
+To begin, let's assume "z" is positive. Consider
+
+Nz[z_, Zi_] := Floor[z/Zi]
+
+and
+
+Rz[z_, Zi_] := z - Floor[z/Zi]
