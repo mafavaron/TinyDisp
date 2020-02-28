@@ -1,0 +1,34 @@
+! TinyDisp - A very simple ultrasonic anemometer flow visualization
+!            tool, showing (in 2D) effects of both long-range
+! transport and turbulent diffusion.
+!
+! Data are assumed to be coming from a set of ultrasonic
+! anemometer files stored in a dedicated form (for now).
+!
+! TinyPart follows the NanoPart idea, but with important
+! simplifications aimed at improving speed, at the cost of
+! a dramatic reduction of scientific capability.
+!
+! Let me say, this is something interesting didactically:
+! no research purposes.
+!
+! Copyright 2020 by Patrizia M. Favaron
+!
+! This is open-source code, covered by the MIT license.
+!
+program TinyDisp
+
+    use omp_lib
+    use appgraphics
+    
+    implicit none
+
+    integer :: myscreen
+    
+    myscreen = initwindow(1280, 720, dbflag = .true., closeflag = .true.)
+    
+    call loop()
+    
+    call closewindow(myscreen)
+
+end program TinyDisp
