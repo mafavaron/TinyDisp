@@ -1,0 +1,5 @@
+&configuration
+    rTimeStep   =    10.0
+    rEdgeLength = 10000.0
+    sMeteoFile  = "trial.csv"
+/
