@@ -29,7 +29,8 @@ contains
         real                :: rTimeStep
         real                :: rEdgeLength
         character(len=256)  :: sMeteoFile
-        logical             :: iErrCode
+        integer             :: iErrCode
+        logical             :: lIsFile
         namelist /configuration/ &
             rTimeStep, &
             rEdgeLength, &
@@ -54,7 +55,25 @@ contains
         
         ! Validate configuration
         this % lIsValid = .false.
+        if(rTimeStep <= 0.) then
+            print *, "cfg> Invalid time step: value is zero or negative, should be positive"
+            iRetCode = 3
+        end if
+        if(rEdgeLength <= 0.) then
+            print *, "cfg> Invalid edge length: value is zero or negative, should be positive"
+            iRetCode = 3
+        end if
+        inquire(file = sMeteoFile, exist = lIsFile)
+        if(.not.lIsFile) then
+            print *, "cfg> Invalid met file: file does not exist"
+            iRetCode = 3
+        end if
         
+        ! Form configuration, and declare it valid
+        this % rTimeStep   = rTimeStep
+        this % rEdgeLength = rEdgeLength
+        this % sMeteoFile  = sMeteoFile
+        this % lIsValid    = .true.
         
     end function gather
 
