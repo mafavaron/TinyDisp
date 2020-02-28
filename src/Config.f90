@@ -61,12 +61,12 @@ contains
         end if
         if(rEdgeLength <= 0.) then
             print *, "cfg> Invalid edge length: value is zero or negative, should be positive"
-            iRetCode = 3
+            iRetCode = 4
         end if
         inquire(file = sMeteoFile, exist = lIsFile)
         if(.not.lIsFile) then
             print *, "cfg> Invalid met file: file does not exist"
-            iRetCode = 3
+            iRetCode = 5
         end if
         
         ! Form configuration, and declare it valid
