@@ -5,7 +5,7 @@
 ! Data are assumed to be coming from a set of ultrasonic
 ! anemometer files stored in a dedicated form (for now).
 !
-! TinyPart follows the NanoPart idea, but with important
+! TinyDisp follows the NanoPart idea, but with important
 ! simplifications aimed at improving speed, at the cost of
 ! a dramatic reduction of scientific capability.
 !
@@ -17,13 +17,31 @@
 ! This is open-source code, covered by the MIT license.
 !
 program TinyDisp
-
+    
     use omp_lib
     use appgraphics
+    use Config
     
     implicit none
-
-    integer :: myscreen
+    
+    ! Locals
+    integer             :: myscreen
+    character(len=256)  :: sCfgFile
+    
+    ! Get parameters
+    if(command_argument_count() /= 1) then
+        print *, "TinyDisp - Local airflow visualizer for ultrasonic anemometer data"
+        print *
+        print *, "Usage:"
+        print *
+        print *, "    TinyDisp <CfgFile>"
+        print *
+        print *, "Copyright 2020 by Servizi Territorio srl"
+        print *, "This is open-source software, covered by the MIT license."
+        print *
+        stop
+    end if
+    call get_command_argument(1, sCfgFile)
     
     myscreen = initwindow(1280, 720, dbflag = .true., closeflag = .true.)
     
@@ -32,3 +50,4 @@ program TinyDisp
     call closewindow(myscreen)
 
 end program TinyDisp
+
