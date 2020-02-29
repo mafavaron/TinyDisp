@@ -107,7 +107,7 @@ contains
         iNumLines = 0
         do
             read(iLUN, "(a)", iostat=iErrCode) sBuffer
-            if(iErrCode > 0) exit
+            if(iErrCode /= 0) exit
             read(sBuffer(1:19), "(i4,5(1x,i2))", iostat=iErrCode) iYear, iMonth, iDay, iHour, iMinute, iSecond
             if(iErrCode /= 0) exit
             read(sBuffer(20:), *, iostat=iErrCode) rU, rV, rStdDevU, rStdDevV, rCovUV
