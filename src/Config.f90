@@ -236,11 +236,6 @@ contains
         ivTimeIndex = (ivTimeStamp - ivTimeStamp(1)) / this % iTimeStep + 1
         rvTimeShift = float((ivTimeIndex - 1) * this % iTimeStep)
         
-        ! Print values, for test
-        do i = 1, iNumTimes
-            print *, i, ivTimeStamp(i), ivTimeIndex(i), rvTimeShift(i)
-        end do
-        
         ! Leave
         deallocate(rvTimeShift)
         deallocate(ivTimeIndex)
