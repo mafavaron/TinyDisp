@@ -187,13 +187,13 @@ contains
         ! Locals
         integer, dimension(:), allocatable  :: ivTimeIndex
         real, dimension(:), allocatable     :: rvTimeShift
-        integer :: iErrCode
         integer :: iMinTimeStamp
         integer :: iMaxTimeStamp
         integer :: iNumTimes
         integer :: iDeltaTime
-        
         integer :: i
+        integer :: j
+        real    :: rFactor
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -235,6 +235,17 @@ contains
         ! linear interpolation sampling of meteorological data
         ivTimeIndex = (ivTimeStamp - ivTimeStamp(1)) / this % iTimeStep + 1
         rvTimeShift = float((ivTimeIndex - 1) * this % iTimeStep)
+        
+        ! Interpolate meteorological values
+        do i = 1, iNumTimes
+            j            = ivTimeIndex(i)
+            rFactor      = rvTimeShift(i) / iDeltaTime
+            rvU(i)       = this % rvU(j)       + (this % rvU(j+1)       - this % rvU(j)) * rFactor
+            rvV(i)       = this % rvV(j)       + (this % rvV(j+1)       - this % rvV(j)) * rFactor
+            rvStdDevU(i) = this % rvStdDevU(j) + (this % rvStdDevU(j+i) - this % rvStdDevU(j)) * rFactor
+            rvStdDevV(i) = this % rvStdDevV(j) + (this % rvStdDevV(j+1) - this % rvStdDevV(j)) * rFactor
+            rvCovUV(i)   = this % rvCovUV(j)   + (this % rvCovUV(j+1)   - this % rvCovUV(j)) * rFactor
+        end do
         
         ! Leave
         deallocate(rvTimeShift)

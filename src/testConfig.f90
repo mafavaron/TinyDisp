@@ -6,6 +6,7 @@ program testConfig
 	
 	type(ConfigType)	:: tCfg
 	integer				:: iRetCode
+	integer				:: i
     integer, dimension(:), allocatable  :: ivTimeStamp
     real, dimension(:), allocatable     :: rvU
     real, dimension(:), allocatable     :: rvV
@@ -18,6 +19,10 @@ program testConfig
     
     iRetCode = tCfg % get_meteo(ivTimeStamp, rvU, rvV, rvStdDevU, rvStdDevV, rvCovUV)
 	print *, iRetCode
+    
+    do i = 1, size(ivTimeStamp)
+        print *, ivTimeStamp(i), rvU(i), rvV(i)
+    end do
 
 end program testConfig
 
