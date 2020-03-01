@@ -10,7 +10,7 @@ module Config
     
     type ConfigType
         ! -1- General
-        real                :: rTimeStep        ! In seconds, strictly positive
+        integer             :: iTimeStep        ! In seconds, strictly positive
         real                :: rEdgeLength      ! In metres
         character(len=256)  :: sMeteoFile       ! The desired one
         logical             :: lIsValid         ! Use data type only if .TRUE.
@@ -23,6 +23,7 @@ module Config
         real, dimension(:), allocatable     :: rvCovUV
     contains
         procedure           :: gather           ! Gets configuration from a NAMELIST file
+        procedure           :: get_meteo        ! Get meteo data
     end type ConfigType
     
 contains
@@ -38,17 +39,14 @@ contains
         ! Locals
         ! -1- Just variables
         integer             :: iErrCode
-        real                :: rTimeStep
+        integer             :: iTimeStep
         real                :: rEdgeLength
         character(len=256)  :: sBuffer
         character(len=256)  :: sMeteoFile
         logical             :: lIsFile
         integer             :: iNumLines
         integer             :: iLine
-        namelist /configuration/ &
-            rTimeStep, &
-            rEdgeLength, &
-            sMeteoFile
+        namelist /configuration/ iTimeStep, rEdgeLength, sMeteoFile
         ! -1- From meteo file
         integer             :: iCurTime
         real                :: rU
@@ -57,6 +55,8 @@ contains
         real                :: rStdDevV
         real                :: rCovUV
         integer             :: iYear, iMonth, iDay, iHour, iMinute, iSecond
+        integer             :: iTimeDelta
+        integer             :: iNewTimeDelta
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -77,7 +77,7 @@ contains
         
         ! Validate general configuration
         this % lIsValid = .false.
-        if(rTimeStep <= 0.) then
+        if(iTimeStep <= 0) then
             print *, "cfg> Invalid time step: value is zero or negative, should be positive"
             iRetCode = 3
         end if
@@ -107,14 +107,14 @@ contains
         iNumLines = 0
         do
             read(iLUN, "(a)", iostat=iErrCode) sBuffer
-            if(iErrCode > 0) exit
+            if(iErrCode /= 0) exit
             read(sBuffer(1:19), "(i4,5(1x,i2))", iostat=iErrCode) iYear, iMonth, iDay, iHour, iMinute, iSecond
             if(iErrCode /= 0) exit
             read(sBuffer(20:), *, iostat=iErrCode) rU, rV, rStdDevU, rStdDevV, rCovUV
             if(iErrCode /= 0) exit
             iNumLines = iNumLines + 1
         end do
-        if(iNumLines <= 0) then
+        if(iNumLines <= 1) then
             iRetCode = 8
             close(iLUN)
             return
@@ -146,12 +146,100 @@ contains
         end do
         close(iLUN)
         
+        ! Check the meteorological data is valid, that is, with at least
+        ! two data records (this has been already tested - iRetCode = 6), and with equally-spaced time stamps
+        ! monotonically increasing
+        iTimeDelta = this % ivTimeStamp(2) - this % ivTimeStamp(1)
+        if(iTimeDelta <= 0) then
+            iRetCode = 9
+            return
+        end if
+        do iLine = 3, iNumLines
+            iNewTimeDelta = this % ivTimeStamp(iLine) - this % ivTimeStamp(iLine - 1)
+            if(iNewTimeDelta /= iTimeDelta) then
+                iRetCode = 10
+                return
+            end if
+        end do
+        ! Post-condition: time stamps are monotonically increasing, and equally spaced in time
+        
         ! Form all what remains of configuration, and declare it valid
-        this % rTimeStep   = rTimeStep
+        this % iTimeStep   = iTimeStep
         this % rEdgeLength = rEdgeLength
         this % sMeteoFile  = sMeteoFile
         this % lIsValid    = .true.
         
     end function gather
+    
+    
+    function get_meteo(this, ivTimeStamp, rvU, rvV, rvStdDevU, rvStdDevV, rvCovUV) result(iRetCode)
+    
+        ! Routine arguments
+        class(ConfigType), intent(in)                   :: this
+        integer, dimension(:), allocatable, intent(out) :: ivTimeStamp
+        real, dimension(:), allocatable, intent(out)    :: rvU
+        real, dimension(:), allocatable, intent(out)    :: rvV
+        real, dimension(:), allocatable, intent(out)    :: rvStdDevU
+        real, dimension(:), allocatable, intent(out)    :: rvStdDevV
+        real, dimension(:), allocatable, intent(out)    :: rvCovUV
+        integer                                         :: iRetCode
+        
+        ! Locals
+        integer, dimension(:), allocatable  :: ivTimeIndex
+        real, dimension(:), allocatable     :: rvTimeShift
+        integer :: iErrCode
+        integer :: iMinTimeStamp
+        integer :: iMaxTimeStamp
+        integer :: iNumTimes
+        integer :: iDeltaTime
+        
+        integer :: i
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
+        
+        ! Check something can be done
+        if(.not. this % lIsValid) then
+            iRetCode = 1
+            return
+        end if
+        
+        ! Compute the time span, and use it to derive the length of the meteo files
+        iMinTimeStamp = minval(this % ivTimeStamp)
+        iMaxTimeStamp = maxval(this % ivTimeStamp)
+        iNumTimes = (iMaxTimeStamp - iMinTimeStamp) / this % iTimeStep + 1
+        
+        ! Compute the time step in input meteo data
+        iDeltaTime = this % ivTimeStamp(2) - this % ivTimeStamp(1)
+        
+        ! Reserve space for output values
+        if(allocated(ivTimeStamp)) deallocate(ivTimeStamp)
+        if(allocated(rvU))         deallocate(rvU)
+        if(allocated(rvV))         deallocate(rvV)
+        if(allocated(rvStdDevU))   deallocate(rvStdDevU)
+        if(allocated(rvStdDevV))   deallocate(rvStdDevV)
+        if(allocated(rvCovUV))     deallocate(rvCovUV)
+        allocate(ivTimeStamp(iNumTimes))
+        allocate(ivTimeIndex(iNumTimes))
+        allocate(rvTimeShift(iNumTimes))
+        allocate(rvU(iNumTimes))
+        allocate(rvV(iNumTimes))
+        allocate(rvStdDevU(iNumTimes))
+        allocate(rvStdDevV(iNumTimes))
+        allocate(rvCovUV(iNumTimes))
+        
+        ! Generate output time stamps
+        ivTimeStamp = [(iMinTimeStamp + this % iTimeStep * (i - 1), i = 1, iNumTimes)]
+        
+        ! Convert the time stamps to time indices, and to displacements to be used in
+        ! linear interpolation sampling of meteorological data
+        ivTimeIndex = (ivTimeStamp - ivTimeStamp(1)) / this % iTimeStep + 1
+        rvTimeShift = float((ivTimeIndex - 1) * this % iTimeStep)
+        
+        ! Leave
+        deallocate(rvTimeShift)
+        deallocate(ivTimeIndex)
+        
+    end function get_meteo
 
 end module Config
