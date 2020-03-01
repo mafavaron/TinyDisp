@@ -207,7 +207,7 @@ contains
         ! Compute the time span, and use it to derive the length of the meteo files
         iMinTimeStamp = minval(this % ivTimeStamp)
         iMaxTimeStamp = maxval(this % ivTimeStamp)
-        iNumTimes = (iMaxTimeStamp - iMinTimeStamp) / this % iTimeStep
+        iNumTimes = (iMaxTimeStamp - iMinTimeStamp) / this % iTimeStep + 1
         
         ! Compute the time step in input meteo data
         iDeltaTime = this % ivTimeStamp(2) - this % ivTimeStamp(1)
