@@ -187,12 +187,10 @@ contains
         ! Locals
         integer, dimension(:), allocatable  :: ivTimeIndex
         real, dimension(:), allocatable     :: rvTimeShift
-        integer :: iErrCode
         integer :: iMinTimeStamp
         integer :: iMaxTimeStamp
         integer :: iNumTimes
         integer :: iDeltaTime
-        
         integer :: i
         
         ! Assume success (will falsify on failure)
@@ -235,6 +233,20 @@ contains
         ! linear interpolation sampling of meteorological data
         ivTimeIndex = (ivTimeStamp - ivTimeStamp(1)) / this % iTimeStep + 1
         rvTimeShift = float((ivTimeIndex - 1) * this % iTimeStep)
+        
+        ! Interpolate meteorological values
+        do i = 1, iNumTimes
+            rvU(i)       = this % rvU(ivTimeIndex(i)) + &
+                            (this % rvU(ivTimeIndex(i+1)) - this % rvU(ivTimeIndex(i))) * rvTimeShift(i) / iDeltaTime
+            rvV(i)       = this % rvV(ivTimeIndex(i)) + &
+                            (this % rvV(ivTimeIndex(i+1)) - this % rvV(ivTimeIndex(i))) * rvTimeShift(i) / iDeltaTime
+            rvStdDevU(i) = this % rvStdDevU(ivTimeIndex(i)) + &
+                            (this % rvStdDevU(ivTimeIndex(i+1)) - this % rvStdDevU(ivTimeIndex(i))) * rvTimeShift(i) / iDeltaTime
+            rvStdDevV(i) = this % rvStdDevV(ivTimeIndex(i)) + &
+                            (this % rvStdDevV(ivTimeIndex(i+1)) - this % rvStdDevV(ivTimeIndex(i))) * rvTimeShift(i) / iDeltaTime
+            rvConUV(i)   = this % rvCovUV(ivTimeIndex(i)) + &
+                            (this % rvCovUV(ivTimeIndex(i+1)) - this % rvCovUV(ivTimeIndex(i))) * rvTimeShift(i) / iDeltaTime
+        end do
         
         ! Leave
         deallocate(rvTimeShift)
