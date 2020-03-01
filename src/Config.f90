@@ -46,10 +46,7 @@ contains
         logical             :: lIsFile
         integer             :: iNumLines
         integer             :: iLine
-        namelist /configuration/ &
-            iTimeStep, &
-            rEdgeLength, &
-            sMeteoFile
+        namelist /configuration/ iTimeStep, rEdgeLength, sMeteoFile
         ! -1- From meteo file
         integer             :: iCurTime
         real                :: rU
@@ -58,6 +55,8 @@ contains
         real                :: rStdDevV
         real                :: rCovUV
         integer             :: iYear, iMonth, iDay, iHour, iMinute, iSecond
+        integer             :: iTimeDelta
+        integer             :: iNewTimeDelta
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -70,7 +69,11 @@ contains
         end if
         read(iLUN, nml=configuration, iostat=iErrCode)
         if(iErrCode /= 0) then
+            print *, iErrCode
             iRetCode = 2
+            backspace(iLUN)
+            read(iLUN, "(a)") sBuffer
+            print *, "Line at fault: ", trim(sBuffer)
             close(iLUN)
             return
         end if
@@ -186,10 +189,15 @@ contains
         integer                                         :: iRetCode
         
         ! Locals
+        integer, dimension(:), allocatable  :: ivTimeIndex
+        real, dimension(:), allocatable     :: rvTimeShift
         integer :: iErrCode
         integer :: iMinTimeStamp
         integer :: iMaxTimeStamp
         integer :: iNumTimes
+        integer :: iDeltaTime
+        
+        integer :: i
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -205,19 +213,41 @@ contains
         iMaxTimeStamp = maxval(this % ivTimeStamp)
         iNumTimes = (iMaxTimeStamp - iMinTimeStamp) / this % iTimeStep
         
+        ! Compute the time step in input meteo data
+        iDeltaTime = this % ivTimeStamp(2) - this % ivTimeStamp(1)
+        
         ! Reserve space for output values
         if(allocated(ivTimeStamp)) deallocate(ivTimeStamp)
         if(allocated(rvU))         deallocate(rvU)
         if(allocated(rvV))         deallocate(rvV)
         if(allocated(rvStdDevU))   deallocate(rvStdDevU)
         if(allocated(rvStdDevV))   deallocate(rvStdDevV)
-        if(allocated(rvCovUV))     deallocate(rvConUV)
+        if(allocated(rvCovUV))     deallocate(rvCovUV)
         allocate(ivTimeStamp(iNumTimes))
+        allocate(ivTimeIndex(iNumTimes))
+        allocate(rvTimeShift(iNumTimes))
         allocate(rvU(iNumTimes))
         allocate(rvV(iNumTimes))
         allocate(rvStdDevU(iNumTimes))
         allocate(rvStdDevV(iNumTimes))
         allocate(rvCovUV(iNumTimes))
+        
+        ! Generate output time stamps
+        ivTimeStamp = [(iMinTimeStamp + this % iTimeStep * (i - 1), i = 1, iNumTimes)]
+        
+        ! Convert the time stamps to time indices, and to displacements to be used in
+        ! linear interpolation sampling of meteorological data
+        ivTimeIndex = ivTimeStamp / iDeltaTime + 1
+        rvTimeShift = float(ivTimeIndex * iDeltaTime - ivTimeStamp)
+        
+        ! Print values, for test
+        do i = 1, iNumTimes
+            print *, i, ivTimeIndex(i), rvTimeShift(i)
+        end do
+        
+        ! Leave
+        deallocate(rvTimeShift)
+        deallocate(ivTimeIndex)
         
     end function get_meteo
 
