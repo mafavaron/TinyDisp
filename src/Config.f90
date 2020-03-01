@@ -69,11 +69,7 @@ contains
         end if
         read(iLUN, nml=configuration, iostat=iErrCode)
         if(iErrCode /= 0) then
-            print *, iErrCode
             iRetCode = 2
-            backspace(iLUN)
-            read(iLUN, "(a)") sBuffer
-            print *, "Line at fault: ", trim(sBuffer)
             close(iLUN)
             return
         end if
