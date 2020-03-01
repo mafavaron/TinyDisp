@@ -244,7 +244,7 @@ contains
                             (this % rvStdDevU(ivTimeIndex(i+1)) - this % rvStdDevU(ivTimeIndex(i))) * rvTimeShift(i) / iDeltaTime
             rvStdDevV(i) = this % rvStdDevV(ivTimeIndex(i)) + &
                             (this % rvStdDevV(ivTimeIndex(i+1)) - this % rvStdDevV(ivTimeIndex(i))) * rvTimeShift(i) / iDeltaTime
-            rvConUV(i)   = this % rvCovUV(ivTimeIndex(i)) + &
+            rvCovUV(i)   = this % rvCovUV(ivTimeIndex(i)) + &
                             (this % rvCovUV(ivTimeIndex(i+1)) - this % rvCovUV(ivTimeIndex(i))) * rvTimeShift(i) / iDeltaTime
         end do
         
