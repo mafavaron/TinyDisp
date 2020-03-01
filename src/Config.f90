@@ -10,7 +10,7 @@ module Config
     
     type ConfigType
         ! -1- General
-        real                :: iTimeStep        ! In seconds, strictly positive
+        integer             :: iTimeStep        ! In seconds, strictly positive
         real                :: rEdgeLength      ! In metres
         character(len=256)  :: sMeteoFile       ! The desired one
         logical             :: lIsValid         ! Use data type only if .TRUE.
