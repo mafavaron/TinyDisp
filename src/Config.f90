@@ -10,7 +10,7 @@ module Config
     
     type ConfigType
         ! -1- General
-        real                :: rTimeStep        ! In seconds, strictly positive
+        real                :: iTimeStep        ! In seconds, strictly positive
         real                :: rEdgeLength      ! In metres
         character(len=256)  :: sMeteoFile       ! The desired one
         logical             :: lIsValid         ! Use data type only if .TRUE.
@@ -23,6 +23,7 @@ module Config
         real, dimension(:), allocatable     :: rvCovUV
     contains
         procedure           :: gather           ! Gets configuration from a NAMELIST file
+        procedure           :: get_meteo        ! Get meteo data
     end type ConfigType
     
 contains
@@ -38,7 +39,7 @@ contains
         ! Locals
         ! -1- Just variables
         integer             :: iErrCode
-        real                :: rTimeStep
+        integer             :: iTimeStep
         real                :: rEdgeLength
         character(len=256)  :: sBuffer
         character(len=256)  :: sMeteoFile
@@ -46,7 +47,7 @@ contains
         integer             :: iNumLines
         integer             :: iLine
         namelist /configuration/ &
-            rTimeStep, &
+            iTimeStep, &
             rEdgeLength, &
             sMeteoFile
         ! -1- From meteo file
@@ -77,7 +78,7 @@ contains
         
         ! Validate general configuration
         this % lIsValid = .false.
-        if(rTimeStep <= 0.) then
+        if(iTimeStep <= 0) then
             print *, "cfg> Invalid time step: value is zero or negative, should be positive"
             iRetCode = 3
         end if
@@ -147,11 +148,48 @@ contains
         close(iLUN)
         
         ! Form all what remains of configuration, and declare it valid
-        this % rTimeStep   = rTimeStep
+        this % iTimeStep   = iTimeStep
         this % rEdgeLength = rEdgeLength
         this % sMeteoFile  = sMeteoFile
         this % lIsValid    = .true.
         
     end function gather
+    
+    
+    function get_meteo(this, ivTimeStamp, rvU, rvV, rvStdDevU, rvStdDevV, rvCovUV) result(iRetCode)
+    
+        ! Routine arguments
+        class(ConfigType), intent(in)                   :: this
+        integer, dimension(:), allocatable, intent(out) :: ivTimeStamp
+        real, dimension(:), allocatable, intent(out)    :: rvU
+        real, dimension(:), allocatable, intent(out)    :: rvV
+        real, dimension(:), allocatable, intent(out)    :: rvStdDevU
+        real, dimension(:), allocatable, intent(out)    :: rvStdDevV
+        real, dimension(:), allocatable, intent(out)    :: rvCovUV
+        integer                                         :: iRetCode
+        
+        ! Locals
+        integer :: iErrCode
+        integer :: iMinTimeStamp
+        integer :: iMaxTimeStamp
+        integer :: iNumTimes
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
+        
+        ! Check something can be done
+        if(.not. this % lIsValid) then
+            iRetCode = 1
+            return
+        end if
+        
+        ! Compute the time span, and use it to derive the length of the meteo files
+        iMinTimeStamp = minval(this % ivTimeStamp)
+        iMaxTimeStamp = maxval(this % ivTimeStamp)
+        iNumTimes = (iMaxTimeStamp - iMinTimeStamp) / this % iTimeStep
+        
+        ! Reserve space for output values
+        
+    end function get_meteo
 
 end module Config
