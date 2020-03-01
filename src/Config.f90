@@ -192,6 +192,8 @@ contains
         integer :: iNumTimes
         integer :: iDeltaTime
         integer :: i
+        integer :: j
+        real    :: rFactor
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -236,16 +238,13 @@ contains
         
         ! Interpolate meteorological values
         do i = 1, iNumTimes
-            rvU(i)       = this % rvU(ivTimeIndex(i)) + &
-                            (this % rvU(ivTimeIndex(i+1)) - this % rvU(ivTimeIndex(i))) * rvTimeShift(i) / iDeltaTime
-            rvV(i)       = this % rvV(ivTimeIndex(i)) + &
-                            (this % rvV(ivTimeIndex(i+1)) - this % rvV(ivTimeIndex(i))) * rvTimeShift(i) / iDeltaTime
-            rvStdDevU(i) = this % rvStdDevU(ivTimeIndex(i)) + &
-                            (this % rvStdDevU(ivTimeIndex(i+1)) - this % rvStdDevU(ivTimeIndex(i))) * rvTimeShift(i) / iDeltaTime
-            rvStdDevV(i) = this % rvStdDevV(ivTimeIndex(i)) + &
-                            (this % rvStdDevV(ivTimeIndex(i+1)) - this % rvStdDevV(ivTimeIndex(i))) * rvTimeShift(i) / iDeltaTime
-            rvCovUV(i)   = this % rvCovUV(ivTimeIndex(i)) + &
-                            (this % rvCovUV(ivTimeIndex(i+1)) - this % rvCovUV(ivTimeIndex(i))) * rvTimeShift(i) / iDeltaTime
+            j            = ivTimeIndex(i)
+            rFactor      = rvTimeShift(i) / iDeltaTime
+            rvU(i)       = this % rvU(j)       + (this % rvU(j+1)       - this % rvU(j)) * rFactor
+            rvV(i)       = this % rvV(j)       + (this % rvV(j+1)       - this % rvV(j)) * rFactor
+            rvStdDevU(i) = this % rvStdDevU(j) + (this % rvStdDevU(j+i) - this % rvStdDevU(j)) * rFactor
+            rvStdDevV(i) = this % rvStdDevV(j) + (this % rvStdDevV(j+1) - this % rvStdDevV(j)) * rFactor
+            rvCovUV(i)   = this % rvCovUV(j)   + (this % rvCovUV(j+1)   - this % rvCovUV(j)) * rFactor
         end do
         
         ! Leave
