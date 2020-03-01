@@ -189,6 +189,18 @@ contains
         iNumTimes = (iMaxTimeStamp - iMinTimeStamp) / this % iTimeStep
         
         ! Reserve space for output values
+        if(allocated(ivTimeStamp)) deallocate(ivTimeStamp)
+        if(allocated(rvU))         deallocate(rvU)
+        if(allocated(rvV))         deallocate(rvV)
+        if(allocated(rvStdDevU))   deallocate(rvStdDevU)
+        if(allocated(rvStdDevV))   deallocate(rvStdDevV)
+        if(allocated(rvCovUV))     deallocate(rvConUV)
+        allocate(ivTimeStamp(iNumTimes))
+        allocate(rvU(iNumTimes))
+        allocate(rvV(iNumTimes))
+        allocate(rvStdDevU(iNumTimes))
+        allocate(rvStdDevV(iNumTimes))
+        allocate(rvCovUV(iNumTimes))
         
     end function get_meteo
 
