@@ -115,7 +115,7 @@ contains
             if(iErrCode /= 0) exit
             iNumLines = iNumLines + 1
         end do
-        if(iNumLines <= 0) then
+        if(iNumLines <= 1) then
             iRetCode = 8
             close(iLUN)
             return
@@ -146,6 +146,23 @@ contains
                 this % rvCovUV(iLine)
         end do
         close(iLUN)
+        
+        ! Check the meteorological data is valid, that is, with at least
+        ! two data records (this has been already tested - iRetCode = 6), and with equally-spaced time stamps
+        ! monotonically increasing
+        iTimeDelta = this % ivTimeStamp(2) - this % ivTimeStamp(1)
+        if(iTimeDelta <= 0) then
+            iRetCode = 9
+            return
+        end if
+        do iLine = 3, iNumLines
+            iNewTimeDelta = this % ivTimeStamp(iLine) - this % ivTimeStamp(iLine - 1)
+            if(iNewTimeDelta /= iTimeDelta) then
+                iRetCode = 10
+                return
+            end if
+        end do
+        ! Post-condition: time stamps are monotonically increasing, and equally spaced in time
         
         ! Form all what remains of configuration, and declare it valid
         this % iTimeStep   = iTimeStep
