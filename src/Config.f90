@@ -48,6 +48,7 @@ contains
         integer             :: iLine
         namelist /configuration/ iTimeStep, rEdgeLength, sMeteoFile
         ! -1- From meteo file
+        integer             :: i
         integer             :: iCurTime
         real                :: rU
         real                :: rV
@@ -110,6 +111,9 @@ contains
             if(iErrCode /= 0) exit
             read(sBuffer(1:19), "(i4,5(1x,i2))", iostat=iErrCode) iYear, iMonth, iDay, iHour, iMinute, iSecond
             if(iErrCode /= 0) exit
+            do i = 20, len_trim(sBuffer)
+                if(sBuffer(i:i) == ',') sBuffer(i:i) = ' '
+            end do
             read(sBuffer(20:), *, iostat=iErrCode) rU, rV, rStdDevU, rStdDevV, rCovUV
             if(iErrCode /= 0) exit
             iNumLines = iNumLines + 1
@@ -137,6 +141,9 @@ contains
             read(iLUN, "(a)") sBuffer
             read(sBuffer(1:19), "(i4,5(1x,i2))") iYear, iMonth, iDay, iHour, iMinute, iSecond
             call PackTime(this % ivTimeStamp(iLine), iYear, iMonth, iDay, iHour, iMinute, iSecond)
+            do i = 20, len_trim(sBuffer)
+                if(sBuffer(i:i) == ',') sBuffer(i:i) = ' '
+            end do
             read(sBuffer(20:), *) &
                 this % rvU(iLine), &
                 this % rvV(iLine), &
@@ -235,6 +242,10 @@ contains
         ! linear interpolation sampling of meteorological data
         ivTimeIndex = (ivTimeStamp - ivTimeStamp(1)) / this % iTimeStep + 1
         rvTimeShift = float((ivTimeIndex - 1) * this % iTimeStep)
+        
+        do i = 1, size(this % ivTimeStamp)
+            print *, i, this % ivTimeStamp(i), this % rvU(i), this % rvV(i)
+        end do
         
         ! Interpolate meteorological values
         do i = 1, iNumTimes
