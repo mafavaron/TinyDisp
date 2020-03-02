@@ -243,9 +243,7 @@ contains
         ivTimeIndex = (ivTimeStamp - ivTimeStamp(1)) / this % iTimeStep + 1
         rvTimeShift = float((ivTimeIndex - 1) * this % iTimeStep)
         
-        do i = 1, size(this % ivTimeStamp)
-            print *, i, this % ivTimeStamp(i), this % rvU(i), this % rvV(i)
-        end do
+        print *, ivTimeStamp
         
         ! Interpolate meteorological values
         do i = 1, iNumTimes
