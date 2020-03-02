@@ -25,8 +25,23 @@ program TinyDisp
     implicit none
     
     ! Locals
-    integer             :: myscreen
-    character(len=256)  :: sCfgFile
+    integer                             :: iRetCode
+    integer                             :: i
+    integer                             :: iNumPart
+    integer                             :: myscreen
+    character(len=256)                  :: sCfgFile
+    type(ConfigType)                    :: tCfg
+    integer, dimension(:), allocatable  :: ivTimeStamp
+    real, dimension(:), allocatable     :: rvU
+    real, dimension(:), allocatable     :: rvV
+    real, dimension(:), allocatable     :: rvStdDevU
+    real, dimension(:), allocatable     :: rvStdDevV
+    real, dimension(:), allocatable     :: rvCovUV
+    real, dimension(:), allocatable     :: rvPartX
+    real, dimension(:), allocatable     :: rvPartY
+    real, dimension(:), allocatable     :: rvPartU
+    real, dimension(:), allocatable     :: rvPartV
+    logical, dimension(:), allocatable  :: lvPartIsActive
     
     ! Get parameters
     if(command_argument_count() /= 1) then
@@ -43,7 +58,39 @@ program TinyDisp
     end if
     call get_command_argument(1, sCfgFile)
     
+    ! Read configuration
+    iRetCode = tCfg % gather(10, sCfgFile)
+    if(iRetCode /= 0) then
+        print *, "Invalid configuration"
+        stop
+    end if
+    
     myscreen = initwindow(1280, 720, dbflag = .true., closeflag = .true.)
+    
+    ! Configure drawing environment
+    call setcolor(WHITE)
+    call setfillstyle(SOLID_FILL, WHITE)
+    call setbkcolor(BLACK)
+    call setmatchthemetextstyle()
+    
+    ! Set page permanence to 50 ms
+    call startidle(50)
+    
+    ! Sample meteorology at the points desired
+    iRetCode = tCfg % get_meteo(ivTimeStamp, rvU, rvV, rvStdDevU, rvStdDevV, rvCovUV)
+    if(iRetCode /= 0) then
+        print *, "Meteo data not accessed"
+        stop
+    end if
+    
+    ! Initialize the particle pool
+    iNumPart = tCfg % get_num_particles()
+    allocate(lvPartIsActive(iNumPart))
+    
+    ! Main loop: Iterate over meteorology
+    do i = 1, size(ivTimeStamp)
+        
+    end do
     
     call loop()
     

@@ -1,5 +1,7 @@
 &CONFIGURATION
-    iTimeStep   =    10,
-    rEdgeLength = 10000.0,
-    sMeteoFile  = ".\\trial.csv",
+    iTimeStep      =   100,
+    rEdgeLength    = 10000.0,
+    iPartsPerStep  =   100,
+    iStepsSurvival =    72,
+    sMeteoFile     = ".\\trial.csv",
 /
