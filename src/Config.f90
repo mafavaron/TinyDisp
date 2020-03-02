@@ -193,7 +193,7 @@ contains
         
         ! Locals
         integer, dimension(:), allocatable  :: ivTimeIndex
-        real, dimension(:), allocatable     :: rvTimeShift
+        integer, dimension(:), allocatable  :: ivTimeShift
         integer :: iMinTimeStamp
         integer :: iMaxTimeStamp
         integer :: iNumTimes
@@ -228,7 +228,7 @@ contains
         if(allocated(rvCovUV))     deallocate(rvCovUV)
         allocate(ivTimeStamp(iNumTimes))
         allocate(ivTimeIndex(iNumTimes))
-        allocate(rvTimeShift(iNumTimes))
+        allocate(ivTimeShift(iNumTimes))
         allocate(rvU(iNumTimes))
         allocate(rvV(iNumTimes))
         allocate(rvStdDevU(iNumTimes))
@@ -241,19 +241,25 @@ contains
         ! Convert the time stamps to time indices, and to displacements to be used in
         ! linear interpolation sampling of meteorological data
         ivTimeIndex = (ivTimeStamp - ivTimeStamp(1)) / iDeltaTime + 1
-        rvTimeShift = float(ivTimeStamp - this % ivTimeStamp(ivTimeIndex))
-        
-        print *, rvTimeShift
+        ivTimeShift = ivTimeStamp - this % ivTimeStamp(ivTimeIndex)
         
         ! Interpolate meteorological values
         do i = 1, iNumTimes
-            j            = ivTimeIndex(i)
-            rFactor      = rvTimeShift(i) / iDeltaTime
-            rvU(i)       = this % rvU(j)       + (this % rvU(j+1)       - this % rvU(j)) * rFactor
-            rvV(i)       = this % rvV(j)       + (this % rvV(j+1)       - this % rvV(j)) * rFactor
-            rvStdDevU(i) = this % rvStdDevU(j) + (this % rvStdDevU(j+i) - this % rvStdDevU(j)) * rFactor
-            rvStdDevV(i) = this % rvStdDevV(j) + (this % rvStdDevV(j+1) - this % rvStdDevV(j)) * rFactor
-            rvCovUV(i)   = this % rvCovUV(j)   + (this % rvCovUV(j+1)   - this % rvCovUV(j)) * rFactor
+            j = ivTimeIndex(i)
+            if(ivTimeShift(i) > 0) then
+                rFactor      = ivTimeShift(i) / float(iDeltaTime)
+                rvU(i)       = this % rvU(j)       + (this % rvU(j+1)       - this % rvU(j)) * rFactor
+                rvV(i)       = this % rvV(j)       + (this % rvV(j+1)       - this % rvV(j)) * rFactor
+                rvStdDevU(i) = this % rvStdDevU(j) + (this % rvStdDevU(j+i) - this % rvStdDevU(j)) * rFactor
+                rvStdDevV(i) = this % rvStdDevV(j) + (this % rvStdDevV(j+1) - this % rvStdDevV(j)) * rFactor
+                rvCovUV(i)   = this % rvCovUV(j)   + (this % rvCovUV(j+1)   - this % rvCovUV(j)) * rFactor
+            else
+                rvU(i)       = this % rvU(j)
+                rvV(i)       = this % rvV(j)
+                rvStdDevU(i) = this % rvStdDevU(j)
+                rvStdDevV(i) = this % rvStdDevV(j)
+                rvCovUV(i)   = this % rvCovUV(j)
+            end if
         end do
         
         ! Leave
