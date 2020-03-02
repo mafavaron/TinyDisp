@@ -8,11 +8,19 @@ module Config
 
     implicit none
     
+    private
+    
+    ! Public interface
+    public  :: ConfigType
+    
+    ! Main module's data type
     type ConfigType
         ! -1- General
         integer             :: iTimeStep        ! In seconds, strictly positive
         real                :: rEdgeLength      ! In metres
         character(len=256)  :: sMeteoFile       ! The desired one
+        integer             :: iPartsPerStep    ! Number of particles emitted at each step
+        integer             :: iStepsSurvival   ! Number of spet a particle is expected to survive.
         logical             :: lIsValid         ! Use data type only if .TRUE.
         ! -1- Meteorology
         integer, dimension(:), allocatable  :: ivTimeStamp
@@ -22,8 +30,9 @@ module Config
         real, dimension(:), allocatable     :: rvStdDevV
         real, dimension(:), allocatable     :: rvCovUV
     contains
-        procedure           :: gather           ! Gets configuration from a NAMELIST file
-        procedure           :: get_meteo        ! Get meteo data
+        procedure           :: gather               ! Gets configuration from a NAMELIST file
+        procedure           :: get_meteo            ! Get meteo data
+        procedure           :: get_num_particles    ! Retrieve the number of particle based on configuration
     end type ConfigType
     
 contains
@@ -46,7 +55,9 @@ contains
         logical             :: lIsFile
         integer             :: iNumLines
         integer             :: iLine
-        namelist /configuration/ iTimeStep, rEdgeLength, sMeteoFile
+        integer             :: iPartsPerStep
+        integer             :: iStepsSurvival
+        namelist /configuration/ iTimeStep, rEdgeLength, sMeteoFile, iPartsPerStep, iStepsSurvival
         ! -1- From meteo file
         integer             :: i
         integer             :: iCurTime
@@ -105,6 +116,7 @@ contains
             close(iLUN)
             return
         end if
+        
         iNumLines = 0
         do
             read(iLUN, "(a)", iostat=iErrCode) sBuffer
@@ -267,5 +279,20 @@ contains
         deallocate(ivTimeIndex)
         
     end function get_meteo
-
+    
+    
+    function get_num_particles(this) result(iNumPart)
+        
+        ! Routine arguments
+        class(ConfigType), intent(in)   :: this
+        integer                         :: iNumPart
+        
+        ! Locals
+        ! -none-
+        
+        ! Get the information desired
+        iNumPart = this % iPartsPerStep * this % iStepsSurvival
+        
+    end function get_num_particles
+    
 end module Config
