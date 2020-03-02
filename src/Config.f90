@@ -263,7 +263,7 @@ contains
         end do
         
         ! Leave
-        deallocate(rvTimeShift)
+        deallocate(ivTimeShift)
         deallocate(ivTimeIndex)
         
     end function get_meteo
