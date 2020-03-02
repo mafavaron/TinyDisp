@@ -17,6 +17,7 @@ module DotPlot
         real    :: yOffset
     contains
         procedure   :: init
+        procedure   :: show
     end type PointType
     
 contains
@@ -65,5 +66,35 @@ contains
         this % yOffset     = jMin - this % yMultiplier
         
     end function init
+    
+    
+    function show(this, rvX, rvY) result(iRetCode)
+    
+        ! Routine arguments
+        class(PointType), intent(out)   :: this
+        real, dimension(:), intent(in)  :: rvX
+        real, dimension(:), intent(in)  :: rvY
+        integer                         :: iRetCode
+        
+        ! Locals
+        integer, dimension(:), allocatable  :: ivX
+        integer, dimension(:), allocatable  :: ivY
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
+        
+        ! Reserve workspace
+        allocate(ivX(size(rvX)), ivY(size(rvY)))
+        
+        ! Convert floating point coordinates to integer form
+        ivX = nint(rvX * xMultiplier + xOffset)
+        ivY = nint(rvY * yMultiplier + yOffset)
+        
+        ! Plot points
+        
+        ! Leave
+        deallocate(ivX, ivY)
+        
+    end function show
 
 end module DotPlot
