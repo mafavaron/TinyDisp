@@ -183,10 +183,12 @@ contains
         ! Post-condition: time stamps are monotonically increasing, and equally spaced in time
         
         ! Form all what remains of configuration, and declare it valid
-        this % iTimeStep   = iTimeStep
-        this % rEdgeLength = rEdgeLength
-        this % sMeteoFile  = sMeteoFile
-        this % lIsValid    = .true.
+        this % iTimeStep      = iTimeStep
+        this % rEdgeLength    = rEdgeLength
+        this % sMeteoFile     = sMeteoFile
+        this % iPartsPerStep  = iPartsPerStep
+        this % iStepsSurvival = iStepsSurvival
+        this % lIsValid       = .true.
         
     end function gather
     
@@ -291,7 +293,11 @@ contains
         ! -none-
         
         ! Get the information desired
-        iNumPart = this % iPartsPerStep * this % iStepsSurvival
+        if(this % lIsValid) then
+            iNumPart = this % iPartsPerStep * this % iStepsSurvival
+        else
+            iNumPart = -1
+        end if
         
     end function get_num_particles
     
