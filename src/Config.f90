@@ -241,7 +241,7 @@ contains
         ! Convert the time stamps to time indices, and to displacements to be used in
         ! linear interpolation sampling of meteorological data
         ivTimeIndex = (ivTimeStamp - ivTimeStamp(1)) / iDeltaTime + 1
-        rvTimeShift = float((ivTimeIndex - 1) * iDeltaTime)
+        rvTimeShift = float(ivTimeStamp - this % ivTimeStamp(ivTimeIndex))
         
         print *, rvTimeShift
         
