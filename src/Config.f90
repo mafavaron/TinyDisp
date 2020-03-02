@@ -240,10 +240,10 @@ contains
         
         ! Convert the time stamps to time indices, and to displacements to be used in
         ! linear interpolation sampling of meteorological data
-        ivTimeIndex = (ivTimeStamp - ivTimeStamp(1)) / this % iTimeStep + 1
-        rvTimeShift = float((ivTimeIndex - 1) * this % iTimeStep)
+        ivTimeIndex = (ivTimeStamp - ivTimeStamp(1)) / iDeltaTime + 1
+        rvTimeShift = float((ivTimeIndex - 1) * iDeltaTime)
         
-        print *, ivTimeStamp
+        print *, rvTimeShift
         
         ! Interpolate meteorological values
         do i = 1, iNumTimes
