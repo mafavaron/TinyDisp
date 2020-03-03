@@ -98,6 +98,7 @@ contains
         
         ! Leave
         deallocate(ivX, ivY)
+        call swapbuffers()
         
     end function show
 
