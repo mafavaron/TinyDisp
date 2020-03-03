@@ -11,7 +11,7 @@ module Particles
     
     ! Data types
     type ParticlePoolType
-        integer                             :: iNextPart
+        integer                             :: iLastPart
         real, dimension(:), allocatable     :: rvX
         real, dimension(:), allocatable     :: rvY
         real, dimension(:), allocatable     :: rvU
@@ -21,6 +21,7 @@ module Particles
         procedure   :: clean
         procedure   :: init
         procedure   :: start
+        procedure   :: release
     end type ParticlePoolType
     
 contains
@@ -56,6 +57,12 @@ contains
         ! Assume success (will falsify on failure
         iRetCode = 0
         
+        ! Check input parameters
+        if(iNumPart <= 0) then
+            iRetCode = 1
+            return
+        end if
+        
         ! Clean, then reserve workspace
         call this % clean()
         allocate(this % rvX(iNumPart))
@@ -85,8 +92,56 @@ contains
         this % rvY        = 0.
         this % rvU        = 0.
         this % rvV        = 0.
-        this % iNextPart  = 0
+        this % iLastPart  = 0
         
     end function start
+    
+    
+    function release(this, iNumToRelease, rU, rV) result(iRetCode)
+    
+        ! Routine arguments
+        class(ParticlePoolType), intent(inout)  :: this
+        integer, intent(in)                     :: iNumToRelease
+        real, intent(in)                        :: rU
+        real, intent(in)                        :: rV
+        integer                                 :: iRetCode
+        
+        ! Locals
+        integer :: iStart
+        integer :: iStop
+        
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
+    
+        ! Check input parameters
+        if(iNumToRelease <= 0) then
+            iRetCode = 1
+            return
+        end if
+        if(mod(size(this % lvIsActive), iNumToRelease) /= 0) then
+            iRetCode = 2
+            return
+        end if
+        
+        ! Emit new particles
+        ! -1- Index bounds
+        if(this % iLastPart < size(this % lvIsActive)) then
+            iStart = this % iLastPart + 1
+            iStop  = this % iLastPart + iNumToRelease
+        else
+            iStart = 1
+            iStop  = iNumToRelease
+        end if
+        this % rvX(iStart:iStop)        = 0.
+        this % rvY(iStart:iStop)        = 0.
+        this % rvU(iStart:iStop)        = rU
+        this % rvV(iStart:iStop)        = rV
+        this % lvIsActive(iStart:iStop) = .true.
+        
+        ! Update last particle index
+        this % iLastPart = iStop
+        
+    end function release
 
 end module Particles
