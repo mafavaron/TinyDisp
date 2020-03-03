@@ -98,7 +98,13 @@ program TinyDisp
     
     ! Initialize the particle pool
     iNumPart = tCfg % get_num_particles()
-    allocate(lvPartIsActive(iNumPart))
+    allocate( &
+        lvPartIsActive(iNumPart), &
+        rvPartX(iNumPart), &
+        rvPartY(iNumPart), &
+        rvPartU(iNumPart), &
+        rvPartV(iNumPart)  &
+    )
     
     ! Main loop: Iterate over meteorology
     do i = 1, size(ivTimeStamp)
@@ -108,6 +114,9 @@ program TinyDisp
     ! Wait until window is closed
     call loop()
     call closewindow(myscreen)
+    
+    ! Leave
+    deallocate(lvPartIsActive, rvPartX, rvPartY, rvPartU, rvPartV)
 
 end program TinyDisp
 
