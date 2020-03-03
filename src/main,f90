@@ -18,10 +18,15 @@
 !
 program TinyDisp
     
+    ! Computer science:
     use omp_lib
     use appgraphics
-    use Config
+    ! GUI:
+    use Controls
     use DotPlot
+    ! Physics:
+    use Particles
+    use Config
     
     implicit none
     
@@ -33,18 +38,13 @@ program TinyDisp
     character(len=256)                  :: sCfgFile
     type(ConfigType)                    :: tCfg
     type(PointType)                     :: tPlt
+    type(ParticlePoolType)              :: tPart
     integer, dimension(:), allocatable  :: ivTimeStamp
     real, dimension(:), allocatable     :: rvU
     real, dimension(:), allocatable     :: rvV
     real, dimension(:), allocatable     :: rvStdDevU
     real, dimension(:), allocatable     :: rvStdDevV
     real, dimension(:), allocatable     :: rvCovUV
-    real, dimension(:), allocatable     :: rvPartX
-    real, dimension(:), allocatable     :: rvPartY
-    real, dimension(:), allocatable     :: rvPartU
-    real, dimension(:), allocatable     :: rvPartV
-    real, dimension(:), allocatable     :: rvDelta
-    logical, dimension(:), allocatable  :: lvPartIsActive
     
     ! Get parameters
     if(command_argument_count() /= 1) then
