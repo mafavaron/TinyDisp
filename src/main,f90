@@ -21,6 +21,7 @@ program TinyDisp
     use omp_lib
     use appgraphics
     use Config
+    use DotPlot
     
     implicit none
     
@@ -31,6 +32,7 @@ program TinyDisp
     integer                             :: myscreen
     character(len=256)                  :: sCfgFile
     type(ConfigType)                    :: tCfg
+    type(PointType)                     :: tPlt
     integer, dimension(:), allocatable  :: ivTimeStamp
     real, dimension(:), allocatable     :: rvU
     real, dimension(:), allocatable     :: rvV
@@ -83,18 +85,38 @@ program TinyDisp
         stop
     end if
     
+    ! Initialize plotting window
+    iRetCode = tPlt % Init( &
+        720, 720, &
+        -tCfg % rEdgeLength / 2., tCfg % rEdgeLength / 2., &
+        -tCfg % rEdgeLength / 2., tCfg % rEdgeLength / 2.  &
+    )
+    if(iRetCode /= 0) then
+        print *, "Plot window not initialized"
+        stop
+    end if
+    
     ! Initialize the particle pool
     iNumPart = tCfg % get_num_particles()
-    allocate(lvPartIsActive(iNumPart))
+    allocate( &
+        lvPartIsActive(iNumPart), &
+        rvPartX(iNumPart), &
+        rvPartY(iNumPart), &
+        rvPartU(iNumPart), &
+        rvPartV(iNumPart)  &
+    )
     
     ! Main loop: Iterate over meteorology
     do i = 1, size(ivTimeStamp)
         
     end do
     
+    ! Wait until window is closed
     call loop()
-    
     call closewindow(myscreen)
+    
+    ! Leave
+    deallocate(lvPartIsActive, rvPartX, rvPartY, rvPartU, rvPartV)
 
 end program TinyDisp
 
