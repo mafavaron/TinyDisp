@@ -43,6 +43,7 @@ program TinyDisp
     real, dimension(:), allocatable     :: rvPartY
     real, dimension(:), allocatable     :: rvPartU
     real, dimension(:), allocatable     :: rvPartV
+    real, dimension(:), allocatable     :: rvDelta
     logical, dimension(:), allocatable  :: lvPartIsActive
     
     ! Get parameters
@@ -72,7 +73,7 @@ program TinyDisp
     ! Configure drawing environment
     call setcolor(WHITE)
     call setfillstyle(SOLID_FILL, WHITE)
-    call setbkcolor(BLACK)
+    call setbkcolor(RED)
     call setmatchthemetextstyle()
     
     ! Set page permanence to 50 ms
@@ -99,6 +100,7 @@ program TinyDisp
     ! Initialize the particle pool
     iNumPart = tCfg % get_num_particles()
     allocate( &
+        rvDelta(iNumPart), &
         lvPartIsActive(iNumPart), &
         rvPartX(iNumPart), &
         rvPartY(iNumPart), &
@@ -108,7 +110,13 @@ program TinyDisp
     
     ! Main loop: Iterate over meteorology
     do i = 1, size(ivTimeStamp)
-        
+        rvPartX = -tCfg % rEdgeLength / 2. + tCfg % rEdgeLength * float(i-1) / float(size(ivTimeStamp) - 1)
+        call RANDOM_NUMBER(rvDelta)
+        rvPartX = 10. * rvPartX * rvDelta
+        rvPartY =  rvPartX
+        call RANDOM_NUMBER(rvDelta)
+        rvPartY = 10. * rvPartY * rvDelta
+        iRetCode = tPlt % show(rvPartX, rvPartY)
     end do
     
     ! Wait until window is closed
@@ -116,7 +124,7 @@ program TinyDisp
     call closewindow(myscreen)
     
     ! Leave
-    deallocate(lvPartIsActive, rvPartX, rvPartY, rvPartU, rvPartV)
+    deallocate(rvDelta, lvPartIsActive, rvPartX, rvPartY, rvPartU, rvPartV)
 
 end program TinyDisp
 
