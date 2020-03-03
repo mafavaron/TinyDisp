@@ -92,8 +92,9 @@ contains
         ivY = nint(rvY * this % yMultiplier + this % yOffset)
         
         ! Plot points
+        call clearviewport()
         do i = 1, size(rvX)
-            call putpixel(ivX(i), ivY(i), LIGHTBLUE)
+            call putpixel(ivX(i), ivY(i), WHITE)
         end do
         
         ! Leave
