@@ -5,6 +5,7 @@ module Controls
 
     use appgraphics
     use iso_c_binding
+    use Particles
 
     implicit none
     
@@ -133,9 +134,13 @@ contains
     end subroutine save_screen
     
     
-    subroutine reset_run()
+    subroutine reset_run(tPart)
+    
+        ! Routine arguments
+        type(ParticlePoolType), intent(inout)   :: tPart
         
         ! Initialize run
+        call tPart % start()
         
         ! Forces a redraw, but the paused flag is still
         ! set to True, meaning the run won't actually
