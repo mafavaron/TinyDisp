@@ -78,9 +78,8 @@ program TinyDisp
     ! Configure drawing environment
     call setcolor(WHITE)
     call setfillstyle(SOLID_FILL, WHITE)
-    call setbkcolor(RED)
+    call setbkcolor(BLACK)
     call setmatchthemetextstyle()
-    call rectangle(0, 0, 1279, 719)
     
     ! Set page permanence to 50 ms
     call startidle(50)
