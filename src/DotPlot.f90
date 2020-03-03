@@ -79,6 +79,7 @@ contains
         ! Locals
         integer, dimension(:), allocatable  :: ivX
         integer, dimension(:), allocatable  :: ivY
+        integer                             :: i
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -87,10 +88,13 @@ contains
         allocate(ivX(size(rvX)), ivY(size(rvY)))
         
         ! Convert floating point coordinates to integer form
-        ivX = nint(rvX * xMultiplier + xOffset)
-        ivY = nint(rvY * yMultiplier + yOffset)
+        ivX = nint(rvX * this % xMultiplier + this % xOffset)
+        ivY = nint(rvY * this % yMultiplier + this % yOffset)
         
         ! Plot points
+        do i = 1, size(rvX)
+            call putpixel(ivX(i), ivY(i), LIGHTBLUE)
+        end do
         
         ! Leave
         deallocate(ivX, ivY)
