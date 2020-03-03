@@ -85,7 +85,16 @@ program TinyDisp
         stop
     end if
     
-    ! Initialize plotting
+    ! Initialize plotting window
+    iRetCode = tPlt % Init( &
+        720, 720, &
+        -tCfg % rEdgeLength / 2., tCfg % rEdgeLength / 2., &
+        -tCfg % rEdgeLength / 2., tCfg % rEdgeLength / 2.  &
+    )
+    if(iRetCode /= 0) then
+        print *, "Plot window not initialized"
+        stop
+    end if
     
     ! Initialize the particle pool
     iNumPart = tCfg % get_num_particles()
