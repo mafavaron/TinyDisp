@@ -18,10 +18,15 @@
 !
 program TinyDisp
     
+    ! Computer science:
     use omp_lib
     use appgraphics
-    use Config
+    ! GUI:
+    use Controls
     use DotPlot
+    ! Physics:
+    use Particles
+    use Config
     
     implicit none
     
@@ -33,18 +38,13 @@ program TinyDisp
     character(len=256)                  :: sCfgFile
     type(ConfigType)                    :: tCfg
     type(PointType)                     :: tPlt
+    type(ParticlePoolType)              :: tPart
     integer, dimension(:), allocatable  :: ivTimeStamp
     real, dimension(:), allocatable     :: rvU
     real, dimension(:), allocatable     :: rvV
     real, dimension(:), allocatable     :: rvStdDevU
     real, dimension(:), allocatable     :: rvStdDevV
     real, dimension(:), allocatable     :: rvCovUV
-    real, dimension(:), allocatable     :: rvPartX
-    real, dimension(:), allocatable     :: rvPartY
-    real, dimension(:), allocatable     :: rvPartU
-    real, dimension(:), allocatable     :: rvPartV
-    real, dimension(:), allocatable     :: rvDelta
-    logical, dimension(:), allocatable  :: lvPartIsActive
     
     ! Get parameters
     if(command_argument_count() /= 1) then
@@ -60,6 +60,9 @@ program TinyDisp
         stop
     end if
     call get_command_argument(1, sCfgFile)
+    
+    ! Initialize random number generator based on date and time
+    call init_random()
     
     ! Read configuration
     iRetCode = tCfg % gather(10, sCfgFile)
@@ -78,12 +81,9 @@ program TinyDisp
     ! Configure drawing environment
     call setcolor(WHITE)
     call setfillstyle(SOLID_FILL, WHITE)
-    call setbkcolor(RED)
+    call setbkcolor(BLACK)
     call setmatchthemetextstyle()
-    call rectangle(0, 0, 1279, 719)
-    
-    ! Set page permanence to 50 ms
-    call startidle(50)
+    call setviewport(0,0,719,719,.true.)
     
     ! Sample meteorology at the points desired
     iRetCode = tCfg % get_meteo(ivTimeStamp, rvU, rvV, rvStdDevU, rvStdDevV, rvCovUV)
@@ -132,5 +132,25 @@ program TinyDisp
     ! Leave
     deallocate(rvDelta, lvPartIsActive, rvPartX, rvPartY, rvPartU, rvPartV)
 
+contains
+    
+    subroutine init_random()
+    
+        ! Routine arguments
+        ! -none-
+        
+        ! Locals
+        integer, dimension(:), allocatable  :: seed
+        integer                             :: values(8), k
+        
+        ! Seed the random number generator using current date and time
+        call date_and_time(values=values)
+        call random_seed(size=k)
+        allocate(seed(k))
+        seed = values(8)
+        call random_seed(put=seed)
+        
+    end subroutine init_random
+    
 end program TinyDisp
 
