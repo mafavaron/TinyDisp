@@ -105,14 +105,7 @@ program TinyDisp
     
     ! Initialize the particle pool
     iNumPart = tCfg % get_num_particles()
-    allocate( &
-        rvDelta(iNumPart), &
-        lvPartIsActive(iNumPart), &
-        rvPartX(iNumPart), &
-        rvPartY(iNumPart), &
-        rvPartU(iNumPart), &
-        rvPartV(iNumPart)  &
-    )
+    iRetCode = tPart % init(iNumPart)
     
     ! Main loop: Iterate over meteorology
     do i = 1, size(ivTimeStamp)
