@@ -4,6 +4,7 @@
 module Controls
 
     use appgraphics
+    use iso_c_binding
 
     implicit none
     
@@ -61,6 +62,30 @@ contains
     end subroutine init_menu
     
     
+     subroutine start_run()
+    
+        ! Routine arguments
+        ! -none-
+        
+        ! Locals
+        ! -none-
+        
+        ! Force state to "running"
+        paused = .false.
+        
+        ! Release the idle loop so that other things can be made
+        call stopidle()
+
+        ! Finalize state forcing to "running"
+        call enablebutton(iStopButton,  .true.)
+        call enablebutton(iStartButton, .false.)
+        call enablemenuitem(iPauseMenuItem,  .true.)
+        call enablemenuitem(iResumeMenuItem, .false.)
+        call enablemenuitem(iResetMenuItem,  .false.)
+        
+    end subroutine start_run
+    
+    
     subroutine stop_run()
     
         ! Routine arguments
@@ -79,4 +104,64 @@ contains
         
     end subroutine stop_run
 
+
+    subroutine quit_run()
+        
+        ! Routine arguments
+        ! -none-
+        
+        ! Locals
+        ! -none-
+        
+        ! Force state to "not running", to allow
+        ! orderly breaking out of the idle loop
+        lRunning = .false.
+        
+        ! By doing so, the loop will break
+        ! but as lRunning==.false. an orderly
+        ! shutdown will occur
+        call start_run()
+        
+    end subroutine quit_run
+
+
+    subroutine save_screen()
+    
+        ! Open the screen save dialog
+        call writeimagefile()
+    
+    end subroutine save_screen
+    
+    
+    subroutine reset_run()
+        
+        ! Initialize run
+        
+        ! Forces a redraw, but the paused flag is still
+        ! set to True, meaning the run won't actually
+        ! start
+        call stopidle()
+        
+    end subroutine reset_run
+
+
+    subroutine about_run
+
+        character(2)    :: ff
+        character(512)  :: msg
+        
+        ! To create multiple lines in our message box, we need to have
+        ! a \r\n for windows.  For brevity, we can create that variable
+        ! here to hold the two characters.
+        ff = C_CARRIAGE_RETURN//C_NEW_LINE
+        
+        msg = repeat(' ', 512)
+        msg = "Conway's Game of Life"//ff//"A demo of AppGraphics by Approximatrix"//ff//ff//&
+              "Please feel free to modify and use this demonstration"//ff//&
+              "in any way you wish."
+        
+        call dlgmessage(DIALOG_INFO, msg)
+        
+    end subroutine about_run
+    
 end module Controls
