@@ -11,15 +11,16 @@ module Particles
     
     ! Data types
     type ParticlePoolType
+        integer                             :: iNextPart
         real, dimension(:), allocatable     :: rvX
         real, dimension(:), allocatable     :: rvY
         real, dimension(:), allocatable     :: rvU
         real, dimension(:), allocatable     :: rvV
-        real, dimension(:), allocatable     :: rvDelta
         logical, dimension(:), allocatable  :: lvIsActive
     contains
         procedure   :: clean
         procedure   :: init
+        procedure   :: start
     end type ParticlePoolType
     
 contains
@@ -37,7 +38,6 @@ contains
         if(allocated(this % rvY))        deallocate(this % rvY)
         if(allocated(this % rvU))        deallocate(this % rvU)
         if(allocated(this % rvV))        deallocate(this % rvV)
-        if(allocated(this % rvDelta))    deallocate(this % rvDelta)
         if(allocated(this % lvIsActive)) deallocate(this % lvIsActive)
         
     end subroutine clean
@@ -51,6 +51,7 @@ contains
         integer                                 :: iRetCode
         
         ! Locals
+        ! -none-
         
         ! Assume success (will falsify on failure
         iRetCode = 0
@@ -61,9 +62,31 @@ contains
         allocate(this % rvY(iNumPart))
         allocate(this % rvU(iNumPart))
         allocate(this % rvV(iNumPart))
-        allocate(this % rvDelta(iNumPart))
         allocate(this % lvIsActive(iNumPart))
     
     end function init
+    
+    
+    function start(this) result(iRetCode)
+    
+        ! Routine arguments
+        class(ParticlePoolType), intent(inout)  :: this
+        integer                                 :: iRetCode
+        
+        ! Locals
+        ! -none-
+        
+        ! Assume success (will falsify on failure
+        iRetCode = 0
+        
+        ! Cleanout all particle space
+        this % lvIsActive = .false.
+        this % rvX        = 0.
+        this % rvY        = 0.
+        this % rvU        = 0.
+        this % rvV        = 0.
+        this % iNextPart  = 0
+        
+    end function start
 
 end module Particles
