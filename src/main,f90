@@ -21,6 +21,7 @@ program TinyDisp
     use omp_lib
     use appgraphics
     use Config
+    use DotPlot
     
     implicit none
     
@@ -31,6 +32,7 @@ program TinyDisp
     integer                             :: myscreen
     character(len=256)                  :: sCfgFile
     type(ConfigType)                    :: tCfg
+    type(PointType)                     :: tPlt
     integer, dimension(:), allocatable  :: ivTimeStamp
     real, dimension(:), allocatable     :: rvU
     real, dimension(:), allocatable     :: rvV
@@ -83,6 +85,8 @@ program TinyDisp
         stop
     end if
     
+    ! Initialize plotting
+    
     ! Initialize the particle pool
     iNumPart = tCfg % get_num_particles()
     allocate(lvPartIsActive(iNumPart))
@@ -92,8 +96,8 @@ program TinyDisp
         
     end do
     
+    ! Wait until window is closed
     call loop()
-    
     call closewindow(myscreen)
 
 end program TinyDisp
