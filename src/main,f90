@@ -68,13 +68,19 @@ program TinyDisp
         stop
     end if
     
-    myscreen = initwindow(1280, 720, dbflag = .true., closeflag = .true.)
+    myscreen = initwindow( &
+        1280, 720, &
+        title = "TinyDisp - Airflow Visualizer for Ultrasonic Anemometer", &
+        dbflag = .true., closeflag = .true. &
+    )
+    call disableresize()
     
     ! Configure drawing environment
     call setcolor(WHITE)
     call setfillstyle(SOLID_FILL, WHITE)
     call setbkcolor(RED)
     call setmatchthemetextstyle()
+    call rectangle(0, 0, 1279, 719)
     
     ! Set page permanence to 50 ms
     call startidle(50)
