@@ -61,6 +61,9 @@ program TinyDisp
     end if
     call get_command_argument(1, sCfgFile)
     
+    ! Initialize random number generator based on date and time
+    call init_random()
+    
     ! Read configuration
     iRetCode = tCfg % gather(10, sCfgFile)
     if(iRetCode /= 0) then
@@ -80,9 +83,7 @@ program TinyDisp
     call setfillstyle(SOLID_FILL, WHITE)
     call setbkcolor(BLACK)
     call setmatchthemetextstyle()
-    
-    ! Set page permanence to 50 ms
-    call startidle(50)
+    call setviewport(0,0,719,719,.true.)
     
     ! Sample meteorology at the points desired
     iRetCode = tCfg % get_meteo(ivTimeStamp, rvU, rvV, rvStdDevU, rvStdDevV, rvCovUV)
@@ -131,5 +132,25 @@ program TinyDisp
     ! Leave
     deallocate(rvDelta, lvPartIsActive, rvPartX, rvPartY, rvPartU, rvPartV)
 
+contains
+    
+    subroutine init_random()
+    
+        ! Routine arguments
+        ! -none-
+        
+        ! Locals
+        integer, dimension(:), allocatable  :: seed
+        integer                             :: values(8), k
+        
+        ! Seed the random number generator using current date and time
+        call date_and_time(values=values)
+        call random_seed(size=k)
+        allocate(seed(k))
+        seed = values(8)
+        call random_seed(put=seed)
+        
+    end subroutine init_random
+    
 end program TinyDisp
 
