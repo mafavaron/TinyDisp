@@ -22,6 +22,7 @@ module Particles
         procedure   :: init
         procedure   :: start
         procedure   :: release
+        procedure   :: move
     end type ParticlePoolType
     
 contains
@@ -143,5 +144,24 @@ contains
         this % iLastPart = iStop
         
     end function release
+    
+    
+    function move(this, rU, rV, rStdDevU, rStdDevV, rCovUV) result(iRetCode)
+    
+        ! Routine arguments
+        class(ParticlePoolType), intent(inout)  :: this
+        real, intent(in)                        :: rU
+        real, intent(in)                        :: rV
+        real, intent(in)                        :: rStdDevU
+        real, intent(in)                        :: rStdDevV
+        real, intent(in)                        :: rCovUV
+        integer                                 :: iRetCode
+        
+        ! Locals
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
+        
+    end function move
 
 end module Particles
