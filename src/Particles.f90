@@ -75,17 +75,13 @@ contains
     end function init
     
     
-    function start(this) result(iRetCode)
+    subroutine start(this)
     
         ! Routine arguments
         class(ParticlePoolType), intent(inout)  :: this
-        integer                                 :: iRetCode
         
         ! Locals
         ! -none-
-        
-        ! Assume success (will falsify on failure
-        iRetCode = 0
         
         ! Cleanout all particle space
         this % lvIsActive = .false.
@@ -95,7 +91,7 @@ contains
         this % rvV        = 0.
         this % iLastPart  = 0
         
-    end function start
+    end subroutine start
     
     
     function release(this, iNumToRelease, rU, rV) result(iRetCode)
@@ -158,9 +154,20 @@ contains
         integer                                 :: iRetCode
         
         ! Locals
+        integer :: i
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
+        
+        ! Main loop: iterate over all particles, and prepare to act on the
+        ! active ones
+        do i = 1, size(this % lvIsActive)
+            if(this % lvIsActive(i)) then
+            
+                ! 
+            
+            end if
+        end do
         
     end function move
 
