@@ -10,8 +10,49 @@ module RandVals
 
 contains
 
-    ! Normal generator
+    ! Normal generator, after the "Ratio method for normal deviates"
+    ! in D.E. Knuth, "The Art of Computer Programming - Vol.2: Seminumerical Algorithms"
     function Norm() result(rNorm)
+    
+        ! Routine arguments
+        real    :: rNorm
+        
+        ! Locals
+        real    :: rU, rV, rX
+        
+        ! Constants
+        real, parameter :: e   = exp(1.)
+        real, parameter :: s8e = sqrt(8/e)
+        real, parameter :: e4  = 4. * e**0.25
+        real, parameter :: e5  = 4. * e**-1.35
+        
+        do
+        
+            ! Step R1
+            do
+                call random_number(rU)
+                if(rU > 0.) exit
+            end do
+            call random_number(rV)
+            rX = s8e * (rV - 0.5) / rU
+            
+            ! Step R2
+            if(rX**2 <= 5. - e4 * rU) then
+                rNorm = rX
+                return
+            end if
+            
+            ! Step R3
+            if(rX**2 >= e5/rU + 1.4) cycle
+            
+            ! Step R4
+            if(rX**2 <= -4./log(rU)) then
+                rNorm = rX
+                return
+            end if
+            
+        end do
+        
     end function Norm
     
 
@@ -47,3 +88,4 @@ contains
     end subroutine BivarNorm
 
 end module RandVals
+
