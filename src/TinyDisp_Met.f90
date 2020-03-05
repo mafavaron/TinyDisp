@@ -26,7 +26,11 @@ program TinyDisp_Met
 	real(4), dimension(:), allocatable				:: rvV
 	real(4), dimension(:), allocatable				:: rvW
 	real(4), dimension(:), allocatable				:: rvT
-	real(4), dimension(:), allocatable				:: rvVel
+	real(4), dimension(:), allocatable				:: rvU
+	real(4), dimension(:), allocatable				:: rvV
+	real(4), dimension(:), allocatable				:: rvStdDevU
+	real(4), dimension(:), allocatable				:: rvStdDevV
+	real(4), dimension(:), allocatable				:: rvCovUV
 	real(4), dimension(:), allocatable				:: rvAvgTime
 	real(4), dimension(:), allocatable				:: rvAvgVel
 	real(4), dimension(:), allocatable				:: rvHourlyAvgTime
