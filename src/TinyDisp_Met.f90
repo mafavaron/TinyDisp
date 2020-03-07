@@ -19,6 +19,7 @@ program TinyDisp_Met
 	real                :: rTimeEnd
 	real                :: rMaxSec
 	integer             :: i
+	integer             :: iData
 	integer             :: iMinute, iSecond
 	character(len=256), dimension(:), allocatable	:: svFiles
 	real(4), dimension(:), allocatable				:: rvTimeStamp
@@ -69,6 +70,8 @@ program TinyDisp_Met
 	end if
 
 	! Main loop: process files in turn
+	open(11, file=sOutputFile, status='unknown', action='write')
+	write(11, "('Time.stamp,U,V,SigmaU,SigmaV,CovUV')")
 	do i = 1, size(svFiles)
 
 		! Get date and hour from file name
@@ -97,14 +100,38 @@ program TinyDisp_Met
 			print *, 'warning:: Some problem computing 600s mean'
 			cycle
 		end if
+		iRetCode = stddev(rvTimeStamp, rvU, 600., rvAvgTime, rvStdDevU)
+		if(iRetCode /= 0) then
+			print *, 'warning:: Some problem computing 600s mean'
+			cycle
+		end if
+		iRetCode = stddev(rvTimeStamp, rvV, 600., rvAvgTime, rvStdDevV)
+		if(iRetCode /= 0) then
+			print *, 'warning:: Some problem computing 600s mean'
+			cycle
+		end if
+		iRetCode = cov(rvTimeStamp, rvU, rvV, 600., rvAvgTime, rvCovUV)
+		if(iRetCode /= 0) then
+			print *, 'warning:: Some problem computing 600s mean'
+			cycle
+		end if
+
+		! Print all data computed so far
+		do iData = 1, size(rvAvgTime)
 		
-		! Print
-		write(*, "(a4,2('-',a2),1x,a2,2(':',i2.2),4(',',f8.2))") &
-			sYear, sMonth, sDay, sHour, iMinute, iSecond, &
-			minval(rvAvgVel), maxval(rvAvgVel), &
-			rvAvgVel(ivPos(1)), rvHourlyAvgVel(1)
+			iMinute = floor(rvAvgTime(iData) / 60.)
+			iSecond = floor(rvAvgTime(iData) - iMinute * 60.)
+		
+			write(11, "(a4,2('-',a2),1x,a2,2(':',i2.2),5(',',f8.2))") &
+				sYear, sMonth, sDay, sHour, iMinute, iSecond, &
+				rvAvgU(iData), rvAvgV(iData), &
+				rvStdDevU(iData), rvStdDevV(iData), &
+				rvCovUV(iData)
+				
+		end do
 
 	end do
+	close(11)
 
 	! Time elapsed counts
 	call cpu_time(rTimeEnd)
