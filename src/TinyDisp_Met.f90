@@ -13,7 +13,7 @@ program TinyDisp_Met
 
 	! Locals
 	character(len=256)  :: sInputPath
-	character(len=256)  :: sOutputPath
+	character(len=256)  :: sOutputFile
 	integer             :: iRetCode
 	real                :: rTimeBegin
 	real                :: rTimeEnd
@@ -57,7 +57,7 @@ program TinyDisp_Met
 		stop
 	end if
 	call get_command_argument(1, sInputPath)
-	call get_command_argument(2, sOutputPath)
+	call get_command_argument(2, sOutputFile)
 
 	! Time elapsed counts
 	call cpu_time(rTimeBegin)
@@ -75,7 +75,7 @@ program TinyDisp_Met
 	do i = 1, size(svFiles)
 
 		! Get date and hour from file name
-		iDateStart = len_trim(svFiles(i)) - 15
+		iDateStart = len_trim(svFiles(i)) - 14
 		sYear  = svFiles(i)(iDateStart:iDateStart+3)
 		sMonth = svFiles(i)(iDateStart+4:iDateStart+5)
 		sDay   = svFiles(i)(iDateStart+6:iDateStart+7)
