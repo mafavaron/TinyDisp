@@ -122,7 +122,7 @@ program TinyDisp_Met
 			iMinute = floor(rvAvgTime(iData) / 60.)
 			iSecond = floor(rvAvgTime(iData) - iMinute * 60.)
 		
-			write(11, "(a4,2('-',a2),1x,a2,2(':',i2.2),5(',',f8.2))") &
+			write(11, "(a4,2('-',a2),1x,a2,2(':',i2.2),5(',',f10.4))") &
 				sYear, sMonth, sDay, sHour, iMinute, iSecond, &
 				rvAvgU(iData), rvAvgV(iData), &
 				rvStdDevU(iData), rvStdDevV(iData), &
