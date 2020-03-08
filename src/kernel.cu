@@ -1,6 +1,7 @@
 
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+#include "ini.h"
 
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
@@ -15,8 +16,24 @@ __global__ void addKernel(int *c, const int *a, const int *b)
     c[i] = a[i] + b[i];
 }
 
-int main()
+int main(int argc, char** argv)
 {
+
+    // Get input parameters
+    if (argc != 2) {
+        std::cerr << "TinyDisp - A simple, local airflow visualizer" << std::endl;
+        std::cerr << std::endl;
+        std::cerr << "Usage:" << std::endl;
+        std::cerr << std::endl;
+        std::cerr << "    td <RunConfiguration>" << std::endl;
+        std::cerr << std::endl;
+        std::cerr << "Copyright 2020 by Servizi Territorio srl" << std::endl;
+        std::cerr << "                  This is open-source software, covered by the MIT license" << std::endl;
+        return 1;
+    }
+    std::string sCfgFile = argv[1];
+
+
     const int arraySize = 5;
     const int a[arraySize] = { 1, 2, 3, 4, 5 };
     const int b[arraySize] = { 10, 20, 30, 40, 50 };
