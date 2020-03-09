@@ -70,7 +70,7 @@ Config::Config(const std::string sConfigFile) {
 						if (rU > -9999.0f && rV > -9999.0f && rStdDevU > -9999.0f && rStdDevV > -9999.0f && rCovUV > -9999.0f) {
 							std::istringstream ss{svFields[0]};
 							std::tm tTimeStamp;
-							std::get_time(&tTimeStamp, dateTimeFormat.c_str());
+							ss >> std::get_time(&tTimeStamp, dateTimeFormat.c_str());
 							ivTimeStamp.push_back(std::mktime(&tTimeStamp));
 							rvU.push_back(rU);
 							rvV.push_back(rV);
