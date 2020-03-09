@@ -58,7 +58,7 @@ Config::Config(const std::string sConfigFile) {
 					lIsFirst = false; // And, do nothing with the buffer - a header, in case
 				}
 				else {
-					static const std::wstring dateTimeFormat{ L"%Y-%m-%d %H:%M:%S" };
+					static const std::string dateTimeFormat{ "%Y-%m-%d %H:%M:%S" };
 					std::vector<std::string> svFields;
 					split(sBuffer, svFields);
 					if (svFields.size() == 6) {
@@ -69,7 +69,7 @@ Config::Config(const std::string sConfigFile) {
 						float rCovUV   = stof(svFields[3]);
 						if (rU > -9999.0f && rV > -9999.0f && rStdDevU > -9999.0f && rStdDevV > -9999.0f && rCovUV > -9999.0f) {
 							std::istringstream ss{svFields[0]};
-							std::tm tTimeStamp;
+							struct tm tTimeStamp;
 							ss >> std::get_time(&tTimeStamp, dateTimeFormat.c_str());
 							ivTimeStamp.push_back(std::mktime(&tTimeStamp));
 							rvU.push_back(rU);
