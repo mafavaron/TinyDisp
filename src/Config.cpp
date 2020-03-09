@@ -60,10 +60,20 @@ Config::Config(const std::string sConfigFile) {
 					static const std::wstring dateTimeFormat{ L"%Y-%m-%d %H:%M:%S" };
 					std::vector<std::string> svFields;
 					split(sBuffer, svFields);
-					for (int i = 0; i < svFields.size(); i++) {
-						std::tm tTimeStamp;
-						std::get_time(&tTimeStamp, dateTimeFormat.c_str());
-						ivTimeStamp.push_back(std::mktime(&tTimeStamp));
+					if (svFields.size() == 6) {
+						for (int i = 0; i < svFields.size(); i++) {
+							float rU       = stof(svFields[1]);
+							float rV       = stof(svFields[2]);
+							float rStdDevU = stof(svFields[3]);
+							float rStdDevV = stof(svFields[4]);
+							float rCovUV   = stof(svFields[3]);
+							if (rU > -9999.0f && rV > -9999.0f && rStdDevU > -9999.0f && rStdDevV > -9999.0f && rCovUV > -9999.0f) {
+								std::istringstream ss{svFields[0]};
+								std::tm tTimeStamp;
+								std::get_time(&tTimeStamp, dateTimeFormat.c_str());
+								ivTimeStamp.push_back(std::mktime(&tTimeStamp));
+							}
+						}
 					}
 				}
 			}
