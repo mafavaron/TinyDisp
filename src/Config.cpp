@@ -20,7 +20,7 @@ template <class Container> void split(const std::string& str, Container& cont, c
 Config::Config(const std::string sConfigFile) {
 
 	// Parse initialization file
-	INIReader tCfg(sMeteoFile);
+	INIReader tCfg(sConfigFile);
 	if (tCfg.ParseError() < 0) {
 		std::cout << "Cannot load configuration file " << sConfigFile << std::endl;
 		this->lIsValid = false;
