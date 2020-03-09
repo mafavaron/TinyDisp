@@ -72,6 +72,11 @@ Config::Config(const std::string sConfigFile) {
 							std::tm tTimeStamp;
 							std::get_time(&tTimeStamp, dateTimeFormat.c_str());
 							ivTimeStamp.push_back(std::mktime(&tTimeStamp));
+							rvU.push_back(rU);
+							rvV.push_back(rV);
+							rvStdDevU.push_back(rStdDevU);
+							rvStdDevV.push_back(rStdDevV);
+							rvCovUV.push_back(rCovUV);
 						}
 					}
 				}
