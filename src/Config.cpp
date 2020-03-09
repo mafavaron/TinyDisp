@@ -1,7 +1,21 @@
 #include "Config.h"
 #include "ini.h"
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
 
-Config::Config(const std::string sMeteoFile) {
+template <class Container> void split(const std::string& str, Container& cont, char delim = ',') {
+	std::stringstream ss(str);
+	std::string       token;
+	while (std::getline(ss, token, delim)) {
+		cont.push_back(token);
+	}
+}
+
+
+Config::Config(const std::string sConfigFile) {
 
 	// Parse initialization file
 	INIReader tCfg(sMeteoFile);
@@ -19,6 +33,29 @@ Config::Config(const std::string sMeteoFile) {
 		this->sMeteoFile     = tCfg.Get("General", "MeteoFile", "");
 
 		// Try reading the meteorological file
+		std::ifstream fMeteo;
+		fMeteo.open(this->sMeteoFile.c_str());
+		if (!fMeteo) {
+			std::cout << "Unable to read meteorological file " << this->sMeteoFile << std::endl;
+			this->lIsValid = false;
+		}
+		else {
+
+			// Gather meteo data
+			std::vector<int>	
+			std::string sBuffer;
+			bool        lIsFirst = true;
+			while (fMeteo >> sBuffer) {
+				if (lIsFirst) {
+					lIsFirst = false; // And, do nothing with the buffer - a header, in case
+				}
+				else {
+					std::vector<std::string> svFields;
+					split(sBuffer, svFields);
+				}
+			}
+
+		}
 
 	}
 };
