@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <iterator>
 #include <iostream>
+#include <iomanip>
 
 template <class Container> void split(const std::string& str, Container& cont, char delim = ',') {
 	std::stringstream ss(str);
@@ -56,11 +57,12 @@ Config::Config(const std::string sConfigFile) {
 					lIsFirst = false; // And, do nothing with the buffer - a header, in case
 				}
 				else {
+					static const std::wstring dateTimeFormat{ L"%Y-%m-%d %H:%M:%S" };
 					std::vector<std::string> svFields;
 					split(sBuffer, svFields);
-					for (int i = 0; i < svFields.size; i++) {
+					for (int i = 0; i < svFields.size(); i++) {
 						std::tm tTimeStamp;
-						std::get_time(&tTimeStamp, "%Y-%m-%d %H:%M:%S");
+						std::get_time(&tTimeStamp, dateTimeFormat.c_str());
 						ivTimeStamp.push_back(std::mktime(&tTimeStamp));
 					}
 				}
@@ -71,5 +73,5 @@ Config::Config(const std::string sConfigFile) {
 	}
 };
 
-virtual Config::~Config() {
+Config::~Config() {
 };
