@@ -97,7 +97,15 @@ Config::Config(const std::string sConfigFile) {
 			std::vector<float> rvInterpDeltaTime;
 			int				   iIdx = 0;
 			time_t             iTimeStamp = ivTimeStamp[iIdx];
-			while (iTimeStamp < ivTimeStamp[ivTimeStamp.size()-1]) {
+			time_t             iLastTime = ivTimeStamp[ivTimeStamp.size() - 1];
+			int                iNumElements = (iLastTime - iTimeStamp) / this->iTimeStep;
+			this->ivTimeStamp.reserve(iNumElements);
+			this->rvU.reserve(iNumElements);
+			this->rvV.reserve(iNumElements);
+			this->rvStdDevU.reserve(iNumElements);
+			this->rvStdDevV.reserve(iNumElements);
+			this->rvCovUV.reserve(iNumElements);
+			while (iTimeStamp < iLastTime) {
 
 				// Exactly the same?
 				if (iTimeStamp == ivTimeStamp[iIdx]) {
@@ -143,8 +151,10 @@ Config::Config(const std::string sConfigFile) {
 
 					}
 
-
 				}
+
+				iTimeStamp += this->iTimeStep;
+
 			}
 
 		}
