@@ -11,7 +11,7 @@ private:
 	float		rEdgeLength;
 	int			iPartsPerStep;
 	int			iStepsSurvival;
-	std::string	sMeteoFile;
+	string		sMeteoFile;
 	// Meteorology
 	std::vector<int>	ivTimeStamp;
 	std::vector<float>	rvU;
@@ -20,6 +20,6 @@ private:
 	std::vector<float>	rvStdDevV;
 	std::vector<float>	rvCovUV;
 public:
-	Config(const std::string sMeteoFile);
+	Config(const string sConfigFile);
 	virtual ~Config();
 };
