@@ -1,5 +1,6 @@
 #include "Config.h"
 #include "ini.h"
+#include <ctime>
 #include <fstream>
 #include <string>
 #include <sstream>
@@ -20,7 +21,7 @@ Config::Config(const std::string sConfigFile) {
 	// Parse initialization file
 	INIReader tCfg(sMeteoFile);
 	if (tCfg.ParseError() < 0) {
-		std::count << "Cannot load configuration file " << sCfgFile << std::endl;
+		std::cout << "Cannot load configuration file " << sConfigFile << std::endl;
 		this->lIsValid = false;
 	}
 	else {
@@ -43,8 +44,14 @@ Config::Config(const std::string sConfigFile) {
 
 			// Gather meteo data
 			std::vector<int>	
-			std::string sBuffer;
-			bool        lIsFirst = true;
+			std::string		sBuffer;
+			bool			lIsFirst = true;
+			std::vector<time_t>	ivTimeStamp;
+			std::vector<float>	rvU;
+			std::vector<float>	rvV;
+			std::vector<float>	rvStdDevU;
+			std::vector<float>	rvStdDevV;
+			std::vector<float>	rvCovUV;
 			while (fMeteo >> sBuffer) {
 				if (lIsFirst) {
 					lIsFirst = false; // And, do nothing with the buffer - a header, in case
@@ -52,6 +59,11 @@ Config::Config(const std::string sConfigFile) {
 				else {
 					std::vector<std::string> svFields;
 					split(sBuffer, svFields);
+					for (int i = 0; i < svFields.size; i++) {
+						std::tm tTimeStamp;
+						std::get_time(&tTimeStamp, "%Y-%m-%d %H:%M:%S");
+						ivTimeStamp.push_back(std::mktime(&tTimeStamp));
+					}
 				}
 			}
 
