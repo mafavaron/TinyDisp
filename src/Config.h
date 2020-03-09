@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 class Config
 {
@@ -11,7 +12,7 @@ private:
 	float		rEdgeLength;
 	int			iPartsPerStep;
 	int			iStepsSurvival;
-	string		sMeteoFile;
+	std::string	sMeteoFile;
 	// Meteorology
 	std::vector<int>	ivTimeStamp;
 	std::vector<float>	rvU;
@@ -20,6 +21,6 @@ private:
 	std::vector<float>	rvStdDevV;
 	std::vector<float>	rvCovUV;
 public:
-	Config(const string sConfigFile);
+	Config(const std::string sConfigFile);
 	virtual ~Config();
 };
