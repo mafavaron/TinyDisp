@@ -2,10 +2,10 @@
 #include "ini.h"
 #include <ctime>
 #include <fstream>
-#include <string>
 #include <sstream>
 #include <algorithm>
 #include <iterator>
+#include <iostream>
 
 template <class Container> void split(const std::string& str, Container& cont, char delim = ',') {
 	std::stringstream ss(str);
@@ -43,9 +43,8 @@ Config::Config(const std::string sConfigFile) {
 		else {
 
 			// Gather meteo data
-			std::vector<int>	
-			std::string		sBuffer;
-			bool			lIsFirst = true;
+			std::string			sBuffer;
+			bool				lIsFirst = true;
 			std::vector<time_t>	ivTimeStamp;
 			std::vector<float>	rvU;
 			std::vector<float>	rvV;
