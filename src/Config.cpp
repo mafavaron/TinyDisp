@@ -66,7 +66,7 @@ int main(int argc, char** argv)
             rvPartV[j] = rV;
         }
         iNextPart += tCfg.GetNumNewParticles();
-        if (iNextPart > iNumPart) {
+        if (iNextPart >= iNumPart) {
             iNextPart = 0;
         }
 
