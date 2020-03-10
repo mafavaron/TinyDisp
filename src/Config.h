@@ -26,4 +26,5 @@ public:
 	bool GetMeteo(const int i, int& iTimeStamp, float& rU, float& rV, float& rStdDevU, float& rStdDevV, float& rCovUV);
 	int GetNumMeteoData(void);
 	int GetParticlePoolSize(void);
+	int GetNumNewParticles(void);
 };
