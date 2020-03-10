@@ -201,3 +201,16 @@ int Config::GetParticlePoolSize(void) {
 	}
 	return iNumPart;
 };
+
+int Config::GetNumNewParticles(void) {
+	int iNumPart;
+	if (this->lIsValid) {
+		iNumPart = this->iPartsPerStep;
+	}
+	else {
+		iNumPart = 0;
+	}
+	return iNumPart;
+};
+
+
