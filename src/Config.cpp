@@ -186,3 +186,7 @@ bool Config::GetMeteo(const int i, int& iTimeStamp, float& rU, float& rV, float&
 	return lGo;
 
 };
+
+int Config::GetNumMeteoData(void) {
+	return this->ivTimeStamp.size();
+};
