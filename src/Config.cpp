@@ -164,3 +164,25 @@ Config::Config(const std::string sConfigFile) {
 
 Config::~Config() {
 };
+
+bool Config::GetMeteo(const int i, int& iTimeStamp, float& rU, float& rV, float& rStdDevU, float& rStdDevV, float& rCovUV) {
+
+	// Check something can be made
+	int iNumData = this->ivTimeStamp.size();
+	bool lGo = (i >= 0 && i < iNumData);
+	if (lGo) {
+
+		// Retrieve the information desired
+		iTimeStamp = this->ivTimeStamp[i];
+		rU = this->rvU[i];
+		rV = this->rvV[i];
+		rStdDevU = this->rvStdDevU[i];
+		rStdDevV = this->rvStdDevV[i];
+		rCovUV = this->rvCovUV[i];
+
+	}
+
+	// Leave
+	return lGo;
+
+};
