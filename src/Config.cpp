@@ -190,3 +190,14 @@ bool Config::GetMeteo(const int i, int& iTimeStamp, float& rU, float& rV, float&
 int Config::GetNumMeteoData(void) {
 	return this->ivTimeStamp.size();
 };
+
+int Config::GetParticlePoolSize(void) {
+	int iNumPart;
+	if (this->lIsValid) {
+		iNumPart = this->iPartsPerStep * this->iStepsSurvival;
+	}
+	else {
+		iNumPart = 0;
+	}
+	return iNumPart;
+};
