@@ -63,6 +63,7 @@ int main(int argc, char** argv)
     thrust::device_vector<float> rvN1(iNumPart);
     thrust::device_vector<float> rvN2(iNumPart);
     thrust::device_vector<float> rvX1(iNumPart);
+    thrust::device_vector<float> rvX2(iNumPart);
     thrust::device_vector<float> rvDeltaU(iNumPart);
     thrust::device_vector<float> rvDeltaV(iNumPart);
 
@@ -120,7 +121,13 @@ int main(int argc, char** argv)
         rvX1 = rvN1;
         thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rStdDevU), rvX1.begin(), thrust::multiplies<float>());
         rvDeltaU = rvX1;
-        rvDeltaV = rV + lambda * (rvX1 - rU) + nu * rvN2;
+        rvX2 = rvN2;
+        thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(nu), rvX2.begin(), thrust::multiplies<float>());
+        thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rU), rvX1.begin(), thrust::minus<float>());
+        thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(lambda), rvX1.begin(), thrust::multiplies<float>());
+        thrust::transform(rvX1.begin(), rvX1.end(), rvX2.begin(), rvX1.begin(), thrust::plus<float>());
+        thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rV), rvX1.begin(), thrust::plus<float>());
+        rvDeltaV = rvX1;
 
         // Move particles
 
