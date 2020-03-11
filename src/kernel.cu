@@ -51,16 +51,13 @@ int main(int argc, char** argv)
     // Particle pool
     int iNumPart  = tCfg.GetParticlePoolSize();
     int iNextPart = 0;  // For indexing the generation circular buffer
-    thrust::host_vector<int> ivPartTimeStamp(iNumPart); // Time stamp at emission time - for reporting - host-only
+    thrust::device_vector<int> ivPartTimeStamp(iNumPart); // Time stamp at emission time - for reporting - host-only
     thrust::device_vector<float> rvPartX(iNumPart);
     thrust::device_vector<float> rvPartY(iNumPart);
     thrust::device_vector<float> rvPartU(iNumPart);
     thrust::device_vector<float> rvPartV(iNumPart);
     thrust::device_vector<float> rvN1(iNumPart);
     thrust::device_vector<float> rvN2(iNumPart);
-
-    // Initialize random number generator
-
 
     // Main loop: iterate over meteo data
     int iNumData = tCfg.GetNumMeteoData();
@@ -104,17 +101,31 @@ int main(int argc, char** argv)
         );
         iIteration++;
 
-        for (auto i = 0; i < rvN1.size()/1000; i++) {
-            std::cout << rvN1[i] << std::endl;
-        }
-
         // Move particles
 
         // Count in cells
 
         // Inform users of the progress
-        std::cout << iTimeStamp << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
+        std::cout << iIteration << ", " << iTimeStamp << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
     }
+
+    // Deallocate manually thrust resources
+    // -1- Reclaim workspace
+    ivPartTimeStamp.clear();
+    rvPartX.clear();
+    rvPartY.clear();
+    rvPartU.clear();
+    rvPartV.clear();
+    rvN1.clear();
+    rvN2.clear();
+    // -1- Clear any other resources
+    ivPartTimeStamp.shrink_to_fit();
+    rvPartX.shrink_to_fit();
+    rvPartY.shrink_to_fit();
+    rvPartU.shrink_to_fit();
+    rvPartV.shrink_to_fit();
+    rvN1.shrink_to_fit();
+    rvN2.shrink_to_fit();
 
     // Leave
     // cudaDeviceReset must be called before exiting in order for profiling and
