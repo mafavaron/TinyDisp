@@ -65,6 +65,7 @@ int main(int argc, char** argv)
     // Main loop: iterate over meteo data
     int iNumData = tCfg.GetNumMeteoData();
     thrust::counting_iterator<unsigned int> index_sequence_begin(0);
+    unsigned int iIteration = 0;
     for (auto i = 0; i < iNumData; i++) {
 
         // Get current meteorology
@@ -90,17 +91,18 @@ int main(int argc, char** argv)
         // Generate bivariate normal deviates
         // -1- First of all, generate two sets of random normals, with mu=0 and sigma=1
         thrust::transform(
-            index_sequence_begin,
-            index_sequence_begin + iNumPart,
+            index_sequence_begin + iIteration * iNumPart,
+            index_sequence_begin + iIteration * (iNumPart + 1),
             rvN1.begin(),
             normal_deviate(0.0f, 1.0f)
         );
         thrust::transform(
-            index_sequence_begin,
-            index_sequence_begin + iNumPart,
+            index_sequence_begin + iIteration * (iNumPart + 2),
+            index_sequence_begin + iIteration * (iNumPart + 3),
             rvN2.begin(),
             normal_deviate(0.0f, 1.0f)
         );
+        iIteration++;
 
         for (auto i = 0; i < rvN1.size()/1000; i++) {
             std::cout << rvN1[i] << std::endl;
