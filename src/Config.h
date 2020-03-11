@@ -27,4 +27,5 @@ public:
 	int GetNumMeteoData(void);
 	int GetParticlePoolSize(void);
 	int GetNumNewParticles(void);
+	float GetTimeStep(void);
 };
