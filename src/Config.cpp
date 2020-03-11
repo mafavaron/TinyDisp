@@ -32,6 +32,7 @@ Config::Config(const std::string sConfigFile) {
 		this->iPartsPerStep  = tCfg.GetInteger("General", "PartsPerStep", -1);
 		this->iStepsSurvival = tCfg.GetInteger("General", "StepsSurvival", -1);
 		this->rEdgeLength    = tCfg.GetReal("General", "EdgeLength", -1.0);
+		this->iCellsPerEdge = tCfg.GetInteger("General", "CellsPerEdge", 0);
 		this->sMeteoFile     = tCfg.Get("General", "MeteoFile", "");
 
 		// Try reading the meteorological file
@@ -91,7 +92,7 @@ Config::Config(const std::string sConfigFile) {
 			if (this->rEdgeLength <= 0.0f) return;
 			if (this->iPartsPerStep <= 0) return;
 			if (this->iStepsSurvival <= 0) return;
-
+			if (this->iCellsPerEdge <= 0) return;
 
 			// Interpolate linearly in the time range of meteo data
 			std::vector<float> rvInterpDeltaTime;
