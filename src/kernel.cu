@@ -1,20 +1,32 @@
 
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
-#include "ini.h"
+#include "Config.h"
 
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
+#include <thrust/random.h>
+#include <thrust/iterator/counting_iterator.h>
 
 #include <iostream>
 
-cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size);
+struct normal_deviate {
 
-__global__ void addKernel(int *c, const int *a, const int *b)
-{
-    int i = threadIdx.x;
-    c[i] = a[i] + b[i];
-}
+    float mu, sigma;
+
+    __host__ __device__ normal_deviate(float _mu = 0.0f, float _sigma = 1.0f) : mu(_mu), sigma(_sigma) {};
+
+    __device__ float operator()(unsigned int n) {
+
+        thrust::default_random_engine engine;
+        thrust::normal_distribution<float> dist(mu, sigma);
+        engine.discard(n);
+
+        return dist(engine);
+
+    }
+
+};
 
 int main(int argc, char** argv)
 {
@@ -33,24 +45,92 @@ int main(int argc, char** argv)
     }
     std::string sCfgFile = argv[1];
 
+    // Gather configuration (and meteo data)
+    Config tCfg(sCfgFile);
 
-    const int arraySize = 5;
-    const int a[arraySize] = { 1, 2, 3, 4, 5 };
-    const int b[arraySize] = { 10, 20, 30, 40, 50 };
-    int c[arraySize] = { 0 };
+    // Particle pool
+    int iNumPart  = tCfg.GetParticlePoolSize();
+    int iNextPart = 0;  // For indexing the generation circular buffer
+    thrust::device_vector<int> ivPartTimeStamp(iNumPart); // Time stamp at emission time - for reporting - host-only
+    thrust::device_vector<float> rvPartX(iNumPart);
+    thrust::device_vector<float> rvPartY(iNumPart);
+    thrust::device_vector<float> rvPartU(iNumPart);
+    thrust::device_vector<float> rvPartV(iNumPart);
+    thrust::device_vector<float> rvN1(iNumPart);
+    thrust::device_vector<float> rvN2(iNumPart);
 
-    // Add vectors in parallel.
-    cudaError_t cudaStatus = addWithCuda(c, a, b, arraySize);
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "addWithCuda failed!" << std::endl;
-        return 1;
+    // Main loop: iterate over meteo data
+    int iNumData = tCfg.GetNumMeteoData();
+    thrust::counting_iterator<unsigned int> index_sequence_begin(0);
+    unsigned int iIteration = 0;
+    for (auto i = 0; i < iNumData; i++) {
+
+        // Get current meteorology
+        int iTimeStamp;
+        float rU;
+        float rV;
+        float rStdDevU;
+        float rStdDevV;
+        float rCovUV;
+        bool lOk = tCfg.GetMeteo(i, iTimeStamp, rU, rV, rStdDevU, rStdDevV, rCovUV);
+
+        // Emit new particles
+        thrust::fill(ivPartTimeStamp.begin() + iNextPart, ivPartTimeStamp.begin() + iNextPart + tCfg.GetNumNewParticles(), iTimeStamp);
+        thrust::fill(rvPartX.begin() + iNextPart, rvPartX.begin() + iNextPart + tCfg.GetNumNewParticles(), 0.0f);
+        thrust::fill(rvPartY.begin() + iNextPart, rvPartY.begin() + iNextPart + tCfg.GetNumNewParticles(), 0.0f);
+        thrust::fill(rvPartU.begin() + iNextPart, rvPartU.begin() + iNextPart + tCfg.GetNumNewParticles(), rU);
+        thrust::fill(rvPartV.begin() + iNextPart, rvPartV.begin() + iNextPart + tCfg.GetNumNewParticles(), rV);
+        iNextPart += tCfg.GetNumNewParticles();
+        if (iNextPart >= iNumPart) {
+            iNextPart = 0;
+        }
+
+        // Generate bivariate normal deviates
+        // -1- First of all, generate two sets of random normals, with mu=0 and sigma=1
+        thrust::transform(
+            index_sequence_begin + iIteration * iNumPart,
+            index_sequence_begin + iIteration * (iNumPart + 1),
+            rvN1.begin(),
+            normal_deviate(0.0f, 1.0f)
+        );
+        thrust::transform(
+            index_sequence_begin + iIteration * (iNumPart + 2),
+            index_sequence_begin + iIteration * (iNumPart + 3),
+            rvN2.begin(),
+            normal_deviate(0.0f, 1.0f)
+        );
+        iIteration++;
+
+        // Move particles
+
+        // Count in cells
+
+        // Inform users of the progress
+        std::cout << iIteration << ", " << iTimeStamp << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
     }
-    
-    std::cout << "{1,2,3,4,5} + {10,20,30,40,50} = " << c[0] << ", " << c[1] << ", " << c[2] << ", " << c[3] << ", " << c[4] << std::endl;
 
+    // Deallocate manually thrust resources
+    // -1- Reclaim workspace
+    ivPartTimeStamp.clear();
+    rvPartX.clear();
+    rvPartY.clear();
+    rvPartU.clear();
+    rvPartV.clear();
+    rvN1.clear();
+    rvN2.clear();
+    // -1- Clear any other resources
+    ivPartTimeStamp.shrink_to_fit();
+    rvPartX.shrink_to_fit();
+    rvPartY.shrink_to_fit();
+    rvPartU.shrink_to_fit();
+    rvPartV.shrink_to_fit();
+    rvN1.shrink_to_fit();
+    rvN2.shrink_to_fit();
+
+    // Leave
     // cudaDeviceReset must be called before exiting in order for profiling and
     // tracing tools such as Nsight and Visual Profiler to show complete traces.
-    cudaStatus = cudaDeviceReset();
+    cudaError_t cudaStatus = cudaDeviceReset();
     if (cudaStatus != cudaSuccess) {
         std::cout << "cudaDeviceReset failed!" << std::endl;
         return 1;
@@ -59,82 +139,3 @@ int main(int argc, char** argv)
     return 0;
 }
 
-// Helper function for using CUDA to add vectors in parallel.
-cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size)
-{
-    int *dev_a = 0;
-    int *dev_b = 0;
-    int *dev_c = 0;
-    cudaError_t cudaStatus;
-
-    // Choose which GPU to run on, change this on a multi-GPU system.
-    cudaStatus = cudaSetDevice(0);
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?" << std::endl;
-        goto Error;
-    }
-
-    // Allocate GPU buffers for three vectors (two input, one output)    .
-    cudaStatus = cudaMalloc((void**)&dev_c, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaMalloc failed!" << std::endl;
-        goto Error;
-    }
-
-    cudaStatus = cudaMalloc((void**)&dev_a, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaMalloc failed!" << std::endl;
-        goto Error;
-    }
-
-    cudaStatus = cudaMalloc((void**)&dev_b, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaMalloc failed!" << std::endl;
-        goto Error;
-    }
-
-    // Copy input vectors from host memory to GPU buffers.
-    cudaStatus = cudaMemcpy(dev_a, a, size * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaMemcpy failed!" << std::endl;
-        goto Error;
-    }
-
-    cudaStatus = cudaMemcpy(dev_b, b, size * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaMemcpy failed!" << std::endl;
-        goto Error;
-    }
-
-    // Launch a kernel on the GPU with one thread for each element.
-    addKernel<<<1, size>>>(dev_c, dev_a, dev_b);
-
-    // Check for any errors launching the kernel
-    cudaStatus = cudaGetLastError();
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "addKernel launch failed: " << cudaGetErrorString(cudaStatus) << std::endl;
-        goto Error;
-    }
-    
-    // cudaDeviceSynchronize waits for the kernel to finish, and returns
-    // any errors encountered during the launch.
-    cudaStatus = cudaDeviceSynchronize();
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaDeviceSynchronize returned error code " << cudaStatus << " after launching addKernel!\n";
-        goto Error;
-    }
-
-    // Copy output vector from GPU buffer to host memory.
-    cudaStatus = cudaMemcpy(c, dev_c, size * sizeof(int), cudaMemcpyDeviceToHost);
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaMemcpy failed!" << std::endl;
-        goto Error;
-    }
-
-Error:
-    cudaFree(dev_c);
-    cudaFree(dev_a);
-    cudaFree(dev_b);
-    
-    return cudaStatus;
-}
