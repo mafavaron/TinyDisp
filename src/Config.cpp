@@ -213,4 +213,15 @@ int Config::GetNumNewParticles(void) {
 	return iNumPart;
 };
 
+float Config::GetTimeStep(void) {
+	float rTimeStep;
+	if (this->lIsValid) {
+		rTimeStep = (float)this->iTimeStep;
+	}
+	else {
+		rTimeStep = 0.f;
+	}
+	return rTimeStep;
+};
+
 
