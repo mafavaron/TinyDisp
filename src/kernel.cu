@@ -1,7 +1,7 @@
 
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
-#include "ini.h"
+#include "Config.h"
 
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
@@ -33,6 +33,49 @@ int main(int argc, char** argv)
     }
     std::string sCfgFile = argv[1];
 
+    // Gather configuration (and meteo data)
+    Config tCfg(sCfgFile);
+
+    // Particle pool
+    int iNumPart  = tCfg.GetParticlePoolSize();
+    int iNextPart = 0;  // For indexing the generation circular buffer
+    thrust::host_vector<int> ivPartTimeStamp(iNumPart); // Time stamp at emission time - for reporting - host-only
+    thrust::device_vector<float> rvPartX(iNumPart);
+    thrust::device_vector<float> rvPartY(iNumPart);
+    thrust::device_vector<float> rvPartU(iNumPart);
+    thrust::device_vector<float> rvPartV(iNumPart);
+
+    // Main loop: iterate over meteo data
+    int iNumData = tCfg.GetNumMeteoData();
+    for (auto i = 0; i < iNumData; i++) {
+
+        // Get current meteorology
+        int iTimeStamp;
+        float rU;
+        float rV;
+        float rStdDevU;
+        float rStdDevV;
+        float rCovUV;
+        bool lOk = tCfg.GetMeteo(i, iTimeStamp, rU, rV, rStdDevU, rStdDevV, rCovUV);
+
+        // Emit new particles
+        thrust::fill(ivPartTimeStamp.begin() + iNextPart, ivPartTimeStamp.begin() + iNextPart + tCfg.GetNumNewParticles(), iTimeStamp);
+        thrust::fill(rvPartX.begin() + iNextPart, rvPartX.begin() + iNextPart + tCfg.GetNumNewParticles(), 0.0f);
+        thrust::fill(rvPartY.begin() + iNextPart, rvPartY.begin() + iNextPart + tCfg.GetNumNewParticles(), 0.0f);
+        thrust::fill(rvPartU.begin() + iNextPart, rvPartU.begin() + iNextPart + tCfg.GetNumNewParticles(), rU);
+        thrust::fill(rvPartV.begin() + iNextPart, rvPartV.begin() + iNextPart + tCfg.GetNumNewParticles(), rV);
+        iNextPart += tCfg.GetNumNewParticles();
+        if (iNextPart >= iNumPart) {
+            iNextPart = 0;
+        }
+
+        // Move particles
+
+        // Count in cells
+
+        // Inform users of the progress
+        std::cout << iTimeStamp << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
+    }
 
     const int arraySize = 5;
     const int a[arraySize] = { 1, 2, 3, 4, 5 };
