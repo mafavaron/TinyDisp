@@ -1,184 +1,216 @@
-
-#include "cuda_runtime.h"
-#include "device_launch_parameters.h"
 #include "Config.h"
-
-#include <thrust/host_vector.h>
-#include <thrust/device_vector.h>
-
+#include "ini.h"
+#include <ctime>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
 #include <iostream>
+#include <iomanip>
 
-cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size);
-
-__global__ void addKernel(int *c, const int *a, const int *b)
-{
-    int i = threadIdx.x;
-    c[i] = a[i] + b[i];
+template <class Container> void split(const std::string& str, Container& cont, char delim = ',') {
+	std::stringstream ss(str);
+	std::string       token;
+	while (std::getline(ss, token, delim)) {
+		cont.push_back(token);
+	}
 }
 
-int main(int argc, char** argv)
-{
 
-    // Get input parameters
-    if (argc != 2) {
-        std::cerr << "TinyDisp - A simple, local airflow visualizer" << std::endl;
-        std::cerr << std::endl;
-        std::cerr << "Usage:" << std::endl;
-        std::cerr << std::endl;
-        std::cerr << "    td <RunConfiguration>" << std::endl;
-        std::cerr << std::endl;
-        std::cerr << "Copyright 2020 by Servizi Territorio srl" << std::endl;
-        std::cerr << "                  This is open-source software, covered by the MIT license" << std::endl;
-        return 1;
-    }
-    std::string sCfgFile = argv[1];
+Config::Config(const std::string sConfigFile) {
 
-    // Gather configuration (and meteo data)
-    Config tCfg(sCfgFile);
+	// Parse initialization file
+	INIReader tCfg(sConfigFile);
+	if (tCfg.ParseError() < 0) {
+		std::cout << "Cannot load configuration file " << sConfigFile << std::endl;
+		this->lIsValid = false;
+	}
+	else {
 
-    // Particle pool
-    int iNumPart  = tCfg.GetParticlePoolSize();
-    int iNextPart = 0;  // For indexing the generation circular buffer
-    thrust::host_vector<int> ivPartTimeStamp(iNumPart); // Time stamp at emission time - for reporting - host-only
-    thrust::device_vector<float> rvPartX(iNumPart);
-    thrust::device_vector<float> rvPartY(iNumPart);
-    thrust::device_vector<float> rvPartU(iNumPart);
-    thrust::device_vector<float> rvPartV(iNumPart);
+		// Get configuration parameters
+		this->iTimeStep      = tCfg.GetInteger("General", "TimeStep", -1);
+		this->iPartsPerStep  = tCfg.GetInteger("General", "PartsPerStep", -1);
+		this->iStepsSurvival = tCfg.GetInteger("General", "StepsSurvival", -1);
+		this->rEdgeLength    = tCfg.GetReal("General", "EdgeLength", -1.0);
+		this->sMeteoFile     = tCfg.Get("General", "MeteoFile", "");
 
-    // Main loop: iterate over meteo data
-    int iNumData = tCfg.GetNumMeteoData();
-    for (auto i = 0; i < iNumData; i++) {
+		// Try reading the meteorological file
+		std::ifstream fMeteo;
+		fMeteo.open(this->sMeteoFile.c_str());
+		if (!fMeteo) {
+			std::cout << "Unable to read meteorological file " << this->sMeteoFile << std::endl;
+			this->lIsValid = false;
+		}
+		else {
 
-        // Get current meteorology
-        int iTimeStamp;
-        float rU;
-        float rV;
-        float rStdDevU;
-        float rStdDevV;
-        float rCovUV;
-        bool lOk = tCfg.GetMeteo(i, iTimeStamp, rU, rV, rStdDevU, rStdDevV, rCovUV);
+			// Gather meteo data. By construction, meteo data are sorted
+			// ascending with respect to time stamps
+			std::string			sBuffer;
+			bool				lIsFirst = true;
+			std::vector<time_t>	ivTimeStamp;
+			std::vector<float>	rvU;
+			std::vector<float>	rvV;
+			std::vector<float>	rvStdDevU;
+			std::vector<float>	rvStdDevV;
+			std::vector<float>	rvCovUV;
+			while (std::getline(fMeteo, sBuffer)) {
+				if (lIsFirst) {
+					lIsFirst = false; // And, do nothing with the buffer - a header, in case
+				}
+				else {
+					static const std::string dateTimeFormat{ "%Y-%m-%d %H:%M:%S" };
+					std::vector<std::string> svFields;
+					split(sBuffer, svFields);
+					if (svFields.size() == 6) {
+						float rU       = stof(svFields[1]);
+						float rV       = stof(svFields[2]);
+						float rStdDevU = stof(svFields[3]);
+						float rStdDevV = stof(svFields[4]);
+						float rCovUV   = stof(svFields[3]);
+						if (rU > -9999.0f && rV > -9999.0f && rStdDevU > -9999.0f && rStdDevV > -9999.0f && rCovUV > -9999.0f) {
+							std::istringstream ss{svFields[0]};
+							struct tm tTimeStamp;
+							ss >> std::get_time(&tTimeStamp, dateTimeFormat.c_str());
+							ivTimeStamp.push_back(std::mktime(&tTimeStamp));
+							rvU.push_back(rU);
+							rvV.push_back(rV);
+							rvStdDevU.push_back(rStdDevU);
+							rvStdDevV.push_back(rStdDevV);
+							rvCovUV.push_back(rCovUV);
+						}
+					}
+				}
+			}
 
-        // Emit new particles
-        for (auto j = iNextPart; j < iNextPart + tCfg.GetNumNewParticles(); j++) {
-            rvPartX[j] = 0.0f;
-            rvPartY[j] = 0.0f;
-            rvPartU[j] = rU;
-            rvPartV[j] = rV;
-        }
-        iNextPart += tCfg.GetNumNewParticles();
-        if (iNextPart >= iNumPart) {
-            iNextPart = 0;
-        }
+			// Check some meteo data has been collected (if not, there is
+			// nothing to be made
+			if (ivTimeStamp.size() <= 0) return;
 
-        // Move particles
+			// Check configuration values
+			if (this->iTimeStep <= 0) return;
+			if (this->rEdgeLength <= 0.0f) return;
+			if (this->iPartsPerStep <= 0) return;
+			if (this->iStepsSurvival <= 0) return;
 
-        // Count in cells
 
-        // Inform users of the progress
-        std::cout << iTimeStamp << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
-    }
+			// Interpolate linearly in the time range of meteo data
+			std::vector<float> rvInterpDeltaTime;
+			int				   iIdx = 0;
+			time_t             iTimeStamp = ivTimeStamp[iIdx];
+			time_t             iLastTime = ivTimeStamp[ivTimeStamp.size() - 1];
+			int                iNumElements = (iLastTime - iTimeStamp) / this->iTimeStep;
+			this->ivTimeStamp.reserve(iNumElements);
+			this->rvU.reserve(iNumElements);
+			this->rvV.reserve(iNumElements);
+			this->rvStdDevU.reserve(iNumElements);
+			this->rvStdDevV.reserve(iNumElements);
+			this->rvCovUV.reserve(iNumElements);
+			while (iTimeStamp <= iLastTime) {
 
-    const int arraySize = 5;
-    const int a[arraySize] = { 1, 2, 3, 4, 5 };
-    const int b[arraySize] = { 10, 20, 30, 40, 50 };
-    int c[arraySize] = { 0 };
+				// Exactly the same?
+				if (iTimeStamp == ivTimeStamp[iIdx]) {
 
-    // Add vectors in parallel.
-    cudaError_t cudaStatus = addWithCuda(c, a, b, arraySize);
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "addWithCuda failed!" << std::endl;
-        return 1;
-    }
-    
-    std::cout << "{1,2,3,4,5} + {10,20,30,40,50} = " << c[0] << ", " << c[1] << ", " << c[2] << ", " << c[3] << ", " << c[4] << std::endl;
+					// Yes! Just get values
+					this->ivTimeStamp.push_back( iTimeStamp);
+					this->rvU.push_back(         rvU[iIdx]       );
+					this->rvV.push_back(         rvV[iIdx]       );
+					this->rvStdDevU.push_back(   rvStdDevU[iIdx] );
+					this->rvStdDevV.push_back(   rvStdDevV[iIdx] );
+					this->rvCovUV.push_back(     rvCovUV[iIdx]   );
 
-    // cudaDeviceReset must be called before exiting in order for profiling and
-    // tracing tools such as Nsight and Visual Profiler to show complete traces.
-    cudaStatus = cudaDeviceReset();
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaDeviceReset failed!" << std::endl;
-        return 1;
-    }
+				}
+				else {
 
-    return 0;
-}
+					// No: Locate iIdx so that ivTimeStamp[iIdx] <= iTimeStamp < ivTimeStamp[iIdx+1]
+					while (iTimeStamp >= ivTimeStamp[iIdx + 1]) {
+						++iIdx;
+					}
 
-// Helper function for using CUDA to add vectors in parallel.
-cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size)
-{
-    int *dev_a = 0;
-    int *dev_b = 0;
-    int *dev_c = 0;
-    cudaError_t cudaStatus;
+					// Check whether time is the same or not
+					if (iTimeStamp == ivTimeStamp[iIdx]) {
+						
+						// Same! Just get values
+						this->ivTimeStamp.push_back(iTimeStamp);
+						this->rvU.push_back(rvU[iIdx]);
+						this->rvV.push_back(rvV[iIdx]);
+						this->rvStdDevU.push_back(rvStdDevU[iIdx]);
+						this->rvStdDevV.push_back(rvStdDevV[iIdx]);
+						this->rvCovUV.push_back(rvCovUV[iIdx]);
 
-    // Choose which GPU to run on, change this on a multi-GPU system.
-    cudaStatus = cudaSetDevice(0);
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?" << std::endl;
-        goto Error;
-    }
+					}
+					else {
 
-    // Allocate GPU buffers for three vectors (two input, one output)    .
-    cudaStatus = cudaMalloc((void**)&dev_c, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaMalloc failed!" << std::endl;
-        goto Error;
-    }
+						// Somewhere in-between: linear interpolation
+						this->ivTimeStamp.push_back(iTimeStamp);
+						float rFraction = (float)(iTimeStamp - ivTimeStamp[iIdx]) / (ivTimeStamp[iIdx + 1] - ivTimeStamp[iIdx]);
+						this->rvU.push_back(rvU[iIdx] + rFraction * (rvU[iIdx + 1] - rvU[iIdx]));
+						this->rvV.push_back(rvV[iIdx] + rFraction * (rvV[iIdx + 1] - rvV[iIdx]));
+						this->rvStdDevU.push_back(rvStdDevU[iIdx] + rFraction * (rvStdDevU[iIdx + 1] - rvStdDevU[iIdx]));
+						this->rvStdDevV.push_back(rvStdDevV[iIdx] + rFraction * (rvStdDevV[iIdx + 1] - rvStdDevV[iIdx]));
+						this->rvCovUV.push_back(rvCovUV[iIdx] + rFraction * (rvCovUV[iIdx + 1] - rvCovUV[iIdx]));
 
-    cudaStatus = cudaMalloc((void**)&dev_a, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaMalloc failed!" << std::endl;
-        goto Error;
-    }
+					}
 
-    cudaStatus = cudaMalloc((void**)&dev_b, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaMalloc failed!" << std::endl;
-        goto Error;
-    }
+				}
 
-    // Copy input vectors from host memory to GPU buffers.
-    cudaStatus = cudaMemcpy(dev_a, a, size * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaMemcpy failed!" << std::endl;
-        goto Error;
-    }
+				iTimeStamp += this->iTimeStep;
 
-    cudaStatus = cudaMemcpy(dev_b, b, size * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaMemcpy failed!" << std::endl;
-        goto Error;
-    }
+			}
 
-    // Launch a kernel on the GPU with one thread for each element.
-    addKernel<<<1, size>>>(dev_c, dev_a, dev_b);
+		}
 
-    // Check for any errors launching the kernel
-    cudaStatus = cudaGetLastError();
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "addKernel launch failed: " << cudaGetErrorString(cudaStatus) << std::endl;
-        goto Error;
-    }
-    
-    // cudaDeviceSynchronize waits for the kernel to finish, and returns
-    // any errors encountered during the launch.
-    cudaStatus = cudaDeviceSynchronize();
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaDeviceSynchronize returned error code " << cudaStatus << " after launching addKernel!\n";
-        goto Error;
-    }
+	}
+};
 
-    // Copy output vector from GPU buffer to host memory.
-    cudaStatus = cudaMemcpy(c, dev_c, size * sizeof(int), cudaMemcpyDeviceToHost);
-    if (cudaStatus != cudaSuccess) {
-        std::cout << "cudaMemcpy failed!" << std::endl;
-        goto Error;
-    }
+Config::~Config() {
+};
 
-Error:
-    cudaFree(dev_c);
-    cudaFree(dev_a);
-    cudaFree(dev_b);
-    
-    return cudaStatus;
-}
+bool Config::GetMeteo(const int i, int& iTimeStamp, float& rU, float& rV, float& rStdDevU, float& rStdDevV, float& rCovUV) {
+
+	// Check something can be made
+	int iNumData = this->ivTimeStamp.size();
+	bool lGo = (i >= 0 && i < iNumData);
+	if (lGo) {
+
+		// Retrieve the information desired
+		iTimeStamp = this->ivTimeStamp[i];
+		rU = this->rvU[i];
+		rV = this->rvV[i];
+		rStdDevU = this->rvStdDevU[i];
+		rStdDevV = this->rvStdDevV[i];
+		rCovUV = this->rvCovUV[i];
+
+	}
+
+	// Leave
+	return lGo;
+
+};
+
+int Config::GetNumMeteoData(void) {
+	return this->ivTimeStamp.size();
+};
+
+int Config::GetParticlePoolSize(void) {
+	int iNumPart;
+	if (this->lIsValid) {
+		iNumPart = this->iPartsPerStep * this->iStepsSurvival;
+	}
+	else {
+		iNumPart = 0;
+	}
+	return iNumPart;
+};
+
+int Config::GetNumNewParticles(void) {
+	int iNumPart;
+	if (this->lIsValid) {
+		iNumPart = this->iPartsPerStep;
+	}
+	else {
+		iNumPart = 0;
+	}
+	return iNumPart;
+};
+
+
