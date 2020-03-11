@@ -130,6 +130,15 @@ int main(int argc, char** argv)
         rvDeltaV = rvX1;
 
         // Move particles
+        float rDeltaT = tCfg.GetTimeStep();
+        thrust::transform(rvPartU.begin(), rvPartU.end(), rvDeltaU.begin(), rvPartU.begin(), thrust::plus<float>());
+        rvX1 = rvPartU;
+        thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rDeltaT), rvX1.begin(), thrust::multiplies<float>());
+        thrust::transform(rvPartX.begin(), rvPartX.end(), rvX1.begin(), rvPartX.begin(), thrust::plus<float>());
+        thrust::transform(rvPartV.begin(), rvPartV.end(), rvDeltaV.begin(), rvPartV.begin(), thrust::plus<float>());
+        rvX2 = rvPartV;
+        thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(rDeltaT), rvX2.begin(), thrust::multiplies<float>());
+        thrust::transform(rvPartY.begin(), rvPartY.end(), rvX2.begin(), rvPartY.begin(), thrust::plus<float>());
 
         // Count in cells
 
