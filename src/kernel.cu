@@ -56,6 +56,8 @@ int main(int argc, char** argv)
     thrust::device_vector<float> rvPartY(iNumPart);
     thrust::device_vector<float> rvPartU(iNumPart);
     thrust::device_vector<float> rvPartV(iNumPart);
+    thrust::device_vector<float> rvN1(iNumPart);
+    thrust::device_vector<float> rvN2(iNumPart);
 
     // Initialize random number generator
 
@@ -82,6 +84,27 @@ int main(int argc, char** argv)
         iNextPart += tCfg.GetNumNewParticles();
         if (iNextPart >= iNumPart) {
             iNextPart = 0;
+        }
+
+        // Generate bivariate normal deviates
+        // -1- First of all, generate two sets of random normals, with mu=0 and sigma=1
+        thrust::counting_iterator<unsigned int> first_index_sequence_begin(0);
+        thrust::transform(
+            first_index_sequence_begin,
+            first_index_sequence_begin + iNumPart,
+            rvN1.begin(),
+            normal_deviate(0.0f, 1.0f)
+        );
+        thrust::counting_iterator<unsigned int> second_index_sequence_begin(0);
+        thrust::transform(
+            second_index_sequence_begin,
+            second_index_sequence_begin + iNumPart,
+            rvN2.begin(),
+            normal_deviate(0.0f, 1.0f)
+        );
+
+        for (auto i = 0; i < rvN1.size()/100; i++) {
+            std::cout << rvN1[i] << std::endl;
         }
 
         // Move particles
