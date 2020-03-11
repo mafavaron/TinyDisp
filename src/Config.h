@@ -10,6 +10,7 @@ private:
 	bool		lIsValid;
 	int			iTimeStep;
 	float		rEdgeLength;
+	int			iCellsPerEdge;
 	int			iPartsPerStep;
 	int			iStepsSurvival;
 	std::string	sMeteoFile;
