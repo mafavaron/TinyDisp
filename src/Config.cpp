@@ -122,7 +122,7 @@ Config::Config(const std::string sConfigFile) {
 				else {
 
 					// No: Locate iIdx so that ivTimeStamp[iIdx] <= iTimeStamp < ivTimeStamp[iIdx+1]
-					while (iTimeStamp >= ivTimeStamp[iIdx + 1]) {
+					while (iTimeStamp < iLastTime && iTimeStamp >= ivTimeStamp[iIdx + 1]) {
 						++iIdx;
 					}
 
