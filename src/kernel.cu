@@ -6,9 +6,13 @@
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 #include <thrust/random.h>
+#include <thrust/transform.h>
 #include <thrust/iterator/counting_iterator.h>
+#include <thrust/iterator/constant_iterator.h>
+#include <thrust/functional.h>
 
 #include <iostream>
+#include <math.h>
 
 struct normal_deviate {
 
@@ -58,6 +62,9 @@ int main(int argc, char** argv)
     thrust::device_vector<float> rvPartV(iNumPart);
     thrust::device_vector<float> rvN1(iNumPart);
     thrust::device_vector<float> rvN2(iNumPart);
+    thrust::device_vector<float> rvX1(iNumPart);
+    thrust::device_vector<float> rvDeltaU(iNumPart);
+    thrust::device_vector<float> rvDeltaV(iNumPart);
 
     // Main loop: iterate over meteo data
     int iNumData = tCfg.GetNumMeteoData();
@@ -100,6 +107,20 @@ int main(int argc, char** argv)
             normal_deviate(0.0f, 1.0f)
         );
         iIteration++;
+        // -1- Transform the two independent samples in a 2D bivariate sample
+        float rho;
+        if (rStdDevU > 0.f && rStdDevV > 0.f) {
+            rho = rCovUV / (rStdDevU * rStdDevV);
+        }
+        else {
+            rho = 0.f;
+        }
+        float lambda = (rStdDevV / rStdDevU) * rho;
+        float nu = sqrtf((1.0f - rho * rho) * rStdDevV * rStdDevV);
+        rvX1 = rvN1;
+        thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rStdDevU), rvX1.begin(), thrust::multiplies<float>());
+        rvDeltaU = rvX1;
+        rvDeltaV = rV + lambda * (rvX1 - rU) + nu * rvN2;
 
         // Move particles
 
@@ -138,4 +159,3 @@ int main(int argc, char** argv)
 
     return 0;
 }
-
