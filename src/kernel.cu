@@ -5,12 +5,28 @@
 
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
+#include <thrust/random.h>
 #include <thrust/iterator/counting_iterator.h>
-#include <thrust/functional.h>
-#include <thrust/transform_reduce.h>
-#include <curand_kernel.h>
 
 #include <iostream>
+
+struct normal_deviate {
+
+    float mu, sigma;
+
+    __host__ __device__ normal_deviate(float _mu = 0.0f, float _sigma = 1.0f) : mu(_mu), sigma(_sigma) {};
+
+    __device__ float operator()(unsigned int n) {
+
+        thrust::default_random_engine engine;
+        thrust::normal_distribution<float> dist(mu, sigma);
+        engine.discard(n);
+
+        return dist(engine);
+
+    }
+
+};
 
 int main(int argc, char** argv)
 {
