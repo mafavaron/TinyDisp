@@ -5,6 +5,8 @@
 
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
+#include <cuda.h>
+#include <curand_kernel.h>
 
 #include <iostream>
 
