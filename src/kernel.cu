@@ -66,6 +66,8 @@ int main(int argc, char** argv)
     thrust::device_vector<float> rvX2(iNumPart);
     thrust::device_vector<float> rvDeltaU(iNumPart);
     thrust::device_vector<float> rvDeltaV(iNumPart);
+    thrust::host_vector<float>   rvCellX(iNumPart);
+    thrust::host_vector<float>   rvCellY(iNumPart);
 
     // Main loop: iterate over meteo data
     int iNumData = tCfg.GetNumMeteoData();
@@ -141,6 +143,14 @@ int main(int argc, char** argv)
         thrust::transform(rvPartY.begin(), rvPartY.end(), rvX2.begin(), rvPartY.begin(), thrust::plus<float>());
 
         // Count in cells
+        rvX1 = rvPartX;
+        rvX2 = rvPartY;
+        thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(tCfg.GetMinX()), rvX1.begin(), thrust::minus<float>());
+        thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(tCfg.GetCellSize()), rvX1.begin(), thrust::divides<float>());
+        thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(tCfg.GetMinY()), rvX2.begin(), thrust::minus<float>());
+        thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(tCfg.GetCellSize()), rvX2.begin(), thrust::divides<float>());
+        rvCellX = rvX1;
+        rvCellY = rvX2;
 
         // Inform users of the progress
         std::cout << iIteration << ", " << iTimeStamp << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
@@ -155,6 +165,10 @@ int main(int argc, char** argv)
     rvPartV.clear();
     rvN1.clear();
     rvN2.clear();
+    rvX1.clear();
+    rvX2.clear();
+    rvCellX.clear();
+    rvCellY.clear();
     // -1- Clear any other resources
     ivPartTimeStamp.shrink_to_fit();
     rvPartX.shrink_to_fit();
@@ -163,6 +177,10 @@ int main(int argc, char** argv)
     rvPartV.shrink_to_fit();
     rvN1.shrink_to_fit();
     rvN2.shrink_to_fit();
+    rvX1.shrink_to_fit();
+    rvX2.shrink_to_fit();
+    rvCellX.shrink_to_fit();
+    rvCellY.shrink_to_fit();
 
     // Leave
     // cudaDeviceReset must be called before exiting in order for profiling and

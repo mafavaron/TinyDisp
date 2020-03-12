@@ -32,6 +32,7 @@ Config::Config(const std::string sConfigFile) {
 		this->iPartsPerStep  = tCfg.GetInteger("General", "PartsPerStep", -1);
 		this->iStepsSurvival = tCfg.GetInteger("General", "StepsSurvival", -1);
 		this->rEdgeLength    = tCfg.GetReal("General", "EdgeLength", -1.0);
+		this->iCellsPerEdge = tCfg.GetInteger("General", "CellsPerEdge", 0);
 		this->sMeteoFile     = tCfg.Get("General", "MeteoFile", "");
 
 		// Try reading the meteorological file
@@ -91,7 +92,7 @@ Config::Config(const std::string sConfigFile) {
 			if (this->rEdgeLength <= 0.0f) return;
 			if (this->iPartsPerStep <= 0) return;
 			if (this->iStepsSurvival <= 0) return;
-
+			if (this->iCellsPerEdge <= 0) return;
 
 			// Interpolate linearly in the time range of meteo data
 			std::vector<float> rvInterpDeltaTime;
@@ -213,4 +214,57 @@ int Config::GetNumNewParticles(void) {
 	return iNumPart;
 };
 
+float Config::GetTimeStep(void) {
+	float rTimeStep;
+	if (this->lIsValid) {
+		rTimeStep = (float)this->iTimeStep;
+	}
+	else {
+		rTimeStep = 0.f;
+	}
+	return rTimeStep;
+};
 
+int Config::GetCellsPerEdge(void) {
+	int iNumCells;
+	if (this->lIsValid) {
+		iNumCells = this->iCellsPerEdge;
+	}
+	else {
+		iNumCells = 0;
+	}
+	return iNumCells;
+};
+
+float Config::GetMinX(void) {
+	float rMin;
+	if (this->lIsValid) {
+		rMin = this->rEdgeLength / 2.f;
+	}
+	else {
+		rMin = 0.f;
+	}
+	return rMin;
+};
+
+float Config::GetMinY(void) {
+	float rMin;
+	if (this->lIsValid) {
+		rMin = this->rEdgeLength / 2.f;
+	}
+	else {
+		rMin = 0.f;
+	}
+	return rMin;
+};
+
+float Config::GetCellSize(void) {
+	float rSize;
+	if (this->lIsValid) {
+		rSize = this->rEdgeLength / this->iCellsPerEdge;
+	}
+	else {
+		rSize = 0.f;
+	}
+	return rSize;
+};

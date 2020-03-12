@@ -10,6 +10,7 @@ private:
 	bool		lIsValid;
 	int			iTimeStep;
 	float		rEdgeLength;
+	int			iCellsPerEdge;
 	int			iPartsPerStep;
 	int			iStepsSurvival;
 	std::string	sMeteoFile;
@@ -27,4 +28,9 @@ public:
 	int GetNumMeteoData(void);
 	int GetParticlePoolSize(void);
 	int GetNumNewParticles(void);
+	float GetTimeStep(void);
+	int GetCellsPerEdge(void);
+	float GetMinX();
+	float GetMinY();
+	float GetCellSize();
 };
