@@ -71,7 +71,8 @@ int main(int argc, char** argv)
 
     // Main loop: iterate over meteo data
     int n = tCfg.GetCellsPerEdge();
-    auto imNumPartsInCell = new unsigned int[n*n];
+    auto imNumPartsInCell = new unsigned int[n * n];
+    auto rmConc = new float[n * n];
     int iNumData = tCfg.GetNumMeteoData();
     thrust::counting_iterator<unsigned int> index_sequence_begin(0);
     unsigned int iIteration = 0;
@@ -165,6 +166,14 @@ int main(int argc, char** argv)
                 ++imNumPartsInCell[n * iy + ix];
             }
         }
+        int iTotParticles = 0;
+        for (int j = 0; j < n * n; j++) {
+            iTotParticles += imNumPartsInCell[j];
+        }
+        float rTotParticles = iTotParticles;
+        for (int j = 0; j < n * n; j++) {
+            rmConc[j] = (float)imNumPartsInCell[j] / rTotParticles;
+        }
 
         // Inform users of the progress
         std::cout << iIteration << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
@@ -172,6 +181,7 @@ int main(int argc, char** argv)
 
     // Deallocate manually thrust resources
     // -1- Release count matrices
+    delete rmConc;
     delete imNumPartsInCell;
     // -1- Reclaim workspace
     ivPartTimeStamp.clear();
