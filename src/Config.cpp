@@ -35,6 +35,7 @@ Config::Config(const std::string sConfigFile) {
 		this->iCellsPerEdge  = tCfg.GetInteger("General", "CellsPerEdge", 0);
 		this->sMeteoFile = tCfg.Get("General", "MeteoFile", "");
 		this->sOutputFile = tCfg.Get("General", "OutputFile", "");
+		this->sDescriptorFile = tCfg.Get("General", "DescriptorFile", "");
 
 		// Try reading the meteorological file
 		std::ifstream fMeteo;
@@ -281,3 +282,13 @@ std::string Config::GetOutputFile(void) {
 	return sFile;
 };
 
+std::string Config::GetDescriptorFile(void) {
+	std::string  sFile;
+	if (this->lIsValid) {
+		sFile = this->sOutputFile;
+	}
+	else {
+		sFile = "";
+	}
+	return sFile;
+};
