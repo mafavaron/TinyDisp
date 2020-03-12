@@ -258,4 +258,13 @@ float Config::GetMinY(void) {
 	return rMin;
 };
 
-
+float Config::GetCellSize(void) {
+	float rSize;
+	if (this->lIsValid) {
+		rSize = this->rEdgeLength / this->iCellsPerEdge;
+	}
+	else {
+		rSize = 0.f;
+	}
+	return rSize;
+};
