@@ -31,4 +31,5 @@ public:
 	float GetTimeStep(void);
 	int GetCellsPerEdge(void);
 	float GetMinX();
+	float GetMinY();
 };
