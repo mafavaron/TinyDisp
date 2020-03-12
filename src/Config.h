@@ -32,4 +32,5 @@ public:
 	int GetCellsPerEdge(void);
 	float GetMinX();
 	float GetMinY();
+	float GetCellSize();
 };
