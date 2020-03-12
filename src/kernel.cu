@@ -185,6 +185,19 @@ int main(int argc, char** argv)
     // Release OS resources
     fclose(fOut);
 
+    // Write descriptor file
+    FILE* fDsc = fopen(tCfg.GetDescriptorFile().c_str(), "w");
+    fprintf(fDsc, "TIME: %f\n", 1.f);
+    fprintf(fDsc, "DATA_FILE: %s\n", tCfg.GetOutputFile().c_str());
+    fprintf(fDsc, "DATA_SIZE: %d %d %d\n", tCfg.GetCellsPerEdge(), tCfg.GetCellsPerEdge(), iNumData);
+    fprintf(fDsc, "DATA_FORMAT: FLOAT\n");
+    fprintf(fDsc, "VARIABLE: Concentration\n");
+    fprintf(fDsc, "DATA_ENDIAN: LITTLE\n");
+    fprintf(fDsc, "CENTERING: zonal\n");
+    fprintf(fDsc, "BRICK_ORIGIN: %f %f %f\n", tCfg.GetMinX(), tCfg.GetMinY(), 0.f);
+    fprintf(fDsc, "BRICK_SIZE: %f %f %f\n", -tCfg.GetMinX()*2.f, -tCfg.GetMinY() * 2.f, (float)iNumData);
+    fclose(fDsc);
+
     // Deallocate manually thrust resources
     // -1- Release count matrices
     delete rmConc;
