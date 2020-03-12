@@ -14,6 +14,7 @@ private:
 	int			iPartsPerStep;
 	int			iStepsSurvival;
 	std::string	sMeteoFile;
+	std::string sOutputFile;
 	// Meteorology
 	std::vector<int>	ivTimeStamp;
 	std::vector<float>	rvU;
@@ -33,4 +34,5 @@ public:
 	float GetMinX();
 	float GetMinY();
 	float GetCellSize();
+	std::string GetOutputFile(void);
 };
