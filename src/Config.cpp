@@ -268,3 +268,15 @@ float Config::GetCellSize(void) {
 	}
 	return rSize;
 };
+
+std::string Config::GetOutputFile(void) {
+	std::string  sFile;
+	if (this->lIsValid) {
+		sFile = this->sOutputFile;
+	}
+	else {
+		sFile = "";
+	}
+	return sFile;
+};
+
