@@ -15,6 +15,7 @@ private:
 	int			iStepsSurvival;
 	std::string	sMeteoFile;
 	std::string sOutputFile;
+	std::string sDescriptorFile;
 	// Meteorology
 	std::vector<int>	ivTimeStamp;
 	std::vector<float>	rvU;
@@ -35,4 +36,5 @@ public:
 	float GetMinY();
 	float GetCellSize();
 	std::string GetOutputFile(void);
+	std::string GetDescriptorFile(void);
 };
