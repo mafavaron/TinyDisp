@@ -70,6 +70,8 @@ int main(int argc, char** argv)
     thrust::host_vector<float>   rvCellY(iNumPart);
 
     // Main loop: iterate over meteo data
+    std::string sOutFileName = tCfg.GetOutputFile();
+    FILE* fOut = fopen(sOutFileName.c_str(), "wb");
     int n = tCfg.GetCellsPerEdge();
     auto imNumPartsInCell = new unsigned int[n * n];
     auto rmConc = new float[n * n];
@@ -174,10 +176,14 @@ int main(int argc, char** argv)
         for (int j = 0; j < n * n; j++) {
             rmConc[j] = (float)imNumPartsInCell[j] / rTotParticles;
         }
+        fwrite((void*)rmConc, sizeof(float), n * n, fOut);
 
         // Inform users of the progress
         std::cout << iIteration << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
     }
+
+    // Release OS resources
+    fclose(fOut);
 
     // Deallocate manually thrust resources
     // -1- Release count matrices
