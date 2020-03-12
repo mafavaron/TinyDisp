@@ -236,7 +236,18 @@ int Config::GetCellsPerEdge(void) {
 	return iNumCells;
 };
 
-int Config::GetMinX(void) {
+float Config::GetMinX(void) {
+	float rMin;
+	if (this->lIsValid) {
+		rMin = this->rEdgeLength / 2.f;
+	}
+	else {
+		rMin = 0.f;
+	}
+	return rMin;
+};
+
+float Config::GetMinY(void) {
 	float rMin;
 	if (this->lIsValid) {
 		rMin = this->rEdgeLength / 2.f;
