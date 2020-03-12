@@ -2,7 +2,6 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "Config.h"
-
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 #include <thrust/random.h>
@@ -10,6 +9,7 @@
 #include <thrust/iterator/counting_iterator.h>
 #include <thrust/iterator/constant_iterator.h>
 #include <thrust/functional.h>
+#include <stdio.h>
 
 #include <iostream>
 #include <math.h>
@@ -70,6 +70,9 @@ int main(int argc, char** argv)
     thrust::host_vector<float>   rvCellY(iNumPart);
 
     // Main loop: iterate over meteo data
+    int n = tCfg.GetCellsPerEdge();
+    auto imNumPartsInCell = new unsigned int[n * n];
+    auto rmConc = new float[n * n];
     int iNumData = tCfg.GetNumMeteoData();
     thrust::counting_iterator<unsigned int> index_sequence_begin(0);
     unsigned int iIteration = 0;
@@ -142,7 +145,7 @@ int main(int argc, char** argv)
         thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(rDeltaT), rvX2.begin(), thrust::multiplies<float>());
         thrust::transform(rvPartY.begin(), rvPartY.end(), rvX2.begin(), rvPartY.begin(), thrust::plus<float>());
 
-        // Count in cells
+        // Count cell contents
         rvX1 = rvPartX;
         rvX2 = rvPartY;
         thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(tCfg.GetMinX()), rvX1.begin(), thrust::minus<float>());
@@ -151,12 +154,35 @@ int main(int argc, char** argv)
         thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(tCfg.GetCellSize()), rvX2.begin(), thrust::divides<float>());
         rvCellX = rvX1;
         rvCellY = rvX2;
+        for (int iy = 0; iy < n; iy++) {
+            for (int ix = 0; iy < n; iy++) {
+                imNumPartsInCell[n * iy + ix] = 0U;
+            }
+        }
+        for (int j = 0; j < rvCellX.size(); j++) {
+            int ix = (int)rvCellX[j];
+            int iy = (int)rvCellY[j];
+            if (0 <= ix && ix < n && 0 <= iy && iy < n) {
+                ++imNumPartsInCell[n * iy + ix];
+            }
+        }
+        int iTotParticles = 0;
+        for (int j = 0; j < n * n; j++) {
+            iTotParticles += imNumPartsInCell[j];
+        }
+        float rTotParticles = iTotParticles;
+        for (int j = 0; j < n * n; j++) {
+            rmConc[j] = (float)imNumPartsInCell[j] / rTotParticles;
+        }
 
         // Inform users of the progress
-        std::cout << iIteration << ", " << iTimeStamp << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
+        std::cout << iIteration << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
     }
 
     // Deallocate manually thrust resources
+    // -1- Release count matrices
+    delete rmConc;
+    delete imNumPartsInCell;
     // -1- Reclaim workspace
     ivPartTimeStamp.clear();
     rvPartX.clear();

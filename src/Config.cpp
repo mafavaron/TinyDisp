@@ -32,8 +32,9 @@ Config::Config(const std::string sConfigFile) {
 		this->iPartsPerStep  = tCfg.GetInteger("General", "PartsPerStep", -1);
 		this->iStepsSurvival = tCfg.GetInteger("General", "StepsSurvival", -1);
 		this->rEdgeLength    = tCfg.GetReal("General", "EdgeLength", -1.0);
-		this->iCellsPerEdge = tCfg.GetInteger("General", "CellsPerEdge", 0);
-		this->sMeteoFile     = tCfg.Get("General", "MeteoFile", "");
+		this->iCellsPerEdge  = tCfg.GetInteger("General", "CellsPerEdge", 0);
+		this->sMeteoFile = tCfg.Get("General", "MeteoFile", "");
+		this->sOutputFile = tCfg.Get("General", "OutputFile", "");
 
 		// Try reading the meteorological file
 		std::ifstream fMeteo;
@@ -268,3 +269,15 @@ float Config::GetCellSize(void) {
 	}
 	return rSize;
 };
+
+std::string Config::GetOutputFile(void) {
+	std::string  sFile;
+	if (this->lIsValid) {
+		sFile = this->sOutputFile;
+	}
+	else {
+		sFile = "";
+	}
+	return sFile;
+};
+
