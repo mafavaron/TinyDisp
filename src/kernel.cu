@@ -9,9 +9,9 @@
 #include <thrust/iterator/counting_iterator.h>
 #include <thrust/iterator/constant_iterator.h>
 #include <thrust/functional.h>
-#include <stdio.h>
 
 #include <iostream>
+#include <fstream>
 #include <math.h>
 
 struct normal_deviate {
@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
     // Main loop: iterate over meteo data
     std::string sOutFileName = tCfg.GetOutputFile();
-    FILE* fOut = fopen(sOutFileName.c_str(), "wb");
+    auto fOut = std::fstream(sOutFileName, std::ios::out | std::ios::binary);
     int n = tCfg.GetCellsPerEdge();
     auto imNumPartsInCell = new unsigned int[n * n];
     auto rmConc = new float[n * n];
@@ -176,27 +176,27 @@ int main(int argc, char** argv)
         for (int j = 0; j < n * n; j++) {
             rmConc[j] = (float)imNumPartsInCell[j] / rTotParticles;
         }
-        fwrite((void*)rmConc, sizeof(float), n * n, fOut);
+        fOut.write((char*)&rmConc[0], (size_t)(n * n));
 
         // Inform users of the progress
         std::cout << iIteration << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
     }
 
     // Release OS resources
-    fclose(fOut);
+    fOut.close();
 
     // Write descriptor file
-    FILE* fDsc = fopen(tCfg.GetDescriptorFile().c_str(), "w");
-    fprintf(fDsc, "TIME: %f\n", 1.f);
-    fprintf(fDsc, "DATA_FILE: %s\n", tCfg.GetOutputFile().c_str());
-    fprintf(fDsc, "DATA_SIZE: %d %d %d\n", tCfg.GetCellsPerEdge(), tCfg.GetCellsPerEdge(), iNumData);
-    fprintf(fDsc, "DATA_FORMAT: FLOAT\n");
-    fprintf(fDsc, "VARIABLE: Concentration\n");
-    fprintf(fDsc, "DATA_ENDIAN: LITTLE\n");
-    fprintf(fDsc, "CENTERING: zonal\n");
-    fprintf(fDsc, "BRICK_ORIGIN: %f %f %f\n", tCfg.GetMinX(), tCfg.GetMinY(), 0.f);
-    fprintf(fDsc, "BRICK_SIZE: %f %f %f\n", -tCfg.GetMinX()*2.f, -tCfg.GetMinY() * 2.f, (float)iNumData);
-    fclose(fDsc);
+    std::ofstream fDsc(tCfg.GetDescriptorFile());
+    fDsc << "TIME: 1.0\n";
+    fDsc << "DATA_FILE: " << tCfg.GetOutputFile() << std::endl;
+    fDsc << "DATA_SIZE: " << tCfg.GetCellsPerEdge() << " " << tCfg.GetCellsPerEdge() << " " << iNumData << std::endl;
+    fDsc << "DATA_FORMAT: FLOAT\n";
+    fDsc << "VARIABLE: Concentration\n";
+    fDsc << "DATA_ENDIAN: LITTLE\n";
+    fDsc << "CENTERING: zonal\n";
+    fDsc << "BRICK_ORIGIN: " << tCfg.GetMinX() << " " << tCfg.GetMinY() << " " << 0.f << std::endl;
+    fDsc << "BRICK_SIZE: " << -tCfg.GetMinX()*2.f << " " << -tCfg.GetMinY() * 2.f << " " << (float)iNumData << std::endl;
+    fDsc.close();
 
     // Deallocate manually thrust resources
     // -1- Release count matrices
