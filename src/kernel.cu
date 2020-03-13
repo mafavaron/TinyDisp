@@ -176,7 +176,7 @@ int main(int argc, char** argv)
         for (int j = 0; j < n * n; j++) {
             rmConc[j] = (float)imNumPartsInCell[j] / rTotParticles;
         }
-        fOut.write((char*)&rmConc[0], (size_t)(n * n));
+        fOut.write((char*)&rmConc[0], (size_t)(n * n)*sizeof(float));
 
         // Inform users of the progress
         std::cout << iIteration << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
