@@ -212,6 +212,8 @@ int main(int argc, char** argv)
     rvN2.clear();
     rvX1.clear();
     rvX2.clear();
+    rvDeltaU.clear();
+    rvDeltaV.clear();
     rvCellX.clear();
     rvCellY.clear();
     // -1- Clear any other resources
@@ -224,6 +226,8 @@ int main(int argc, char** argv)
     rvN2.shrink_to_fit();
     rvX1.shrink_to_fit();
     rvX2.shrink_to_fit();
+    rvDeltaU.shrink_to_fit();
+    rvDeltaV.shrink_to_fit();
     rvCellX.shrink_to_fit();
     rvCellY.shrink_to_fit();
 
