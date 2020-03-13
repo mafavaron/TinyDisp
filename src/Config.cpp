@@ -285,7 +285,7 @@ std::string Config::GetOutputFile(void) {
 std::string Config::GetDescriptorFile(void) {
 	std::string  sFile;
 	if (this->lIsValid) {
-		sFile = this->sOutputFile;
+		sFile = this->sDescriptorFile;
 	}
 	else {
 		sFile = "";
