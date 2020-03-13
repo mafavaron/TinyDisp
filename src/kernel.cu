@@ -240,5 +240,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    std::cout << n << std::endl;
+    std::cout << "*** End Job ***" << std::endl;
+
     return 0;
 }
