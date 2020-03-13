@@ -179,7 +179,8 @@ int main(int argc, char** argv)
         fOut.write((char*)&rmConc[0], (size_t)(n * n)*sizeof(float));
 
         // Inform users of the progress
-        std::cout << iIteration << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
+        std::cout << iIteration << " of " << iNumData << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
+
     }
 
     // Release OS resources
