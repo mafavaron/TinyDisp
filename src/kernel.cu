@@ -188,7 +188,6 @@ int main(int argc, char** argv)
 
     // Write descriptor file
     std::ofstream fDsc(tCfg.GetDescriptorFile());
-    std::cout << tCfg.GetDescriptorFile() << std::endl;
     fDsc << "TIME: 1.0\n";
     fDsc << "DATA_FILE: " << tCfg.GetOutputFile() << std::endl;
     fDsc << "DATA_SIZE: " << tCfg.GetCellsPerEdge() << " " << tCfg.GetCellsPerEdge() << " " << iNumData << std::endl;
