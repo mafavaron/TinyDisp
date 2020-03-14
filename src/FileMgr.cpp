@@ -23,6 +23,10 @@ bool FileMgr::MapFiles(const std::string sPath, const std::string sSearchMask) {
 	// Clean out file list, first of all
 	this->svFileName.clear();
 
+	// Assign path and search names: they always constitute the execution context
+	this->sBasePath = sPath;
+	this->sSearchMask = sSearchMask;
+
 	// Before to really proceed, check something can be made, that is, the directory exists
 	if (!fs::exists(sPath)) {
 		return false;
