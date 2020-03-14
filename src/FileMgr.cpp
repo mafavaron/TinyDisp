@@ -86,7 +86,8 @@ std::string FileMgr::GetInnermostDirectory(void) {
 		std::vector<std::string> svParts;
 		std::filesystem::path pBasePath = this->sBasePath;
 		for (auto& e : pBasePath) {
-			svParts.push_back(e);
+			std::string sTempPath = e.string();
+			svParts.push_back(sTempPath);
 		}
 		if (svParts.size() > 1) {
 			sInnermostDir = svParts[svParts.size()-2];
@@ -100,3 +101,30 @@ std::string FileMgr::GetInnermostDirectory(void) {
 	}
 	return sInnermostDir;
 };
+
+std::string FileMgr::GetVisItName(void) {
+	std::string sVisIt;
+	if (!this->sBasePath.empty()) {
+		std::vector<std::string> svParts;
+		std::filesystem::path pBasePath = this->sBasePath;
+		for (auto& e : pBasePath) {
+			std::string sTempPath = e.string();
+			svParts.push_back(sTempPath);
+		}
+		if (svParts.size() > 1) {
+			std::filesystem::path pVisIt = svParts[0];
+			for (int i = 1; i < svParts.size() - 1; ++i) {
+				pVisIt /= svParts[i];
+			}
+			sVisIt = pVisIt.string() + ".visit";
+		}
+		else {
+			sVisIt = "";
+		}
+	}
+	else {
+		sVisIt = "";
+	}
+	return sVisIt;
+};
+
