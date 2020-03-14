@@ -13,5 +13,6 @@ private:
 public:
 	FileMgr(const std::string sPath, const std::string sSearchMask);
 	virtual ~FileMgr(void);
+	bool FileMgr::CreateAndCleanPath(void);
 };
 
