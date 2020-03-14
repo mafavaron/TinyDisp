@@ -16,5 +16,6 @@ public:
 	bool FileMgr::MapFiles(const std::string sPath, const std::string sSearchMask);
 	bool FileMgr::CreateAndCleanPath(void);
 	std::string FileMgr::GetInnermostDirectory(void);
+	std::string FileMgr::GetVisItName(void);
 };
 
