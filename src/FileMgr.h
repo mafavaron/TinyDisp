@@ -12,8 +12,8 @@ private:
 	std::vector<std::string>	svFileName;
 public:
 	FileMgr(void);
-	FileMgr(const std::string sPath, const std::string sSearchMask);
 	virtual ~FileMgr(void);
+	bool FileMgr::MapFiles(const std::string sPath, const std::string sSearchMask);
 	bool FileMgr::CreateAndCleanPath(void);
 };
 
