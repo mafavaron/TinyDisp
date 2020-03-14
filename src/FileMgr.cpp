@@ -4,9 +4,15 @@
 
 namespace fs = std::filesystem;
 
+FileMgr::FileMgr(void) {
+	this->sBasePath.clear();
+	this->sSearchMask.clear();
+	this->lHasData = false;
+};
+
 FileMgr::FileMgr(const std::string sPath, const std::string sSearchMask) {
 
-	// Create regular expression from the search pattern
+		// Create regular expression from the search pattern
 	std::regex reMatch(sSearchMask, std::regex_constants::nosubs);
 	std::smatch match;
 
