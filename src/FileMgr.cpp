@@ -11,6 +11,7 @@ FileMgr::FileMgr(void) {
 };
 
 FileMgr::~FileMgr(void) {
+	this->svFileName.clear();
 };
 
 bool FileMgr::MapFiles(const std::string sPath, const std::string sSearchMask) {
