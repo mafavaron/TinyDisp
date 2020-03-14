@@ -7,6 +7,8 @@
 #include <iterator>
 #include <iostream>
 #include <iomanip>
+#include <filesystem>
+
 
 template <class Container> void split(const std::string& str, Container& cont, char delim = ',') {
 	std::stringstream ss(str);
@@ -28,14 +30,15 @@ Config::Config(const std::string sConfigFile) {
 	else {
 
 		// Get configuration parameters
-		this->iTimeStep      = tCfg.GetInteger("General", "TimeStep", -1);
-		this->iPartsPerStep  = tCfg.GetInteger("General", "PartsPerStep", -1);
-		this->iStepsSurvival = tCfg.GetInteger("General", "StepsSurvival", -1);
-		this->rEdgeLength    = tCfg.GetReal("General", "EdgeLength", -1.0);
-		this->iCellsPerEdge  = tCfg.GetInteger("General", "CellsPerEdge", 0);
-		this->sMeteoFile = tCfg.Get("General", "MeteoFile", "");
-		this->sOutputFile = tCfg.Get("General", "OutputFile", "");
+		this->iTimeStep       = tCfg.GetInteger("General", "TimeStep", -1);
+		this->iPartsPerStep   = tCfg.GetInteger("General", "PartsPerStep", -1);
+		this->iStepsSurvival  = tCfg.GetInteger("General", "StepsSurvival", -1);
+		this->rEdgeLength     = tCfg.GetReal("General", "EdgeLength", -1.0);
+		this->iCellsPerEdge   = tCfg.GetInteger("General", "CellsPerEdge", 0);
+		this->sMeteoFile      = tCfg.Get("General", "MeteoFile", "");
+		this->sOutputFile     = tCfg.Get("General", "OutputFile", "");
 		this->sDescriptorFile = tCfg.Get("General", "DescriptorFile", "");
+		this->sSnapshotsPath  = tCfg.Get("General", "SnapshotsPath", "");
 
 		// Try reading the meteorological file
 		std::ifstream fMeteo;
@@ -158,6 +161,14 @@ Config::Config(const std::string sConfigFile) {
 
 				iTimeStamp += this->iTimeStep;
 
+			}
+
+			// Ensure the snapshots path, if non-empty, is terminated by an os-consistent
+			// directory separator
+			if (!this->sSnapshotsPath.empty()) {
+				char cFinalChar = this->sSnapshotsPath[this->sSnapshotsPath.length() - 1];
+				if (cFinalChar != std::filesystem::path::preferred_separator)
+					this->sSnapshotsPath += std::filesystem::path::preferred_separator;
 			}
 
 		}
@@ -291,4 +302,15 @@ std::string Config::GetDescriptorFile(void) {
 		sFile = "";
 	}
 	return sFile;
+};
+
+std::string Config::GetSnapshotsPath(void) {
+	std::string  sPath;
+	if (this->lIsValid) {
+		sPath = this->sSnapshotsPath;
+	}
+	else {
+		sPath = "";
+	}
+	return sPath;
 };

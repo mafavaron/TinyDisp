@@ -2,6 +2,7 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "Config.h"
+#include "FileMgr.h"
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 #include <thrust/random.h>
@@ -51,6 +52,18 @@ int main(int argc, char** argv)
 
     // Gather configuration (and meteo data)
     Config tCfg(sCfgFile);
+
+    // Get snapshots pathname and, if non-empty, ensure
+    // it exists and is cleaned before to start
+    bool lSnapshotsCreated = false;
+    FileMgr tSnapshots;
+    std::string sSnapshots = tCfg.GetSnapshotsPath();
+    if (!sSnapshots.empty()) {
+        lSnapshotsCreated = true;
+        std::string sSearchMask = "snaps*";
+        bool lResult = tSnapshots.MapFiles(sSnapshots, sSearchMask);
+        bool lOldSnapsRemoved = tSnapshots.CreateAndCleanPath();
+    }
 
     // Particle pool
     int iNumPart  = tCfg.GetParticlePoolSize();
