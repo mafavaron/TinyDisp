@@ -16,6 +16,7 @@ private:
 	std::string	sMeteoFile;
 	std::string sOutputFile;
 	std::string sDescriptorFile;
+	std::string sSnapshotsPath;
 	// Meteorology
 	std::vector<int>	ivTimeStamp;
 	std::vector<float>	rvU;
@@ -37,4 +38,5 @@ public:
 	float GetCellSize();
 	std::string GetOutputFile(void);
 	std::string GetDescriptorFile(void);
+	std::string GetSnapshotsPath(void);
 };
