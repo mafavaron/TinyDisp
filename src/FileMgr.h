@@ -6,6 +6,7 @@
 class FileMgr
 {
 private:
+	bool						lHasData;
 	std::string					sBasePath;
 	std::string					sSearchMask;
 	std::vector<std::string>	svFileName;
