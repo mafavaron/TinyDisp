@@ -1,6 +1,8 @@
 #include "FileMgr.h"
 #include <filesystem>
 #include <regex>
+#include <vector>
+#include <string>
 
 namespace fs = std::filesystem;
 
@@ -78,3 +80,23 @@ bool FileMgr::CreateAndCleanPath(void) {
 	return lResult;
 };
 
+std::string FileMgr::GetInnermostDirectory(void) {
+	std::string sInnermostDir;
+	if (!this->sBasePath.empty()) {
+		std::vector<std::string> svParts;
+		std::filesystem::path pBasePath = this->sBasePath;
+		for (auto& e : pBasePath) {
+			svParts.push_back(e);
+		}
+		if (svParts.size() > 1) {
+			sInnermostDir = svParts[svParts.size()-2];
+		}
+		else {
+			sInnermostDir = "";
+		}
+	}
+	else {
+		sInnermostDir = "";
+	}
+	return sInnermostDir;
+};
