@@ -39,3 +39,23 @@ FileMgr::FileMgr(const std::string sPath, const std::string sSearchMask) {
 
 FileMgr::~FileMgr(void) {
 };
+
+bool FileMgr::CreateAndCleanPath(void) {
+	bool lResult;
+	if (this->lHasData) {
+		for (auto i = 0; i < this->svFileName.size(); ++i) {
+			std::filesystem::remove(svFileName[i]);
+		}
+		this->svFileName.clear();
+		this->lHasData = false;
+		lResult = true;
+	}
+	else {
+		lResult = false;
+	}
+	if (!std::filesystem::exists(this->sBasePath)) {
+		std::filesystem::create_directories(this->sBasePath);
+	}
+	return lResult;
+};
+
