@@ -1,6 +1,8 @@
 #include "FileMgr.h"
 #include <filesystem>
 #include <regex>
+#include <vector>
+#include <string>
 
 namespace fs = std::filesystem;
 
@@ -76,5 +78,53 @@ bool FileMgr::CreateAndCleanPath(void) {
 		std::filesystem::create_directories(this->sBasePath);
 	}
 	return lResult;
+};
+
+std::string FileMgr::GetInnermostDirectory(void) {
+	std::string sInnermostDir;
+	if (!this->sBasePath.empty()) {
+		std::vector<std::string> svParts;
+		std::filesystem::path pBasePath = this->sBasePath;
+		for (auto& e : pBasePath) {
+			std::string sTempPath = e.string();
+			svParts.push_back(sTempPath);
+		}
+		if (svParts.size() > 1) {
+			sInnermostDir = svParts[svParts.size()-2];
+		}
+		else {
+			sInnermostDir = "";
+		}
+	}
+	else {
+		sInnermostDir = "";
+	}
+	return sInnermostDir;
+};
+
+std::string FileMgr::GetVisItName(void) {
+	std::string sVisIt;
+	if (!this->sBasePath.empty()) {
+		std::vector<std::string> svParts;
+		std::filesystem::path pBasePath = this->sBasePath;
+		for (auto& e : pBasePath) {
+			std::string sTempPath = e.string();
+			svParts.push_back(sTempPath);
+		}
+		if (svParts.size() > 1) {
+			std::filesystem::path pVisIt = svParts[0];
+			for (int i = 1; i < svParts.size() - 1; ++i) {
+				pVisIt /= svParts[i];
+			}
+			sVisIt = pVisIt.string() + ".visit";
+		}
+		else {
+			sVisIt = "";
+		}
+	}
+	else {
+		sVisIt = "";
+	}
+	return sVisIt;
 };
 
