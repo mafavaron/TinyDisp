@@ -32,6 +32,9 @@ FileMgr::FileMgr(const std::string sPath, const std::string sSearchMask) {
 	this->sBasePath   = sPath;
 	this->sSearchMask = sSearchMask;
 
+	// Notify data presence for any further use
+	this->lHasData = (this->svFileName.size() > 0);
+
 };
 
 FileMgr::~FileMgr(void) {
