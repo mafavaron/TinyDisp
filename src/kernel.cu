@@ -58,13 +58,13 @@ int main(int argc, char** argv)
     bool lSnapshotsCreated = false;
     FileMgr tSnapshots;
     std::string sSnapshots = tCfg.GetSnapshotsPath();
-    std::string sInnerDir = "";
+    std::string sVisItFile = "";
     if (!sSnapshots.empty()) {
         lSnapshotsCreated = true;
         std::string sSearchMask = "snaps*";
         bool lResult = tSnapshots.MapFiles(sSnapshots, sSearchMask);
         bool lOldSnapsRemoved = tSnapshots.CreateAndCleanPath();
-        sInnerDir = tSnapshots.GetInnermostDirectory();
+        sVisItFile = tSnapshots.GetVisItName();
     }
 
     // Particle pool
