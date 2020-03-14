@@ -10,9 +10,12 @@ FileMgr::FileMgr(void) {
 	this->lHasData = false;
 };
 
-FileMgr::FileMgr(const std::string sPath, const std::string sSearchMask) {
+FileMgr::~FileMgr(void) {
+};
 
-		// Create regular expression from the search pattern
+bool FileMgr::MapFiles(const std::string sPath, const std::string sSearchMask) {
+
+	// Create regular expression from the search pattern
 	std::regex reMatch(sSearchMask, std::regex_constants::nosubs);
 	std::smatch match;
 
@@ -35,15 +38,15 @@ FileMgr::FileMgr(const std::string sPath, const std::string sSearchMask) {
 	}
 
 	// Store path and search mask
-	this->sBasePath   = sPath;
+	this->sBasePath = sPath;
 	this->sSearchMask = sSearchMask;
 
 	// Notify data presence for any further use
 	this->lHasData = (this->svFileName.size() > 0);
 
-};
+	// Leave
+	return true;
 
-FileMgr::~FileMgr(void) {
 };
 
 bool FileMgr::CreateAndCleanPath(void) {
