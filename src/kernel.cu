@@ -184,12 +184,6 @@ int main(int argc, char** argv)
         rvX2 = rvPartV;
         thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(rDeltaT), rvX2.begin(), thrust::multiplies<float>());
         thrust::transform(rvPartY.begin(), rvPartY.end(), rvX2.begin(), rvPartY.begin(), thrust::plus<float>());
-        float rN1, rN2;
-        for (auto jj = 0; jj < 10; ++jj) {
-            rN1 = rvPartX[jj];
-            rN2 = rvPartY[jj];
-            std::cout << rN1 << " " << rN2 << std::endl;
-        }
 
         // Count cell contents
         rvX1 = rvPartX;
@@ -241,7 +235,7 @@ int main(int argc, char** argv)
             for (auto i = 0; i < iNumPart; ++i) {
                 if(ivPartTimeStamp[i] >= 0) {
                     if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
-                        fSnap << rvTempX[i] << " " << rvTempY[i] << " " << iTimeStamp - ivPartTimeStamp[i] << std::endl;
+                        fSnap << rvTempX[i] << " " << rvTempY[i] << " " << iTimeStamp - ivPartTimeStamp[i] << "\n";
                     }
                 }
             }
