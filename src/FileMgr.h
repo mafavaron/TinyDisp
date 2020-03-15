@@ -17,5 +17,6 @@ public:
 	bool FileMgr::CreateAndCleanPath(void);
 	std::string FileMgr::GetInnermostDirectory(void);
 	std::string FileMgr::GetVisItName(void);
+	std::string FileMgr::GetFilePath(void);
 };
 
