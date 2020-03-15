@@ -170,8 +170,8 @@ int main(int argc, char** argv)
         rvDeltaV = rvX1;
         float rN1, rN2;
         for (auto jj = 0; jj < 10; ++jj) {
-            rN1 = rvDeltaU[jj];
-            rN2 = rvDeltaV[jj];
+            rN1 = rvX1[jj];
+            rN2 = rvX2[jj];
             std::cout << rN1 << " " << rN2 << std::endl;
         }
 
