@@ -223,8 +223,10 @@ int main(int argc, char** argv)
             fSnap << "x y age\n";
             fSnap << "#coordflag xya\n";
             for (auto i = 0; i < iNumPart; ++i) {
-                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
-                    fSnap << rvTempX[i] << " " << rvTempY[i] << " " << iTimeStamp - ivPartTimeStamp[i] << std::endl;
+                if(ivPartTimeStamp[i] >= 0) {
+                    if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
+                        fSnap << rvTempX[i] << " " << rvTempY[i] << " " << iTimeStamp - ivPartTimeStamp[i] << std::endl;
+                    }
                 }
             }
             fSnap.close();
