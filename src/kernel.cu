@@ -160,7 +160,6 @@ int main(int argc, char** argv)
             lambda = 0.f;
         }
         float nu = sqrtf((1.0f - rho * rho) * rStdDevV * rStdDevV);
-        std::cout << rho << " " << nu << " " << rStdDevU << " " << rStdDevV << " " << rCovUV << std::endl;
         // x1 = v1[i] = mu1 + sigma1 * standardnormal(generator)
         rvX1 = rvN1;
         thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rStdDevU), rvX1.begin(), thrust::multiplies<float>());
@@ -174,12 +173,6 @@ int main(int argc, char** argv)
         thrust::transform(rvX1.begin(), rvX1.end(), rvX2.begin(), rvX1.begin(), thrust::plus<float>());
         thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rV), rvX1.begin(), thrust::plus<float>());
         rvDeltaV = rvX1;
-        float rN1, rN2;
-        for (auto jj = 0; jj < 10; ++jj) {
-            rN1 = rvDeltaU[jj];
-            rN2 = rvDeltaV[jj];
-            std::cout << rN1 << " " << rN2 << std::endl;
-        }
 
         // Move particles
         float rDeltaT = tCfg.GetTimeStep();
@@ -191,6 +184,12 @@ int main(int argc, char** argv)
         rvX2 = rvPartV;
         thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(rDeltaT), rvX2.begin(), thrust::multiplies<float>());
         thrust::transform(rvPartY.begin(), rvPartY.end(), rvX2.begin(), rvPartY.begin(), thrust::plus<float>());
+        float rN1, rN2;
+        for (auto jj = 0; jj < 10; ++jj) {
+            rN1 = rvPartU[jj];
+            rN2 = rvPartV[jj];
+            std::cout << rN1 << " " << rN2 << std::endl;
+        }
 
         // Count cell contents
         rvX1 = rvPartX;
