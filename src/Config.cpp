@@ -252,7 +252,7 @@ int Config::GetCellsPerEdge(void) {
 float Config::GetMinX(void) {
 	float rMin;
 	if (this->lIsValid) {
-		rMin = this->rEdgeLength / 2.f;
+		rMin = -this->rEdgeLength / 2.f;
 	}
 	else {
 		rMin = 0.f;
@@ -263,7 +263,7 @@ float Config::GetMinX(void) {
 float Config::GetMinY(void) {
 	float rMin;
 	if (this->lIsValid) {
-		rMin = this->rEdgeLength / 2.f;
+		rMin = -this->rEdgeLength / 2.f;
 	}
 	else {
 		rMin = 0.f;
