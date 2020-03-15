@@ -164,7 +164,7 @@ int main(int argc, char** argv)
         rvX1 = rvN1;
         thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rStdDevU), rvX1.begin(), thrust::multiplies<float>());
         thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rU), rvX1.begin(), thrust::plus<float>());
-        rvDeltaU = rvX1;
+        rvPartU = rvX1;
         // v2[i]=mu2+lambda*(x1-mu1)+nu*standardnormal(generator)
         rvX2 = rvN2;
         thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(nu), rvX2.begin(), thrust::multiplies<float>());
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
         thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(lambda), rvX1.begin(), thrust::multiplies<float>());
         thrust::transform(rvX1.begin(), rvX1.end(), rvX2.begin(), rvX1.begin(), thrust::plus<float>());
         thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rV), rvX1.begin(), thrust::plus<float>());
-        rvDeltaV = rvX1;
+        rvPartV = rvX1;
 
         // Move particles
         float rDeltaT = tCfg.GetTimeStep();
@@ -186,8 +186,8 @@ int main(int argc, char** argv)
         thrust::transform(rvPartY.begin(), rvPartY.end(), rvX2.begin(), rvPartY.begin(), thrust::plus<float>());
         float rN1, rN2;
         for (auto jj = 0; jj < 10; ++jj) {
-            rN1 = rvDeltaU[jj];
-            rN2 = rvDeltaV[jj];
+            rN1 = rvPartU[jj];
+            rN2 = rvPartV[jj];
             std::cout << rN1 << " " << rN2 << std::endl;
         }
 
