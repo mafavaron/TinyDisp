@@ -145,12 +145,6 @@ int main(int argc, char** argv)
             normal_deviate(0.0f, 1.0f)
         );
         iNextRandomBlock += iNumPart;
-        float rN1, rN2;
-        for (auto jj = 0; jj < 10; ++jj) {
-            rN1 = rvN1[jj];
-            rN2 = rvN2[jj];
-            std::cout << rN1 << " " << rN2 << std::endl;
-        }
         iIteration++;
         // -1- Transform the two independent samples in a 2D bivariate sample
         float rho;
@@ -172,6 +166,12 @@ int main(int argc, char** argv)
         thrust::transform(rvX1.begin(), rvX1.end(), rvX2.begin(), rvX1.begin(), thrust::plus<float>());
         thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rV), rvX1.begin(), thrust::plus<float>());
         rvDeltaV = rvX1;
+        float rN1, rN2;
+        for (auto jj = 0; jj < 10; ++jj) {
+            rN1 = rvDeltaU[jj];
+            rN2 = rvDeltaV[jj];
+            std::cout << rN1 << " " << rN2 << std::endl;
+        }
 
         // Move particles
         float rDeltaT = tCfg.GetTimeStep();
