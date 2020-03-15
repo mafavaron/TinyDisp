@@ -13,6 +13,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 #include <math.h>
 
 struct normal_deviate {
@@ -85,6 +87,11 @@ int main(int argc, char** argv)
     thrust::device_vector<float> rvDeltaV(iNumPart);
     thrust::host_vector<float>   rvCellX(iNumPart);
     thrust::host_vector<float>   rvCellY(iNumPart);
+    thrust::host_vector<float>   rvTempX(iNumPart);
+    thrust::host_vector<float>   rvTempY(iNumPart);
+
+    // Initialize the particles' time stamp to -1, to mean "not yet assigned" the parallel vay
+    thrust::fill(ivPartTimeStamp.begin(), ivPartTimeStamp.end(), -1);
 
     // Main loop: iterate over meteo data
     std::string sOutFileName = tCfg.GetOutputFile();
@@ -201,10 +208,28 @@ int main(int argc, char** argv)
 
         // Write snapshot, if needed
         if (!sSnapshots.empty()) {
-            std::string sSnapshotName = tSnapshots.GetFilePath();
+            std::stringstream ssIteration;
+            ssIteration << std::setw(6) << std::setfill('0') << iIteration;
+            std::string sIteration;
+            ssIteration >> sIteration;
+            std::string sSnapshotName = tSnapshots.GetFilePath() + "\\snap_" + sIteration + ".dat";
             std::ofstream fVisIt(tSnapshots.GetVisItName(), std::ios_base::app);
             fVisIt << "!TIME" << (float)(iTimeStamp - iFirstTimeStamp) / 3600.0f << std::endl;
+            fVisIt << sSnapshotName << std::endl;
             fVisIt.close();
+            rvTempX = rvPartX;
+            rvTempY = rvPartY;
+            std::ofstream fSnap(sSnapshotName);
+            fSnap << "x y age\n";
+            fSnap << "#coordflag xya\n";
+            for (auto i = 0; i < iNumPart; ++i) {
+                if(ivPartTimeStamp[i] >= 0) {
+                    if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
+                        fSnap << rvTempX[i] << " " << rvTempY[i] << " " << iTimeStamp - ivPartTimeStamp[i] << std::endl;
+                    }
+                }
+            }
+            fSnap.close();
         }
 
         // Inform users of the progress
@@ -246,6 +271,8 @@ int main(int argc, char** argv)
     rvDeltaV.clear();
     rvCellX.clear();
     rvCellY.clear();
+    rvTempX.clear();
+    rvTempY.clear();
     // -1- Clear any other resources
     ivPartTimeStamp.shrink_to_fit();
     rvPartX.shrink_to_fit();
@@ -260,6 +287,8 @@ int main(int argc, char** argv)
     rvDeltaV.shrink_to_fit();
     rvCellX.shrink_to_fit();
     rvCellY.shrink_to_fit();
+    rvTempX.shrink_to_fit();
+    rvTempY.shrink_to_fit();
 
     // Leave
     // cudaDeviceReset must be called before exiting in order for profiling and
