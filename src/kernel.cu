@@ -103,6 +103,7 @@ int main(int argc, char** argv)
     thrust::counting_iterator<unsigned int> index_sequence_begin(0);
     unsigned int iIteration = 0;
     int iFirstTimeStamp = 0;
+    int iNextRandomBlock = 0;
     for (auto i = 0; i < iNumData; i++) {
 
         // Get current meteorology
@@ -131,27 +132,31 @@ int main(int argc, char** argv)
         // Generate bivariate normal deviates
         // -1- First of all, generate two sets of random normals, with mu=0 and sigma=1
         thrust::transform(
-            index_sequence_begin + iIteration * iNumPart,
-            index_sequence_begin + iIteration * (iNumPart + 1),
+            index_sequence_begin + iNextRandomBlock,
+            index_sequence_begin + iNextRandomBlock + iNumPart,
             rvN1.begin(),
             normal_deviate(0.0f, 1.0f)
         );
+        iNextRandomBlock += iNumPart;
         thrust::transform(
-            index_sequence_begin + iIteration * (iNumPart + 2),
-            index_sequence_begin + iIteration * (iNumPart + 3),
+            index_sequence_begin + iNextRandomBlock,
+            index_sequence_begin + iNextRandomBlock + iNumPart,
             rvN2.begin(),
             normal_deviate(0.0f, 1.0f)
         );
+        iNextRandomBlock += iNumPart;
         iIteration++;
         // -1- Transform the two independent samples in a 2D bivariate sample
         float rho;
+        float lambda;
         if (rStdDevU > 0.f && rStdDevV > 0.f) {
             rho = rCovUV / (rStdDevU * rStdDevV);
+            lambda = (rStdDevV / rStdDevU) * rho;
         }
         else {
             rho = 0.f;
+            lambda = 0.f;
         }
-        float lambda = (rStdDevV / rStdDevU) * rho;
         float nu = sqrtf((1.0f - rho * rho) * rStdDevV * rStdDevV);
         rvX1 = rvN1;
         thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rStdDevU), rvX1.begin(), thrust::multiplies<float>());
@@ -163,6 +168,12 @@ int main(int argc, char** argv)
         thrust::transform(rvX1.begin(), rvX1.end(), rvX2.begin(), rvX1.begin(), thrust::plus<float>());
         thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rV), rvX1.begin(), thrust::plus<float>());
         rvDeltaV = rvX1;
+        float rN1, rN2;
+        for (auto jj = 0; jj < 10; ++jj) {
+            rN1 = rvDeltaU[jj];
+            rN2 = rvDeltaV[jj];
+            std::cout << rN1 << " " << rN2 << std::endl;
+        }
 
         // Move particles
         float rDeltaT = tCfg.GetTimeStep();
