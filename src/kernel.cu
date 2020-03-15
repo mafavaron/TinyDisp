@@ -148,13 +148,15 @@ int main(int argc, char** argv)
         iIteration++;
         // -1- Transform the two independent samples in a 2D bivariate sample
         float rho;
+        float lambda;
         if (rStdDevU > 0.f && rStdDevV > 0.f) {
             rho = rCovUV / (rStdDevU * rStdDevV);
+            lambda = (rStdDevV / rStdDevU) * rho;
         }
         else {
             rho = 0.f;
+            lambda = 0.f;
         }
-        float lambda = (rStdDevV / rStdDevU) * rho;
         float nu = sqrtf((1.0f - rho * rho) * rStdDevV * rStdDevV);
         rvX1 = rvN1;
         thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rStdDevU), rvX1.begin(), thrust::multiplies<float>());
