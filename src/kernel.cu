@@ -234,6 +234,9 @@ int main(int argc, char** argv)
             fSnap << "#coordflag xya\n";
             for (auto i = 0; i < iNumPart; ++i) {
                 if(ivPartTimeStamp[i] >= 0) {
+                    float rMinX =  tCfg.GetMinX();
+                    float rMaxX = -tCfg.GetMinX();
+                    float rX = rvTempX[i];
                     if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
                         fSnap << rvTempX[i] << " " << rvTempY[i] << " " << iTimeStamp - ivPartTimeStamp[i] << "\n";
                     }
