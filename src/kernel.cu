@@ -151,6 +151,8 @@ int main(int argc, char** argv)
         float lambda;
         if (rStdDevU > 0.f && rStdDevV > 0.f) {
             rho = rCovUV / (rStdDevU * rStdDevV);
+            rho = rho < -1.f ? -1.f : rho;
+            rho = rho >  1.f ?  1.f : rho;
             lambda = (rStdDevV / rStdDevU) * rho;
         }
         else {
@@ -158,9 +160,13 @@ int main(int argc, char** argv)
             lambda = 0.f;
         }
         float nu = sqrtf((1.0f - rho * rho) * rStdDevV * rStdDevV);
+        std::cout << rho << " " << nu << " " << rStdDevU << " " << rStdDevV << " " << rCovUV << std::endl;
+        // x1 = v1[i] = mu1 + sigma1 * standardnormal(generator)
         rvX1 = rvN1;
         thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rStdDevU), rvX1.begin(), thrust::multiplies<float>());
+        thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rU), rvX1.begin(), thrust::plus<float>());
         rvDeltaU = rvX1;
+        // v2[i]=mu2+lambda*(x1-mu1)+nu*standardnormal(generator)
         rvX2 = rvN2;
         thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(nu), rvX2.begin(), thrust::multiplies<float>());
         thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(rU), rvX1.begin(), thrust::minus<float>());
