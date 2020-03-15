@@ -44,7 +44,7 @@ bool FileMgr::MapFiles(const std::string sPath, const std::string sSearchMask) {
 		else {
 			// Check conformance to file search mask
 			if (std::regex_search(sFileName, match, reMatch)) {
-				this->svFileName.push_back(sFileName);
+				this->svFileName.push_back(this->sBasePath + sFileName);
 			}
 		}
 	}
