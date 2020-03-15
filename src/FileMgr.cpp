@@ -128,3 +128,7 @@ std::string FileMgr::GetVisItName(void) {
 	return sVisIt;
 };
 
+std::string FileMgr::GetFilePath(void) {
+	return this->sBasePath;
+};
+
