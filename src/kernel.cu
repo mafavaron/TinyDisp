@@ -90,6 +90,9 @@ int main(int argc, char** argv)
     thrust::host_vector<float>   rvTempX(iNumPart);
     thrust::host_vector<float>   rvTempY(iNumPart);
 
+    // Initialize the particles' time stamp to -1, to mean "not yet assigned" the parallel vay
+    thrust::fill(ivPartTimeStamp.begin(), ivPartTimeStamp.end(), -1);
+
     // Main loop: iterate over meteo data
     std::string sOutFileName = tCfg.GetOutputFile();
     auto fOut = std::fstream(sOutFileName, std::ios::out | std::ios::binary);
