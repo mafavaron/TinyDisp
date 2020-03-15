@@ -103,6 +103,7 @@ int main(int argc, char** argv)
     thrust::counting_iterator<unsigned int> index_sequence_begin(0);
     unsigned int iIteration = 0;
     int iFirstTimeStamp = 0;
+    int iNextRandomBlock = 0;
     for (auto i = 0; i < iNumData; i++) {
 
         // Get current meteorology
@@ -131,17 +132,19 @@ int main(int argc, char** argv)
         // Generate bivariate normal deviates
         // -1- First of all, generate two sets of random normals, with mu=0 and sigma=1
         thrust::transform(
-            index_sequence_begin + iIteration * iNumPart,
-            index_sequence_begin + iIteration * (iNumPart + 1),
+            index_sequence_begin + iNextRandomBlock,
+            index_sequence_begin + iNextRandomBlock + iNumPart,
             rvN1.begin(),
             normal_deviate(0.0f, 1.0f)
         );
+        iNextRandomBlock += iNumPart;
         thrust::transform(
-            index_sequence_begin + iIteration * (iNumPart + 2),
-            index_sequence_begin + iIteration * (iNumPart + 3),
+            index_sequence_begin + iNextRandomBlock,
+            index_sequence_begin + iNextRandomBlock + iNumPart,
             rvN2.begin(),
             normal_deviate(0.0f, 1.0f)
         );
+        iNextRandomBlock += iNumPart;
         float rN1, rN2;
         for (auto jj = 0; jj < 10; ++jj) {
             rN1 = rvN1[jj];
