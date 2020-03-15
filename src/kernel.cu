@@ -87,6 +87,8 @@ int main(int argc, char** argv)
     thrust::device_vector<float> rvDeltaV(iNumPart);
     thrust::host_vector<float>   rvCellX(iNumPart);
     thrust::host_vector<float>   rvCellY(iNumPart);
+    thrust::host_vector<float>   rvTempX(iNumPart);
+    thrust::host_vector<float>   rvTempY(iNumPart);
 
     // Main loop: iterate over meteo data
     std::string sOutFileName = tCfg.GetOutputFile();
@@ -212,7 +214,16 @@ int main(int argc, char** argv)
             fVisIt << "!TIME" << (float)(iTimeStamp - iFirstTimeStamp) / 3600.0f << std::endl;
             fVisIt << sSnapshotName << std::endl;
             fVisIt.close();
+            rvTempX = rvPartX;
+            rvTempY = rvPartY;
             std::ofstream fSnap(sSnapshotName);
+            fSnap << "x y age\n";
+            fSnap << "#coordflag xya\n";
+            for (auto i = 0; i < iNumPart; ++i) {
+                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
+                    fSnap << rvTempX[i] << " " << rvTempY[i] << " " << iTimeStamp - ivPartTimeStamp[i] << std::endl;
+                }
+            }
             fSnap.close();
         }
 
@@ -255,6 +266,8 @@ int main(int argc, char** argv)
     rvDeltaV.clear();
     rvCellX.clear();
     rvCellY.clear();
+    rvTempX.clear();
+    rvTempY.clear();
     // -1- Clear any other resources
     ivPartTimeStamp.shrink_to_fit();
     rvPartX.shrink_to_fit();
@@ -269,6 +282,8 @@ int main(int argc, char** argv)
     rvDeltaV.shrink_to_fit();
     rvCellX.shrink_to_fit();
     rvCellY.shrink_to_fit();
+    rvTempX.shrink_to_fit();
+    rvTempY.shrink_to_fit();
 
     // Leave
     // cudaDeviceReset must be called before exiting in order for profiling and
