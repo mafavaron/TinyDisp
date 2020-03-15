@@ -65,6 +65,8 @@ int main(int argc, char** argv)
         bool lResult = tSnapshots.MapFiles(sSnapshots, sSearchMask);
         bool lOldSnapsRemoved = tSnapshots.CreateAndCleanPath();
         sVisItFile = tSnapshots.GetVisItName();
+        std::ofstream fVisIt(sVisItFile);
+        fVisIt.close(); // Force a rewrite: all further accesses will be in append mode
     }
 
     // Particle pool
@@ -93,6 +95,7 @@ int main(int argc, char** argv)
     int iNumData = tCfg.GetNumMeteoData();
     thrust::counting_iterator<unsigned int> index_sequence_begin(0);
     unsigned int iIteration = 0;
+    int iFirstTimeStamp = 0;
     for (auto i = 0; i < iNumData; i++) {
 
         // Get current meteorology
@@ -103,6 +106,9 @@ int main(int argc, char** argv)
         float rStdDevV;
         float rCovUV;
         bool lOk = tCfg.GetMeteo(i, iTimeStamp, rU, rV, rStdDevU, rStdDevV, rCovUV);
+        if (iIteration == 0) {
+            iFirstTimeStamp = iTimeStamp;
+        }
 
         // Emit new particles
         thrust::fill(ivPartTimeStamp.begin() + iNextPart, ivPartTimeStamp.begin() + iNextPart + tCfg.GetNumNewParticles(), iTimeStamp);
@@ -192,6 +198,14 @@ int main(int argc, char** argv)
             rmConc[j] = (float)imNumPartsInCell[j] / rTotParticles;
         }
         fOut.write((char*)&rmConc[0], (size_t)(n * n)*sizeof(float));
+
+        // Write snapshot, if needed
+        if (!sSnapshots.empty()) {
+            std::string sSnapshotName = tSnapshots.GetFilePath();
+            std::ofstream fVisIt(tSnapshots.GetVisItName(), std::ios_base::app);
+            fVisIt << "!TIME" << (float)(iTimeStamp - iFirstTimeStamp) / 3600.0f << std::endl;
+            fVisIt.close();
+        }
 
         // Inform users of the progress
         std::cout << iIteration << " of " << iNumData << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
