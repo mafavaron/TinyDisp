@@ -13,6 +13,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 #include <math.h>
 
 struct normal_deviate {
@@ -201,10 +203,17 @@ int main(int argc, char** argv)
 
         // Write snapshot, if needed
         if (!sSnapshots.empty()) {
-            std::string sSnapshotName = tSnapshots.GetFilePath();
+            std::stringstream ssIteration;
+            ssIteration << std::setw(6) << std::setfill('0') << iIteration;
+            std::string sIteration;
+            ssIteration >> sIteration;
+            std::string sSnapshotName = tSnapshots.GetFilePath() + "\\snap_" + sIteration + ".dat";
             std::ofstream fVisIt(tSnapshots.GetVisItName(), std::ios_base::app);
             fVisIt << "!TIME" << (float)(iTimeStamp - iFirstTimeStamp) / 3600.0f << std::endl;
+            fVisIt << sSnapshotName << std::endl;
             fVisIt.close();
+            std::ofstream fSnap(sSnapshotName);
+            fSnap.close();
         }
 
         // Inform users of the progress
