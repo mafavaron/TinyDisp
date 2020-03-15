@@ -186,8 +186,8 @@ int main(int argc, char** argv)
         thrust::transform(rvPartY.begin(), rvPartY.end(), rvX2.begin(), rvPartY.begin(), thrust::plus<float>());
         float rN1, rN2;
         for (auto jj = 0; jj < 10; ++jj) {
-            rN1 = rvPartU[jj];
-            rN2 = rvPartV[jj];
+            rN1 = rvPartX[jj];
+            rN2 = rvPartY[jj];
             std::cout << rN1 << " " << rN2 << std::endl;
         }
 
