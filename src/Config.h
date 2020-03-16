@@ -6,18 +6,23 @@
 class Config
 {
 private:
-	// General part
+	// [General]
 	bool		lIsValid;
 	int			iTimeStep;
+	// [Grid]
 	float		rEdgeLength;
 	int			iCellsPerEdge;
+	// [Particles]
 	int			iPartsPerStep;
 	int			iStepsSurvival;
+	// [Meteo]
 	std::string	sMeteoFile;
+	// [Output]
 	std::string sOutputFile;
+	// [Snapshots]
 	std::string sDescriptorFile;
 	std::string sSnapshotsPath;
-	// Meteorology
+	// Actual meteorology (from file)
 	std::vector<int>	ivTimeStamp;
 	std::vector<float>	rvU;
 	std::vector<float>	rvV;
