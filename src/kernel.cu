@@ -222,7 +222,7 @@ int main(int argc, char** argv)
             ssIteration << std::setw(6) << std::setfill('0') << iIteration;
             std::string sIteration;
             ssIteration >> sIteration;
-            std::string sSnapshotName = tSnapshots.GetFilePath() + "\\snap_" + sIteration + ".dat";
+            std::string sSnapshotName = tSnapshots.GetFilePath() + "\\snap_" + sIteration + ".p2d";
             std::ofstream fVisIt(tSnapshots.GetVisItName(), std::ios_base::app);
             fVisIt << "!TIME" << (float)(iTimeStamp - iFirstTimeStamp) / 3600.0f << std::endl;
             fVisIt << sSnapshotName << std::endl;
@@ -230,13 +230,9 @@ int main(int argc, char** argv)
             rvTempX = rvPartX;
             rvTempY = rvPartY;
             std::ofstream fSnap(sSnapshotName);
-            fSnap << "x y age\n";
-            fSnap << "#coordflag xya\n";
+            fSnap << "X Y value\n";
             for (auto i = 0; i < iNumPart; ++i) {
                 if(ivPartTimeStamp[i] >= 0) {
-                    float rMinX =  tCfg.GetMinX();
-                    float rMaxX = -tCfg.GetMinX();
-                    float rX = rvTempX[i];
                     if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
                         fSnap << rvTempX[i] << " " << rvTempY[i] << " " << iTimeStamp - ivPartTimeStamp[i] << "\n";
                     }
