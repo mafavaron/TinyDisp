@@ -55,26 +55,10 @@ int main(int argc, char** argv)
     // Gather configuration (and meteo data)
     Config tCfg(sCfgFile);
 
-    // Get snapshots pathname and, if non-empty, ensure
-    // it exists and is cleaned before to start
-    bool lSnapshotsCreated = false;
-    FileMgr tSnapshots;
-    std::string sSnapshots = tCfg.GetSnapshotsPath();
-    std::string sVisItFile = "";
-    if (!sSnapshots.empty()) {
-        lSnapshotsCreated = true;
-        std::string sSearchMask = "snaps*";
-        bool lResult = tSnapshots.MapFiles(sSnapshots, sSearchMask);
-        bool lOldSnapsRemoved = tSnapshots.CreateAndCleanPath();
-        sVisItFile = tSnapshots.GetVisItName();
-        std::ofstream fVisIt(sVisItFile);
-        fVisIt.close(); // Force a rewrite: all further accesses will be in append mode
-    }
-
     // Particle pool
     int iNumPart  = tCfg.GetParticlePoolSize();
     int iNextPart = 0;  // For indexing the generation circular buffer
-    thrust::device_vector<int> ivPartTimeStamp(iNumPart); // Time stamp at emission time - for reporting - host-only
+    thrust::device_vector<int> ivPartTimeStamp(iNumPart);
     thrust::device_vector<float> rvPartX(iNumPart);
     thrust::device_vector<float> rvPartY(iNumPart);
     thrust::device_vector<float> rvPartU(iNumPart);
@@ -85,10 +69,9 @@ int main(int argc, char** argv)
     thrust::device_vector<float> rvX2(iNumPart);
     thrust::device_vector<float> rvDeltaU(iNumPart);
     thrust::device_vector<float> rvDeltaV(iNumPart);
-    thrust::host_vector<float>   rvCellX(iNumPart);
-    thrust::host_vector<float>   rvCellY(iNumPart);
     thrust::host_vector<float>   rvTempX(iNumPart);
     thrust::host_vector<float>   rvTempY(iNumPart);
+    thrust::host_vector<int>     ivTempTimeStamp(iNumPart);
 
     // Initialize the particles' time stamp to -1, to mean "not yet assigned" the parallel vay
     thrust::fill(ivPartTimeStamp.begin(), ivPartTimeStamp.end(), -1);
@@ -96,9 +79,7 @@ int main(int argc, char** argv)
     // Main loop: iterate over meteo data
     std::string sOutFileName = tCfg.GetOutputFile();
     auto fOut = std::fstream(sOutFileName, std::ios::out | std::ios::binary);
-    int n = tCfg.GetCellsPerEdge();
-    auto imNumPartsInCell = new unsigned int[n * n];
-    auto rmConc = new float[n * n];
+    fOut.write((char*)&iNumPart, sizeof(int));
     int iNumData = tCfg.GetNumMeteoData();
     thrust::counting_iterator<unsigned int> index_sequence_begin(0);
     unsigned int iIteration = 0;
@@ -185,60 +166,27 @@ int main(int argc, char** argv)
         thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(rDeltaT), rvX2.begin(), thrust::multiplies<float>());
         thrust::transform(rvPartY.begin(), rvPartY.end(), rvX2.begin(), rvPartY.begin(), thrust::plus<float>());
 
-        // Count cell contents
-        rvX1 = rvPartX;
-        rvX2 = rvPartY;
-        thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(tCfg.GetMinX()), rvX1.begin(), thrust::minus<float>());
-        thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(tCfg.GetCellSize()), rvX1.begin(), thrust::divides<float>());
-        thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(tCfg.GetMinY()), rvX2.begin(), thrust::minus<float>());
-        thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(tCfg.GetCellSize()), rvX2.begin(), thrust::divides<float>());
-        rvCellX = rvX1;
-        rvCellY = rvX2;
-        for (int iy = 0; iy < n; iy++) {
-            for (int ix = 0; iy < n; iy++) {
-                imNumPartsInCell[n * iy + ix] = 0U;
-            }
-        }
-        for (int j = 0; j < rvCellX.size(); j++) {
-            int ix = (int)rvCellX[j];
-            int iy = (int)rvCellY[j];
-            if (0 <= ix && ix < n && 0 <= iy && iy < n) {
-                ++imNumPartsInCell[n * iy + ix];
-            }
-        }
-        int iTotParticles = 0;
-        for (int j = 0; j < n * n; j++) {
-            iTotParticles += imNumPartsInCell[j];
-        }
-        float rTotParticles = iTotParticles;
-        for (int j = 0; j < n * n; j++) {
-            rmConc[j] = (float)imNumPartsInCell[j] / rTotParticles;
-        }
-        fOut.write((char*)&rmConc[0], (size_t)(n * n)*sizeof(float));
-
-        // Write snapshot, if needed
-        if (!sSnapshots.empty()) {
-            std::stringstream ssIteration;
-            ssIteration << std::setw(6) << std::setfill('0') << iIteration;
-            std::string sIteration;
-            ssIteration >> sIteration;
-            std::string sSnapshotName = tSnapshots.GetFilePath() + "\\snap_" + sIteration + ".p2d";
-            std::ofstream fVisIt(tSnapshots.GetVisItName(), std::ios_base::app);
-            fVisIt << "!TIME" << (float)(iTimeStamp - iFirstTimeStamp) / 3600.0f << std::endl;
-            fVisIt << sSnapshotName << std::endl;
-            fVisIt.close();
-            rvTempX = rvPartX;
-            rvTempY = rvPartY;
-            std::ofstream fSnap(sSnapshotName);
-            fSnap << "X Y value\n";
-            for (auto i = 0; i < iNumPart; ++i) {
-                if(ivPartTimeStamp[i] >= 0) {
-                    if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
-                        fSnap << rvTempX[i] << " " << rvTempY[i] << " " << iTimeStamp - ivPartTimeStamp[i] << "\n";
-                    }
+        // Append particles to pool
+        rvTempX = rvPartX;
+        rvTempY = rvPartY;
+        ivTempTimeStamp = ivPartTimeStamp;
+        int iNumActivePart = 0;
+        for (auto i = 0; i < iNumPart; ++i) {
+            if (ivTempTimeStamp[i] >= 0) {
+                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
+                    ++iNumActivePart;
                 }
             }
-            fSnap.close();
+        }
+        fOut.write((char*)&iNumActivePart, sizeof(int));
+        for (auto i = 0; i < iNumPart; ++i) {
+            if (ivTempTimeStamp[i] >= 0) {
+                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
+                    fOut.write((char*)&rvTempX[i], sizeof(float));
+                    fOut.write((char*)&rvTempY[i], sizeof(float));
+                    fOut.write((char*)&ivTempTimeStamp[i], sizeof(int));
+                }
+            }
         }
 
         // Inform users of the progress
@@ -249,23 +197,7 @@ int main(int argc, char** argv)
     // Release OS resources
     fOut.close();
 
-    // Write descriptor file
-    std::ofstream fDsc(tCfg.GetDescriptorFile());
-    fDsc << "TIME: 1.0\n";
-    fDsc << "DATA_FILE: " << tCfg.GetOutputFile() << std::endl;
-    fDsc << "DATA_SIZE: " << tCfg.GetCellsPerEdge() << " " << tCfg.GetCellsPerEdge() << " " << iNumData << std::endl;
-    fDsc << "DATA_FORMAT: FLOAT\n";
-    fDsc << "VARIABLE: Concentration\n";
-    fDsc << "DATA_ENDIAN: LITTLE\n";
-    fDsc << "CENTERING: zonal\n";
-    fDsc << "BRICK_ORIGIN: " << tCfg.GetMinX() << " " << tCfg.GetMinY() << " " << 0.f << std::endl;
-    fDsc << "BRICK_SIZE: " << -tCfg.GetMinX()*2.f << " " << -tCfg.GetMinY() * 2.f << " " << (float)iNumData << std::endl;
-    fDsc.close();
-
     // Deallocate manually thrust resources
-    // -1- Release count matrices
-    delete rmConc;
-    delete imNumPartsInCell;
     // -1- Reclaim workspace
     ivPartTimeStamp.clear();
     rvPartX.clear();
@@ -278,10 +210,9 @@ int main(int argc, char** argv)
     rvX2.clear();
     rvDeltaU.clear();
     rvDeltaV.clear();
-    rvCellX.clear();
-    rvCellY.clear();
     rvTempX.clear();
     rvTempY.clear();
+    ivTempTimeStamp.clear();
     // -1- Clear any other resources
     ivPartTimeStamp.shrink_to_fit();
     rvPartX.shrink_to_fit();
@@ -294,10 +225,9 @@ int main(int argc, char** argv)
     rvX2.shrink_to_fit();
     rvDeltaU.shrink_to_fit();
     rvDeltaV.shrink_to_fit();
-    rvCellX.shrink_to_fit();
-    rvCellY.shrink_to_fit();
     rvTempX.shrink_to_fit();
     rvTempY.shrink_to_fit();
+    ivTempTimeStamp.shrink_to_fit();
 
     // Leave
     // cudaDeviceReset must be called before exiting in order for profiling and
