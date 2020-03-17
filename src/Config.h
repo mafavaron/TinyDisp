@@ -11,7 +11,6 @@ private:
 	int			iTimeStep;
 	// [Grid]
 	float		rEdgeLength;
-	int			iCellsPerEdge;
 	// [Particles]
 	int			iPartsPerStep;
 	int			iStepsSurvival;
@@ -19,9 +18,6 @@ private:
 	std::string	sMeteoFile;
 	// [Output]
 	std::string sOutputFile;
-	// [Snapshots]
-	std::string sDescriptorFile;
-	std::string sSnapshotsPath;
 	// Actual meteorology (from file)
 	std::vector<int>	ivTimeStamp;
 	std::vector<float>	rvU;
