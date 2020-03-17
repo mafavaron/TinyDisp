@@ -31,11 +31,11 @@ Config::Config(const std::string sConfigFile) {
 
 		// Get configuration parameters
 		this->iTimeStep       = tCfg.GetInteger("General", "TimeStep", -1);
-		this->iPartsPerStep   = tCfg.GetInteger("General", "PartsPerStep", -1);
-		this->iStepsSurvival  = tCfg.GetInteger("General", "StepsSurvival", -1);
-		this->rEdgeLength     = tCfg.GetReal("General", "EdgeLength", -1.0);
-		this->sMeteoFile      = tCfg.Get("General", "MeteoFile", "");
-		this->sOutputFile     = tCfg.Get("General", "OutputFile", "");
+		this->iPartsPerStep   = tCfg.GetInteger("Particles", "PartsPerStep", -1);
+		this->iStepsSurvival  = tCfg.GetInteger("Particles", "StepsSurvival", -1);
+		this->rEdgeLength     = tCfg.GetReal("Grid", "EdgeLength", -1.0);
+		this->sMeteoFile      = tCfg.Get("Meteo", "MeteoFile", "");
+		this->sOutputFile     = tCfg.Get("Output", "OutputFile", "");
 
 		// Try reading the meteorological file
 		std::ifstream fMeteo;
