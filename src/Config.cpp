@@ -260,13 +260,3 @@ std::string Config::GetOutputFile(void) {
 	return sFile;
 };
 
-std::string Config::GetSnapshotsPath(void) {
-	std::string  sPath;
-	if (this->lIsValid) {
-		sPath = this->sSnapshotsPath;
-	}
-	else {
-		sPath = "";
-	}
-	return sPath;
-};
