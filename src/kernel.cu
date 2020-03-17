@@ -2,7 +2,6 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "Config.h"
-#include "FileMgr.h"
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 #include <thrust/random.h>
