@@ -166,32 +166,8 @@ int main(int argc, char** argv)
         thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(rDeltaT), rvX2.begin(), thrust::multiplies<float>());
         thrust::transform(rvPartY.begin(), rvPartY.end(), rvX2.begin(), rvPartY.begin(), thrust::plus<float>());
 
+        // Append particles in pool
         fOut.write((char*)&rmConc[0], (size_t)(n * n)*sizeof(float));
-
-        // Write snapshot, if needed
-        if (!sSnapshots.empty()) {
-            std::stringstream ssIteration;
-            ssIteration << std::setw(6) << std::setfill('0') << iIteration;
-            std::string sIteration;
-            ssIteration >> sIteration;
-            std::string sSnapshotName = tSnapshots.GetFilePath() + "\\snap_" + sIteration + ".p2d";
-            std::ofstream fVisIt(tSnapshots.GetVisItName(), std::ios_base::app);
-            fVisIt << "!TIME" << (float)(iTimeStamp - iFirstTimeStamp) / 3600.0f << std::endl;
-            fVisIt << sSnapshotName << std::endl;
-            fVisIt.close();
-            rvTempX = rvPartX;
-            rvTempY = rvPartY;
-            std::ofstream fSnap(sSnapshotName);
-            fSnap << "X Y value\n";
-            for (auto i = 0; i < iNumPart; ++i) {
-                if(ivPartTimeStamp[i] >= 0) {
-                    if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
-                        fSnap << rvTempX[i] << " " << rvTempY[i] << " " << iTimeStamp - ivPartTimeStamp[i] << "\n";
-                    }
-                }
-            }
-            fSnap.close();
-        }
 
         // Inform users of the progress
         std::cout << iIteration << " of " << iNumData << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
