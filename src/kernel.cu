@@ -177,19 +177,6 @@ int main(int argc, char** argv)
     // Release OS resources
     fOut.close();
 
-    // Write descriptor file
-    std::ofstream fDsc(tCfg.GetDescriptorFile());
-    fDsc << "TIME: 1.0\n";
-    fDsc << "DATA_FILE: " << tCfg.GetOutputFile() << std::endl;
-    fDsc << "DATA_SIZE: " << tCfg.GetCellsPerEdge() << " " << tCfg.GetCellsPerEdge() << " " << iNumData << std::endl;
-    fDsc << "DATA_FORMAT: FLOAT\n";
-    fDsc << "VARIABLE: Concentration\n";
-    fDsc << "DATA_ENDIAN: LITTLE\n";
-    fDsc << "CENTERING: zonal\n";
-    fDsc << "BRICK_ORIGIN: " << tCfg.GetMinX() << " " << tCfg.GetMinY() << " " << 0.f << std::endl;
-    fDsc << "BRICK_SIZE: " << -tCfg.GetMinX()*2.f << " " << -tCfg.GetMinY() * 2.f << " " << (float)iNumData << std::endl;
-    fDsc.close();
-
     // Deallocate manually thrust resources
     // -1- Release count matrices
     delete rmConc;
