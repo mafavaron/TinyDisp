@@ -184,7 +184,7 @@ int main(int argc, char** argv)
                 if (tCfg->GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg->GetMaxX() && tCfg->GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg->GetMaxY()) {
                     fOut.write((char*)&rvTempX[i], sizeof(float));
                     fOut.write((char*)&rvTempY[i], sizeof(float));
-                    fOut.write((char*)&ivTimeStamp[i], sizeof(int));
+                    fOut.write((char*)&ivPartTimeStamp[i], sizeof(int));
                 }
             }
         }
@@ -199,7 +199,6 @@ int main(int argc, char** argv)
 
     // Deallocate manually thrust resources
     // -1- Release count matrices
-    delete rmConc;
     delete imNumPartsInCell;
     // -1- Reclaim workspace
     ivPartTimeStamp.clear();
