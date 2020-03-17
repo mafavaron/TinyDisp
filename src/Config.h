@@ -35,7 +35,6 @@ public:
 	float GetTimeStep(void);
 	float GetMinX();
 	float GetMinY();
-	float GetCellSize();
 	std::string GetOutputFile(void);
 	std::string GetDescriptorFile(void);
 	std::string GetSnapshotsPath(void);
