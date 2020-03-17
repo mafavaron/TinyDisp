@@ -31,14 +31,11 @@ Config::Config(const std::string sConfigFile) {
 
 		// Get configuration parameters
 		this->iTimeStep       = tCfg.GetInteger("General", "TimeStep", -1);
-		this->iPartsPerStep   = tCfg.GetInteger("General", "PartsPerStep", -1);
-		this->iStepsSurvival  = tCfg.GetInteger("General", "StepsSurvival", -1);
-		this->rEdgeLength     = tCfg.GetReal("General", "EdgeLength", -1.0);
-		this->iCellsPerEdge   = tCfg.GetInteger("General", "CellsPerEdge", 0);
-		this->sMeteoFile      = tCfg.Get("General", "MeteoFile", "");
-		this->sOutputFile     = tCfg.Get("General", "OutputFile", "");
-		this->sDescriptorFile = tCfg.Get("General", "DescriptorFile", "");
-		this->sSnapshotsPath  = tCfg.Get("General", "SnapshotsPath", "");
+		this->iPartsPerStep   = tCfg.GetInteger("Particles", "PartsPerStep", -1);
+		this->iStepsSurvival  = tCfg.GetInteger("Particles", "StepsSurvival", -1);
+		this->rEdgeLength     = tCfg.GetReal("Grid", "EdgeLength", -1.0);
+		this->sMeteoFile      = tCfg.Get("Meteo", "MeteoFile", "");
+		this->sOutputFile     = tCfg.Get("Output", "OutputFile", "");
 
 		// Try reading the meteorological file
 		std::ifstream fMeteo;
@@ -163,14 +160,6 @@ Config::Config(const std::string sConfigFile) {
 
 			}
 
-			// Ensure the snapshots path, if non-empty, is terminated by an os-consistent
-			// directory separator
-			if (!this->sSnapshotsPath.empty()) {
-				char cFinalChar = this->sSnapshotsPath[this->sSnapshotsPath.length() - 1];
-				if (cFinalChar != std::filesystem::path::preferred_separator)
-					this->sSnapshotsPath += std::filesystem::path::preferred_separator;
-			}
-
 		}
 
 	}
@@ -238,21 +227,10 @@ float Config::GetTimeStep(void) {
 	return rTimeStep;
 };
 
-int Config::GetCellsPerEdge(void) {
-	int iNumCells;
-	if (this->lIsValid) {
-		iNumCells = this->iCellsPerEdge;
-	}
-	else {
-		iNumCells = 0;
-	}
-	return iNumCells;
-};
-
 float Config::GetMinX(void) {
 	float rMin;
 	if (this->lIsValid) {
-		rMin = this->rEdgeLength / 2.f;
+		rMin = -this->rEdgeLength / 2.f;
 	}
 	else {
 		rMin = 0.f;
@@ -263,23 +241,12 @@ float Config::GetMinX(void) {
 float Config::GetMinY(void) {
 	float rMin;
 	if (this->lIsValid) {
-		rMin = this->rEdgeLength / 2.f;
+		rMin = -this->rEdgeLength / 2.f;
 	}
 	else {
 		rMin = 0.f;
 	}
 	return rMin;
-};
-
-float Config::GetCellSize(void) {
-	float rSize;
-	if (this->lIsValid) {
-		rSize = this->rEdgeLength / this->iCellsPerEdge;
-	}
-	else {
-		rSize = 0.f;
-	}
-	return rSize;
 };
 
 std::string Config::GetOutputFile(void) {
@@ -293,24 +260,3 @@ std::string Config::GetOutputFile(void) {
 	return sFile;
 };
 
-std::string Config::GetDescriptorFile(void) {
-	std::string  sFile;
-	if (this->lIsValid) {
-		sFile = this->sDescriptorFile;
-	}
-	else {
-		sFile = "";
-	}
-	return sFile;
-};
-
-std::string Config::GetSnapshotsPath(void) {
-	std::string  sPath;
-	if (this->lIsValid) {
-		sPath = this->sSnapshotsPath;
-	}
-	else {
-		sPath = "";
-	}
-	return sPath;
-};

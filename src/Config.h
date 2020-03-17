@@ -6,18 +6,19 @@
 class Config
 {
 private:
-	// General part
+	// [General]
 	bool		lIsValid;
 	int			iTimeStep;
+	// [Grid]
 	float		rEdgeLength;
-	int			iCellsPerEdge;
+	// [Particles]
 	int			iPartsPerStep;
 	int			iStepsSurvival;
+	// [Meteo]
 	std::string	sMeteoFile;
+	// [Output]
 	std::string sOutputFile;
-	std::string sDescriptorFile;
-	std::string sSnapshotsPath;
-	// Meteorology
+	// Actual meteorology (from file)
 	std::vector<int>	ivTimeStamp;
 	std::vector<float>	rvU;
 	std::vector<float>	rvV;
@@ -32,11 +33,7 @@ public:
 	int GetParticlePoolSize(void);
 	int GetNumNewParticles(void);
 	float GetTimeStep(void);
-	int GetCellsPerEdge(void);
 	float GetMinX();
 	float GetMinY();
-	float GetCellSize();
 	std::string GetOutputFile(void);
-	std::string GetDescriptorFile(void);
-	std::string GetSnapshotsPath(void);
 };
