@@ -33,7 +33,6 @@ public:
 	int GetParticlePoolSize(void);
 	int GetNumNewParticles(void);
 	float GetTimeStep(void);
-	int GetCellsPerEdge(void);
 	float GetMinX();
 	float GetMinY();
 	float GetCellSize();
