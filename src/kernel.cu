@@ -173,7 +173,7 @@ int main(int argc, char** argv)
         int iNumActivePart = 0;
         for (auto i = 0; i < iNumPart; ++i) {
             if (ivPartTimeStamp[i] >= 0) {
-                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMaxX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMaxY()) {
+                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
                     ++iNumActivePart;
                 }
             }
@@ -181,7 +181,7 @@ int main(int argc, char** argv)
         fOut.write((char*)&iNumActivePart, sizeof(int));
         for (auto i = 0; i < iNumPart; ++i) {
             if (ivPartTimeStamp[i] >= 0) {
-                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMaxX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMaxY()) {
+                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
                     fOut.write((char*)&rvTempX[i], sizeof(float));
                     fOut.write((char*)&rvTempY[i], sizeof(float));
                     fOut.write((char*)&ivPartTimeStamp[i], sizeof(int));
