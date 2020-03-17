@@ -55,22 +55,6 @@ int main(int argc, char** argv)
     // Gather configuration (and meteo data)
     Config tCfg(sCfgFile);
 
-    // Get snapshots pathname and, if non-empty, ensure
-    // it exists and is cleaned before to start
-    bool lSnapshotsCreated = false;
-    FileMgr tSnapshots;
-    std::string sSnapshots = tCfg.GetSnapshotsPath();
-    std::string sVisItFile = "";
-    if (!sSnapshots.empty()) {
-        lSnapshotsCreated = true;
-        std::string sSearchMask = "snaps*";
-        bool lResult = tSnapshots.MapFiles(sSnapshots, sSearchMask);
-        bool lOldSnapsRemoved = tSnapshots.CreateAndCleanPath();
-        sVisItFile = tSnapshots.GetVisItName();
-        std::ofstream fVisIt(sVisItFile);
-        fVisIt.close(); // Force a rewrite: all further accesses will be in append mode
-    }
-
     // Particle pool
     int iNumPart  = tCfg.GetParticlePoolSize();
     int iNextPart = 0;  // For indexing the generation circular buffer
