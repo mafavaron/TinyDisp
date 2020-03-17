@@ -69,8 +69,6 @@ int main(int argc, char** argv)
     thrust::device_vector<float> rvX2(iNumPart);
     thrust::device_vector<float> rvDeltaU(iNumPart);
     thrust::device_vector<float> rvDeltaV(iNumPart);
-    thrust::host_vector<float>   rvCellX(iNumPart);
-    thrust::host_vector<float>   rvCellY(iNumPart);
     thrust::host_vector<float>   rvTempX(iNumPart);
     thrust::host_vector<float>   rvTempY(iNumPart);
     thrust::host_vector<int>     ivTempTimeStamp(iNumPart);
@@ -212,8 +210,6 @@ int main(int argc, char** argv)
     rvX2.clear();
     rvDeltaU.clear();
     rvDeltaV.clear();
-    rvCellX.clear();
-    rvCellY.clear();
     rvTempX.clear();
     rvTempY.clear();
     ivTempTimeStamp.clear();
@@ -229,8 +225,6 @@ int main(int argc, char** argv)
     rvX2.shrink_to_fit();
     rvDeltaU.shrink_to_fit();
     rvDeltaV.shrink_to_fit();
-    rvCellX.shrink_to_fit();
-    rvCellY.shrink_to_fit();
     rvTempX.shrink_to_fit();
     rvTempY.shrink_to_fit();
     ivTempTimeStamp.shrink_to_fit();
