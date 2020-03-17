@@ -94,7 +94,6 @@ Config::Config(const std::string sConfigFile) {
 			if (this->rEdgeLength <= 0.0f) return;
 			if (this->iPartsPerStep <= 0) return;
 			if (this->iStepsSurvival <= 0) return;
-			if (this->iCellsPerEdge <= 0) return;
 
 			// Interpolate linearly in the time range of meteo data
 			std::vector<float> rvInterpDeltaTime;
