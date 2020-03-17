@@ -80,6 +80,7 @@ int main(int argc, char** argv)
     // Main loop: iterate over meteo data
     std::string sOutFileName = tCfg.GetOutputFile();
     auto fOut = std::fstream(sOutFileName, std::ios::out | std::ios::binary);
+    fOut.write((char*)&iNumPart, sizeof(int));
     int iNumData = tCfg.GetNumMeteoData();
     thrust::counting_iterator<unsigned int> index_sequence_begin(0);
     unsigned int iIteration = 0;
@@ -166,8 +167,27 @@ int main(int argc, char** argv)
         thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(rDeltaT), rvX2.begin(), thrust::multiplies<float>());
         thrust::transform(rvPartY.begin(), rvPartY.end(), rvX2.begin(), rvPartY.begin(), thrust::plus<float>());
 
-        // Append particles in pool
-        fOut.write((char*)&rmConc[0], (size_t)(n * n)*sizeof(float));
+        // Append particles to pool
+        rvTempX = rvPartX;
+        rvTempY = rvPartY;
+        int iNumActivePart = 0;
+        for (auto i = 0; i < iNumPart; ++i) {
+            if (ivPartTimeStamp[i] >= 0) {
+                if (tCfg->GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg->GetMaxX() && tCfg->GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg->GetMaxY()) {
+                    ++iNumActivePart;
+                }
+            }
+        }
+        fOut.write((char*)&iNumActivePart, sizeof(int));
+        for (auto i = 0; i < iNumPart; ++i) {
+            if (ivPartTimeStamp[i] >= 0) {
+                if (tCfg->GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg->GetMaxX() && tCfg->GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg->GetMaxY()) {
+                    fOut.write((char*)&rvTempX[i], sizeof(float));
+                    fOut.write((char*)&rvTempY[i], sizeof(float));
+                    fOut.write((char*)&ivTimeStamp[i], sizeof(int));
+                }
+            }
+        }
 
         // Inform users of the progress
         std::cout << iIteration << " of " << iNumData << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
