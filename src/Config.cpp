@@ -249,17 +249,6 @@ float Config::GetMinY(void) {
 	return rMin;
 };
 
-float Config::GetCellSize(void) {
-	float rSize;
-	if (this->lIsValid) {
-		rSize = this->rEdgeLength / this->iCellsPerEdge;
-	}
-	else {
-		rSize = 0.f;
-	}
-	return rSize;
-};
-
 std::string Config::GetOutputFile(void) {
 	std::string  sFile;
 	if (this->lIsValid) {
