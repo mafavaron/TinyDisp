@@ -166,35 +166,6 @@ int main(int argc, char** argv)
         thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(rDeltaT), rvX2.begin(), thrust::multiplies<float>());
         thrust::transform(rvPartY.begin(), rvPartY.end(), rvX2.begin(), rvPartY.begin(), thrust::plus<float>());
 
-        // Count cell contents
-        rvX1 = rvPartX;
-        rvX2 = rvPartY;
-        thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(tCfg.GetMinX()), rvX1.begin(), thrust::minus<float>());
-        thrust::transform(rvX1.begin(), rvX1.end(), thrust::make_constant_iterator(tCfg.GetCellSize()), rvX1.begin(), thrust::divides<float>());
-        thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(tCfg.GetMinY()), rvX2.begin(), thrust::minus<float>());
-        thrust::transform(rvX2.begin(), rvX2.end(), thrust::make_constant_iterator(tCfg.GetCellSize()), rvX2.begin(), thrust::divides<float>());
-        rvCellX = rvX1;
-        rvCellY = rvX2;
-        for (int iy = 0; iy < n; iy++) {
-            for (int ix = 0; iy < n; iy++) {
-                imNumPartsInCell[n * iy + ix] = 0U;
-            }
-        }
-        for (int j = 0; j < rvCellX.size(); j++) {
-            int ix = (int)rvCellX[j];
-            int iy = (int)rvCellY[j];
-            if (0 <= ix && ix < n && 0 <= iy && iy < n) {
-                ++imNumPartsInCell[n * iy + ix];
-            }
-        }
-        int iTotParticles = 0;
-        for (int j = 0; j < n * n; j++) {
-            iTotParticles += imNumPartsInCell[j];
-        }
-        float rTotParticles = iTotParticles;
-        for (int j = 0; j < n * n; j++) {
-            rmConc[j] = (float)imNumPartsInCell[j] / rTotParticles;
-        }
         fOut.write((char*)&rmConc[0], (size_t)(n * n)*sizeof(float));
 
         // Write snapshot, if needed
