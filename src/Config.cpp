@@ -260,17 +260,6 @@ std::string Config::GetOutputFile(void) {
 	return sFile;
 };
 
-std::string Config::GetDescriptorFile(void) {
-	std::string  sFile;
-	if (this->lIsValid) {
-		sFile = this->sDescriptorFile;
-	}
-	else {
-		sFile = "";
-	}
-	return sFile;
-};
-
 std::string Config::GetSnapshotsPath(void) {
 	std::string  sPath;
 	if (this->lIsValid) {
