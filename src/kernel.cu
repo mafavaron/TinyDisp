@@ -80,9 +80,6 @@ int main(int argc, char** argv)
     // Main loop: iterate over meteo data
     std::string sOutFileName = tCfg.GetOutputFile();
     auto fOut = std::fstream(sOutFileName, std::ios::out | std::ios::binary);
-    int n = tCfg.GetCellsPerEdge();
-    auto imNumPartsInCell = new unsigned int[n * n];
-    auto rmConc = new float[n * n];
     int iNumData = tCfg.GetNumMeteoData();
     thrust::counting_iterator<unsigned int> index_sequence_begin(0);
     unsigned int iIteration = 0;
