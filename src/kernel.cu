@@ -58,7 +58,7 @@ int main(int argc, char** argv)
     // Particle pool
     int iNumPart  = tCfg.GetParticlePoolSize();
     int iNextPart = 0;  // For indexing the generation circular buffer
-    thrust::device_vector<int> ivPartTimeStamp(iNumPart); // Time stamp at emission time - for reporting - host-only
+    thrust::device_vector<int> ivPartTimeStamp(iNumPart);
     thrust::device_vector<float> rvPartX(iNumPart);
     thrust::device_vector<float> rvPartY(iNumPart);
     thrust::device_vector<float> rvPartU(iNumPart);
@@ -73,6 +73,7 @@ int main(int argc, char** argv)
     thrust::host_vector<float>   rvCellY(iNumPart);
     thrust::host_vector<float>   rvTempX(iNumPart);
     thrust::host_vector<float>   rvTempY(iNumPart);
+    thrust::host_vector<int>     ivTempTimeStamp(iNumPart);
 
     // Initialize the particles' time stamp to -1, to mean "not yet assigned" the parallel vay
     thrust::fill(ivPartTimeStamp.begin(), ivPartTimeStamp.end(), -1);
@@ -170,9 +171,10 @@ int main(int argc, char** argv)
         // Append particles to pool
         rvTempX = rvPartX;
         rvTempY = rvPartY;
+        ivTempTimeStamp = ivPartTimeStamp;
         int iNumActivePart = 0;
         for (auto i = 0; i < iNumPart; ++i) {
-            if (ivPartTimeStamp[i] >= 0) {
+            if (ivTempTimeStamp[i] >= 0) {
                 if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
                     ++iNumActivePart;
                 }
@@ -180,11 +182,11 @@ int main(int argc, char** argv)
         }
         fOut.write((char*)&iNumActivePart, sizeof(int));
         for (auto i = 0; i < iNumPart; ++i) {
-            if (ivPartTimeStamp[i] >= 0) {
+            if (ivTempTimeStamp[i] >= 0) {
                 if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
                     fOut.write((char*)&rvTempX[i], sizeof(float));
                     fOut.write((char*)&rvTempY[i], sizeof(float));
-                    fOut.write((char*)&ivPartTimeStamp[i], sizeof(int));
+                    fOut.write((char*)&ivTempTimeStamp[i], sizeof(int));
                 }
             }
         }
@@ -216,6 +218,7 @@ int main(int argc, char** argv)
     rvCellY.clear();
     rvTempX.clear();
     rvTempY.clear();
+    ivTempTimeStamp.clear();
     // -1- Clear any other resources
     ivPartTimeStamp.shrink_to_fit();
     rvPartX.shrink_to_fit();
@@ -232,6 +235,7 @@ int main(int argc, char** argv)
     rvCellY.shrink_to_fit();
     rvTempX.shrink_to_fit();
     rvTempY.shrink_to_fit();
+    ivTempTimeStamp.shrink_to_fit();
 
     // Leave
     // cudaDeviceReset must be called before exiting in order for profiling and
