@@ -36,5 +36,4 @@ public:
 	float GetMinX();
 	float GetMinY();
 	std::string GetOutputFile(void);
-	std::string GetSnapshotsPath(void);
 };
