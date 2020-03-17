@@ -200,8 +200,6 @@ int main(int argc, char** argv)
     fOut.close();
 
     // Deallocate manually thrust resources
-    // -1- Release count matrices
-    delete imNumPartsInCell;
     // -1- Reclaim workspace
     ivPartTimeStamp.clear();
     rvPartX.clear();
