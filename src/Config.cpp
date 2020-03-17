@@ -227,17 +227,6 @@ float Config::GetTimeStep(void) {
 	return rTimeStep;
 };
 
-int Config::GetCellsPerEdge(void) {
-	int iNumCells;
-	if (this->lIsValid) {
-		iNumCells = this->iCellsPerEdge;
-	}
-	else {
-		iNumCells = 0;
-	}
-	return iNumCells;
-};
-
 float Config::GetMinX(void) {
 	float rMin;
 	if (this->lIsValid) {
