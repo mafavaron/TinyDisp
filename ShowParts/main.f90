@@ -1,14 +1,20 @@
-program life
-use m_grid
-use m_screen
-use m_control
-use m_globals
-use appgraphics, only: startidle, loop, closewindow, ALL_WINDOWS
-implicit none
+program showpart
 
-    integer::screen
+    ! UI and graphics-related.
+    use m_grid
+    use m_screen
+    use m_control
+    use m_globals
     
-    ! These calls only initialize our game
+    ! External libraries
+    use appgraphics, only: startidle, loop, closewindow, ALL_WINDOWS
+    
+    implicit none
+
+    ! Locals
+    integer :: screen
+    
+    ! These calls only initialize our run
     call init_random()
     call init_controls()
     
@@ -22,9 +28,9 @@ implicit none
     grid = allocate_grid(100,100)
     call grid%randomize()
     
-    ! This call actually just pauses our game
-    ! before entering the game loop
-    call stopgame()
+    ! This call actually just pauses our run
+    ! before entering the run loop
+    call stoprun()
     
     
     do while(playing)
@@ -47,8 +53,9 @@ implicit none
         end if
         
         ! This type-bound procedure call will update the
-        ! grid based on the rules of Conway's Game
+        ! grid
         call grid%update()
+        
     end do
     
     ! After ending the game, close all AppGraphics
@@ -73,4 +80,5 @@ implicit none
         call random_seed(put=seed)
         
     end subroutine init_random
-end program life
+    
+end program showpart
