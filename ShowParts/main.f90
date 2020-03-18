@@ -1,5 +1,8 @@
 program showpart
 
+    ! Data
+    use data_file
+
     ! UI and graphics-related.
     use m_grid
     use m_screen
