@@ -17,7 +17,7 @@ implicit none
         integer, intent(in)::width, height
     
         ! Note that we've enabled double-buffering of the screen for performance
-        init_screen = initwindow(width, height, title="Conway's Game of Life", dbflag=.TRUE., closeflag=.TRUE.)
+        init_screen = initwindow(width, height, title="uSonic-3 Flow Visualizer", dbflag=.TRUE., closeflag=.TRUE.)
         
         ! Configure some colors and drawing parameters
         call setcolor(WHITE)
@@ -26,14 +26,14 @@ implicit none
         
         call setmatchthemetextstyle()
         
-        ! Create two buttons on the screen to start and stop the game
+        ! Create two buttons on the screen to start and stop the run
         start_button = createbutton(10, getmaxy( )- status_height*9/10, &
                                     75, status_height*4/5, &
-                                    "Start", startgame)
+                                    "Start", startrun)
                                     
         stop_button = createbutton(85, getmaxy() - status_height*9/10, &
                                    75, status_height*4/5, &
-                                   "Stop", stopgame)
+                                   "Stop", stoprun)
         
         call settextstyle(SERIF_FONT, HORIZ_DIR, status_height*9/10)
         
