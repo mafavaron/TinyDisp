@@ -1,19 +1,19 @@
-! The m_control module is used for controlling the game.  It includes
+! The m_control module is used for controlling the run.  It includes
 ! both variables for flow control and on-screen elements like menus
 ! and buttons.
 !
 ! The flow control variables (paused, playing) are all marked 'volatile' 
 ! because they will regularly be updated by one thread (the user 
-! interface thread) and read by the game thread.  The 'volatile' 
+! interface thread) and read by the run thread.  The 'volatile' 
 ! attribute ensures that the actual memory rather than a cached value is
 ! queried.
 module m_control
 implicit none
 
-    ! True to pause the game, false to run the game
+    ! True to pause the run, false to run the run
     logical, volatile::paused
     
-    ! True if the game should continue running, false to quit the
+    ! True if the run should continue running, false to quit the
     ! program
     logical, volatile::playing
     
@@ -21,12 +21,12 @@ implicit none
     integer::start_button, stop_button
     
     ! The identifiers of all our menus
-    integer::root_menu, file_menu, game_menu, about_menu
+    integer::root_menu, file_menu, run_menu, about_menu
     integer::pause_menuitem, resume_menuitem, reset_menuitem
     
     contains
 
-    ! Initializes flow control for our game
+    ! Initializes flow control for our run
     subroutine init_controls()
     implicit none
     
@@ -35,7 +35,7 @@ implicit none
 
     end subroutine init_controls
     
-    ! Adds a few menus to our game
+    ! Adds a few menus to our run
     subroutine init_menu()
     use appgraphics
     implicit none
@@ -46,24 +46,24 @@ implicit none
     ! circumstances.
     integer::item_temp
     
-        root_menu = addmenu("", MENU_FOR_WINDOW)
-        file_menu = addmenu("File", root_menu)
-        game_menu = addmenu("Game", root_menu)
+        root_menu  = addmenu("", MENU_FOR_WINDOW)
+        file_menu  = addmenu("File", root_menu)
+        run_menu   = addmenu("Run",  root_menu)
         about_menu = addmenu("Help", root_menu)
         
         item_temp = addmenuitem("Save Screenshot...", file_menu, savescreen)
-        item_temp = addmenuitem("Quit", file_menu, quitgame)
+        item_temp = addmenuitem("Quit", file_menu, quitrun)
         
-        pause_menuitem = addmenuitem("Pause", game_menu, stopgame)
-        resume_menuitem = addmenuitem("Resume", game_menu, startgame)
-        reset_menuitem = addmenuitem("Reset Game", game_menu, resetgame)
+        pause_menuitem  = addmenuitem("Pause", run_menu, stoprun)
+        resume_menuitem = addmenuitem("Resume", run_menu, startrun)
+        reset_menuitem  = addmenuitem("Reset Run", run_menu, resetrun)
         
-        item_temp = addmenuitem("About...", about_menu, aboutgame)
+        item_temp = addmenuitem("About...", about_menu, aboutrun)
         
     end subroutine init_menu
 
-    ! Pauses the game
-    subroutine stopgame()
+
+    subroutine stoprun()
     use appgraphics, only: enablebutton, enablemenuitem
     implicit none
     
@@ -76,10 +76,10 @@ implicit none
         call enablemenuitem(resume_menuitem, .TRUE.)
         call enablemenuitem(reset_menuitem, .TRUE.)
         
-    end subroutine stopgame
+    end subroutine stoprun
 
-    ! Starts/resumes the game
-    subroutine startgame()
+
+    subroutine startrun()
     use appgraphics, only: stopidle, enablebutton, enablemenuitem
     implicit none
     
@@ -95,19 +95,19 @@ implicit none
         call enablemenuitem(resume_menuitem, .FALSE.)
         call enablemenuitem(reset_menuitem, .FALSE.)
         
-    end subroutine startgame
+    end subroutine startrun
     
     ! Quits the program cleanly
-    subroutine quitgame()
+    subroutine quitrun()
     implicit none
         
         playing = .FALSE.
         
         ! Need to break free from the idle loop in order
-        ! to acknowledge ending the game
-        call startgame()
+        ! to acknowledge ending the run
+        call startrun()
         
-    end subroutine quitgame
+    end subroutine quitrun
     
     ! Captures the screen as a bitmap
     subroutine savescreen()
@@ -121,7 +121,7 @@ implicit none
     end subroutine savescreen
     
     ! Re-fills the grid with random data
-    subroutine resetgame()
+    subroutine resetrun()
     use m_globals, only: grid
     use appgraphics, only: stopidle
     implicit none
@@ -129,14 +129,14 @@ implicit none
         call grid%randomize()
         
         ! Forces a redraw, but the paused flag is still
-        ! set to True, meaning the game won't actually
+        ! set to True, meaning the run won't actually
         ! start
-        call stopidle()
+        call stoprun()
         
-    end subroutine resetgame
+    end subroutine resetrun
 
     ! Displays a message box
-    subroutine aboutgame
+    subroutine aboutrun
     use appgraphics
     use iso_c_binding
     implicit none
@@ -150,12 +150,12 @@ implicit none
         ff = C_CARRIAGE_RETURN//C_NEW_LINE
         
         msg = repeat(' ', 512)
-        msg = "Conway's Game of Life"//ff//"A demo of AppGraphics by Approximatrix"//ff//ff//&
+        msg = "Particle visualizer"//ff//"A demo of AppGraphics by Approximatrix"//ff//ff//&
               "Please feel free to modify and use this demonstration"//ff//&
               "in any way you wish."
         
         call dlgmessage(DIALOG_INFO, msg)
         
-    end subroutine aboutgame
+    end subroutine aboutrun
 
 end module m_control
