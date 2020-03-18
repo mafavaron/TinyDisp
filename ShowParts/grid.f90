@@ -1,5 +1,5 @@
 ! The m_grid module handles most of the rules surrounding updating
-! cells based on the conventional Conway's Game of Life rule set.
+! cells.
 ! Most routines that another method would need to call are
 ! meant to be called as type-bound procedures.
 module m_grid
@@ -13,7 +13,7 @@ implicit none
     real(kind=4), parameter::alive_threshhold = 0.4
 
     ! The lifegrid type will contain everything we need
-    ! to know about our game's grid.
+    ! to know about our run's grid.
     type lifegrid
         logical, dimension(:,:), allocatable::grid
         integer::rows
