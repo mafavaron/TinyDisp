@@ -59,8 +59,8 @@ program showpart
     if(iRetCode /= 0) stop 2
     
     ! Start accessing particles file
-    !iRetCode = tPart % Open(10, tCfg % sParticlesFile)
-    !if(iRetCode /= 0) stop 3
+    iRetCode = tPart % Open(10, tCfg % sParticlesFile)
+    if(iRetCode /= 0) stop 3
     
     ! Main loop: process data
     iRetCode = tPart % Open(10, tCfg % sParticlesFile)
@@ -101,7 +101,7 @@ program showpart
     call closewindow(ALL_WINDOWS)
     
     ! Leave
-    !iRetCode = tPart % Close()
+    iRetCode = tPart % Close()
     
 contains
     
