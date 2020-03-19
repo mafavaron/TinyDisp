@@ -15,7 +15,27 @@ program showpart
     implicit none
 
     ! Locals
-    integer :: screen
+    integer             :: screen
+    type(PartType)      :: tPart
+    integer             :: iRetCode
+    character(len=256)  :: sIniFileName
+    character(len=256)  :: sFileName
+    
+    ! Get parameters
+    if(command_argument_count() /= 1) then
+        print *, "showparts - Application to visualize modelling results"
+        print *
+        print *, "Usage:"
+        print *
+        print *, "    showparts <IniFile>"
+        print *
+        print *, "Copyright 2020 by Servizi Territorio srl"
+        print *, "                  All rights reserved"
+        stop
+    end if
+    call get_command_argument(1, sIniFileName)
+    
+    ! Get configuration
     
     ! These calls only initialize our run
     call init_random()
@@ -35,7 +55,11 @@ program showpart
     ! before entering the run loop
     call stoprun()
     
-    
+    iRetCode = tPart % Open(10, sFileName)
+    if(iRetCode /= 0) then
+        call closewindow(ALL_WINDOWS)
+        stop "Particle file not opened"
+    end if
     do while(playing)
     
         ! This routine will handle actually drawing the
