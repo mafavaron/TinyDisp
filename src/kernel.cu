@@ -201,7 +201,7 @@ int main(int argc, char** argv)
         }
 
         // Inform users of the progress
-        std::cout << iIteration << " of " << iNumData << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
+        std::cout << iIteration << " of " << iNumData << ", " << iTimeStamp << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
 
     }
 
