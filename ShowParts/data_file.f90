@@ -91,17 +91,24 @@ contains
             iRetCode = -1
             return
         end if
-        do i = 1, this % iNumPart
-            read(this % iLUN, iostat = iErrCode) &
-                this % rvX(i), &
-                this % rvY(i), &
-                this % ivTimeStamp(i)
-            if(iErrCode /= 0) then
-                this % iNumPart = 0
-                iRetCode = -1
-                return
-            end if
-        end do
+        read(this % iLUN, iostat = iErrCode) this % rvX(1:this % iNumPart)
+        if(iErrCode /= 0) then
+            this % iNumPart = 0
+            iRetCode = -1
+            return
+        end if
+        read(this % iLUN, iostat = iErrCode) this % rvY(1:this % iNumPart)
+        if(iErrCode /= 0) then
+            this % iNumPart = 0
+            iRetCode = -1
+            return
+        end if
+        read(this % iLUN, iostat = iErrCode) this % ivTimeStamp(1:this % iNumPart)
+        if(iErrCode /= 0) then
+            this % iNumPart = 0
+            iRetCode = -1
+            return
+        end if
         
     end function Read
     
