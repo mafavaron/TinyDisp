@@ -182,7 +182,19 @@ int main(int argc, char** argv)
             if (ivTempTimeStamp[i] > 0) {
                 if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
                     fOut.write((char*)&rvTempX[i], sizeof(float));
+                }
+            }
+        }
+        for (auto i = 0; i < iNumPart; ++i) {
+            if (ivTempTimeStamp[i] > 0) {
+                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
                     fOut.write((char*)&rvTempY[i], sizeof(float));
+                }
+            }
+        }
+        for (auto i = 0; i < iNumPart; ++i) {
+            if (ivTempTimeStamp[i] > 0) {
+                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
                     fOut.write((char*)&ivTempTimeStamp[i], sizeof(int));
                 }
             }
