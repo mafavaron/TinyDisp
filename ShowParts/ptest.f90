@@ -22,6 +22,9 @@ program ptest
     real                :: rMinY
     real                :: rMaxX
     real                :: rMaxY
+    integer             :: iMinTimeStamp
+    integer             :: iMaxTimeStamp
+    integer             :: iMaxAge
     integer             :: iCountTotal
     integer             :: iCountInside
     
@@ -63,6 +66,8 @@ program ptest
         ! Check the number of particles
         iCountTotal = tPart % iNumPart
         if(iCountTotal > 0) then
+        
+            ! Position-related counts
             rMeanX = sum(tPart % rvX(1:iCountTotal)) / iCountTotal
             rMeanY = sum(tPart % rvY(1:iCountTotal)) / iCountTotal
             rMinX  = minval(tPart % rvX(1:iCountTotal))
@@ -70,6 +75,12 @@ program ptest
             rMaxX  = maxval(tPart % rvX(1:iCountTotal))
             rMaxY  = maxval(tPart % rvY(1:iCountTotal))
             iCountInside = count(abs(tPart % rvX) <= tCfg % rEdgeLength/2. .and. abs(tPart % rvY) <= tCfg % rEdgeLength/2.)
+            
+            ! Time-related counts
+            iMinTimeStamp = minval(tPart % ivTimeStamp)
+            iMaxTimeStamp = minval(tPart % ivTimeStamp)
+            iMaxAge       = iMaxTimeStamp - iMinTimeStamp
+            
         else
             rMeanX = -9999.9
             rMeanY = -9999.9
@@ -77,11 +88,16 @@ program ptest
             rMinY  = -9999.9
             rMaxX  = -9999.9
             rMaxY  = -9999.9
-            iCountInside = 0
+            iCountInside  = 0
+            iMinTimeStamp = 0
+            iMaxTimeStamp = 0
+            iMaxAge       = 0
         end if
         
         ! Inform users
-        print "(1x,6(f8.2,', '),i10)", rMinX, rMeanX, rMaxX, rMinY, rMeanY, rMaxY, iCountInside
+        print "(1x,6(f8.2,', '),i10,2(',',i10),',',i8)", &
+            rMinX, rMeanX, rMaxX, rMinY, rMeanY, rMaxY, iCountInside, &
+            iMinTimeStamp, iMaxTimeStamp, iMaxAge
         
     end do
 
