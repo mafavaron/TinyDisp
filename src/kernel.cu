@@ -171,7 +171,7 @@ int main(int argc, char** argv)
         ivTempTimeStamp = ivPartTimeStamp;
         int iNumActivePart = 0;
         for (auto i = 0; i < iNumPart; ++i) {
-            if (ivTempTimeStamp[i] >= 0) {
+            if (ivTempTimeStamp[i] > 0) {
                 if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
                     ++iNumActivePart;
                 }
@@ -179,17 +179,29 @@ int main(int argc, char** argv)
         }
         fOut.write((char*)&iNumActivePart, sizeof(int));
         for (auto i = 0; i < iNumPart; ++i) {
-            if (ivTempTimeStamp[i] >= 0) {
+            if (ivTempTimeStamp[i] > 0) {
                 if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
                     fOut.write((char*)&rvTempX[i], sizeof(float));
+                }
+            }
+        }
+        for (auto i = 0; i < iNumPart; ++i) {
+            if (ivTempTimeStamp[i] > 0) {
+                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
                     fOut.write((char*)&rvTempY[i], sizeof(float));
+                }
+            }
+        }
+        for (auto i = 0; i < iNumPart; ++i) {
+            if (ivTempTimeStamp[i] > 0) {
+                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
                     fOut.write((char*)&ivTempTimeStamp[i], sizeof(int));
                 }
             }
         }
 
         // Inform users of the progress
-        std::cout << iIteration << " of " << iNumData << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
+        std::cout << iIteration << " of " << iNumData << ", " << iTimeStamp << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
 
     }
 

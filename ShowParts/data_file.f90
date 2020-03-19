@@ -9,6 +9,7 @@ module data_file
     
     type PartType
         integer                             :: iLUN
+        integer                             :: iNumPart
         real, dimension(:), allocatable     :: rvX
         real, dimension(:), allocatable     :: rvY
         integer, dimension(:), allocatable  :: ivTimeStamp
@@ -29,6 +30,44 @@ contains
         integer                         :: iRetCode
         
         ! Locals
+        integer     :: iErrCode
+        integer     :: iNumData
+        
+        ! Assume success (will falsify on failure)
+        iRetCode        =  0
+        this % iLUN     = -1
+        this % iNumPart =  0
+        
+        ! Clean storage space
+        if(allocated(this % rvX))         deallocate(this % rvX)
+        if(allocated(this % rvY))         deallocate(this % rvY)
+        if(allocated(this % ivTimeStamp)) deallocate(this % ivTimeStamp)
+        
+        ! Try accessing file
+        open(iLUN, file=sFileName, action='read', status='old', access='stream', iostat=iErrCode)
+        if(iErrCode /= 0) then
+            iRetCode = 1
+            return
+        end if
+        read(iLUN, iostat=iErrCode) iNumData
+        if(iErrCode /= 0) then
+            iRetCode = 2
+            close(iLUN)
+            return
+        end if
+        if(iNumData <= 0) then
+            iRetCode = 3
+            close(iLUN)
+            return
+        end if
+        
+        ! Reserve storage space
+        allocate(this % rvX(iNumData))
+        allocate(this % rvY(iNumData))
+        allocate(this % ivTimeStamp(iNumData))
+        
+        ! Inform this file is accessible
+        this % iLUN = iLUN
         
     end function Open
     
@@ -40,6 +79,36 @@ contains
         integer                         :: iRetCode
         
         ! Locals
+        integer     :: iErrCode
+        integer     :: i
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
+        
+        ! Try gathering a value
+        read(this % iLUN, iostat = iErrCode) this % iNumPart
+        if(iErrCode /= 0) then
+            iRetCode = -1
+            return
+        end if
+        read(this % iLUN, iostat = iErrCode) this % rvX(1:this % iNumPart)
+        if(iErrCode /= 0) then
+            this % iNumPart = 0
+            iRetCode = -1
+            return
+        end if
+        read(this % iLUN, iostat = iErrCode) this % rvY(1:this % iNumPart)
+        if(iErrCode /= 0) then
+            this % iNumPart = 0
+            iRetCode = -1
+            return
+        end if
+        read(this % iLUN, iostat = iErrCode) this % ivTimeStamp(1:this % iNumPart)
+        if(iErrCode /= 0) then
+            this % iNumPart = 0
+            iRetCode = -1
+            return
+        end if
         
     end function Read
     
@@ -51,6 +120,10 @@ contains
         integer                         :: iRetCode
         
         ! Locals
+        ! -none-
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
         
     end function Close
 

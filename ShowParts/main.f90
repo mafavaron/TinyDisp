@@ -1,6 +1,7 @@
 program showpart
 
     ! Data
+    use config
     use data_file
 
     ! UI and graphics-related.
@@ -15,7 +16,34 @@ program showpart
     implicit none
 
     ! Locals
-    integer :: screen
+    integer             :: screen
+    type(ConfigType)    :: tCfg
+    type(PartType)      :: tPart
+    integer             :: iRetCode
+    character(len=256)  :: sIniFileName
+    character(len=256)  :: sFileName
+    
+    ! Get parameters
+    if(command_argument_count() /= 1) then
+        print *, "showparts - Application to visualize modelling results"
+        print *
+        print *, "Usage:"
+        print *
+        print *, "    showparts <IniFile>"
+        print *
+        print *, "Copyright 2020 by Servizi Territorio srl"
+        print *, "                  All rights reserved"
+        stop 1
+    end if
+    call get_command_argument(1, sIniFileName)
+    
+    ! Get configuration
+    iRetCode = tCfg % Read(10, sIniFileName)
+    if(iRetCode /= 0) stop 2
+    
+    ! Start accessing particles file
+    iRetCode = tPart % Open(10, tCfg % sParticlesFile)
+    if(iRetCode /= 0) stop 3
     
     ! These calls only initialize our run
     call init_random()
@@ -35,7 +63,11 @@ program showpart
     ! before entering the run loop
     call stoprun()
     
-    
+    iRetCode = tPart % Open(10, sFileName)
+    if(iRetCode /= 0) then
+        call closewindow(ALL_WINDOWS)
+        stop "Particle file not opened"
+    end if
     do while(playing)
     
         ! This routine will handle actually drawing the
@@ -65,7 +97,10 @@ program showpart
     ! windows (there should be only one).
     call closewindow(ALL_WINDOWS)
     
-    contains
+    ! Leave
+    iRetCode = tPart % Close()
+    
+contains
     
     ! Basic routine to initialize the random number
     ! generator based on the current clock time
