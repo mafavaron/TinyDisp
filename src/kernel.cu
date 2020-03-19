@@ -171,7 +171,7 @@ int main(int argc, char** argv)
         ivTempTimeStamp = ivPartTimeStamp;
         int iNumActivePart = 0;
         for (auto i = 0; i < iNumPart; ++i) {
-            if (ivTempTimeStamp[i] >= 0) {
+            if (ivTempTimeStamp[i] > 0) {
                 if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
                     ++iNumActivePart;
                 }
