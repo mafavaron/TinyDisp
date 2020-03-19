@@ -179,7 +179,7 @@ int main(int argc, char** argv)
         }
         fOut.write((char*)&iNumActivePart, sizeof(int));
         for (auto i = 0; i < iNumPart; ++i) {
-            if (ivTempTimeStamp[i] >= 0) {
+            if (ivTempTimeStamp[i] > 0) {
                 if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
                     fOut.write((char*)&rvTempX[i], sizeof(float));
                     fOut.write((char*)&rvTempY[i], sizeof(float));
