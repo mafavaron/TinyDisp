@@ -86,13 +86,21 @@ contains
         iRetCode = 0
         
         ! Try gathering a value
-        read(this % iLUN, iostat = iErrCode) this % iNumData
+        read(this % iLUN, iostat = iErrCode) this % iNumPart
         if(iErrCode /= 0) then
             iRetCode = -1
             return
         end if
-        do i = 1, this % iNumData
-            read(this % iLUN, iostat = iErrCode) this % rvX(i), this % rvY(i), this % ivTimeStamp(i)
+        do i = 1, this % iNumPart
+            read(this % iLUN, iostat = iErrCode) &
+                this % rvX(i), &
+                this % rvY(i), &
+                this % ivTimeStamp(i)
+            if(iErrCode /= 0) then
+                this % iNumPart = 0
+                iRetCode = -1
+                return
+            end if
         end do
         
     end function Read
