@@ -1,0 +1,4 @@
+&cfg
+    rEdgeLength    = 10000.0,
+    sParticlesFile = ..\\TinyDisp\\trial.bin
+/
