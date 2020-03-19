@@ -27,6 +27,7 @@ program ptest
     integer             :: iMaxAge
     integer             :: iCountTotal
     integer             :: iCountInside
+    integer             :: iNumIter
     
     ! Get parameters
     if(command_argument_count() /= 1) then
@@ -57,7 +58,10 @@ program ptest
     end if
     
     ! Main loop: get particles, and inspect them
+    iNumIter = 0
     do
+    
+        iNumIter = iNumIter + 1
     
         ! Actual read attempt
         iRetCode = tPart % Read()
@@ -74,11 +78,14 @@ program ptest
             rMinY  = minval(tPart % rvY(1:iCountTotal))
             rMaxX  = maxval(tPart % rvX(1:iCountTotal))
             rMaxY  = maxval(tPart % rvY(1:iCountTotal))
-            iCountInside = count(abs(tPart % rvX) <= tCfg % rEdgeLength/2. .and. abs(tPart % rvY) <= tCfg % rEdgeLength/2.)
+            iCountInside = count(abs( &
+                tPart % rvX(1:iCountTotal)) <= tCfg % rEdgeLength/2. .and. &
+                abs(tPart % rvY(1:iCountTotal)) <= tCfg % rEdgeLength/2. &
+            )
             
             ! Time-related counts
-            iMinTimeStamp = minval(tPart % ivTimeStamp)
-            iMaxTimeStamp = minval(tPart % ivTimeStamp)
+            iMinTimeStamp = minval(tPart % ivTimeStamp(1:iCountTotal))
+            iMaxTimeStamp = maxval(tPart % ivTimeStamp(1:iCountTotal))
             iMaxAge       = iMaxTimeStamp - iMinTimeStamp
             
         else
@@ -95,7 +102,8 @@ program ptest
         end if
         
         ! Inform users
-        print "(1x,6(f8.2,', '),i10,2(',',i10),',',i8)", &
+        print "(1x,2(i10,','),6(f8.2,', '),i10,2(',',i10),',',i10)", &
+            iNumIter, iCountTotal, &
             rMinX, rMeanX, rMaxX, rMinY, rMeanY, rMaxY, iCountInside, &
             iMinTimeStamp, iMaxTimeStamp, iMaxAge
         
