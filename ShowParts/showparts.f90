@@ -10,7 +10,11 @@ program showparts
     character(len=256)  :: sConfigFile
     character(len=256)  :: sInputFile
     character(len=256)  :: sMovieFile
+    type(PartType)      :: tPart
     type(ConfigType)    :: tCfg
+    integer             :: iNumIter
+    integer             :: iCountTotal
+    integer             :: iMinTimeStamp
     
     ! Check input parameters
     if(command_argument_count() /= 2) then
@@ -34,5 +38,38 @@ program showparts
         print *, "Error: Configuration not read - Return code = ", iRetCode, " - Cfg file: ", trim(sConfigFile)
         stop
     end if
+    
+    ! Start accessing particles file
+    iRetCode = tPart % Open(10, tCfg % sParticlesFile)
+    if(iRetCode /= 0) then
+        print *, "Error: Configuration not read"
+        stop
+    end if
+    
+    ! Main loop: get particles, and inspect them
+    iNumIter = 0
+    do
+    
+        iNumIter = iNumIter + 1
+    
+        ! Actual read attempt
+        iRetCode = tPart % Read()
+        if(iRetCode /= 0) exit
+        
+        ! Check the number of particles
+        iCountTotal = tPart % iNumPart
+        if(iCountTotal > 0) then
+            iMinTimeStamp = minval(tPart % ivTimeStamp)
+        else
+            iMinTimeStamp = 0
+        end if
+        
+        ! Inform users
+        print "(1x,2(i10,','),i10)", iNumIter, iCountTotal, iMinTimeStamp
+        
+    end do
+
+    ! Leave
+    iRetCode = tPart % Close()
     
 end program showparts
