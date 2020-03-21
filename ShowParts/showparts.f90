@@ -17,6 +17,15 @@ program showparts
     integer             :: iCountTotal
     integer             :: iMinTimeStamp
     
+    integer             :: n = 100
+    integer             :: i
+    integer             :: ic
+    real, dimension(n)  :: xray, yray1, yray2
+    
+    xray = [((i-1)*360./99., i = 1, 100)]
+    yray1 = sin(xray)
+    yray2 = cos(xray)
+    
     ! Check input parameters
     if(command_argument_count() /= 2) then
         print *, "showparts - Movie producer for TinyDisp outputs"
@@ -48,8 +57,30 @@ program showparts
     end if
     
     ! Start DISLIN
+    call METAFL('CONS')
+    call SCRMOD('REVERS')
     call DISINI()
-    call MESSAG ('This is a test', 100, 100)
+    call PAGERA()
+    call COMPLX()
+    call AXSPOS(450, 1800)
+    call AXSLEN(2200, 1200)
+    call NAME('X-axis', 'X')
+    call NAME('Y-axis', 'Y')
+    call LABDIG(-1, 'X')
+    call TICKS(10, 'XY')
+    call TITLIN('Curve(s)', 1)
+    call TITLIN('SIN(X), COS(X)', 3)
+    ic = INTRGB(0.95, 0.95, 0.95)
+    call AXSBGD(ic)
+    call GRAF(0., 360., 0., 90., -1., 1., -1., 0.5)
+    call SETRGB(0.7, 0.7, 0.7)
+    call GRID(1,1)
+    call COLOR('FORE')
+    call TITLE()
+    call COLOR('RED')
+    call CURVE(xray, yray1, n)
+    call COLOR('BLUE')
+    call CURVE(xray, yray2, n)
     
     ! Main loop: get particles, and inspect them
     iNumIter = 0
