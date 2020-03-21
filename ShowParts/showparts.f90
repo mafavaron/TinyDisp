@@ -13,7 +13,7 @@ program showparts
     type(ConfigType)    :: tCfg
     
     ! Check input parameters
-    if(command_argument_count() /= 0) then
+    if(command_argument_count() /= 2) then
         print *, "showparts - Movie producer for TinyDisp outputs"
         print *
         print *, "Usage:"
