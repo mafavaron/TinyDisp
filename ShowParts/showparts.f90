@@ -49,6 +49,7 @@ program showparts
     
     ! Start DISLIN
     call DISINI()
+    call MESSAG ('This is a test', 100, 100)
     
     ! Main loop: get particles, and inspect them
     iNumIter = 0
