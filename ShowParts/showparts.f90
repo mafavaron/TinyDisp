@@ -1,5 +1,6 @@
 program showparts
 
+    use dislin
     use config
     use data_file
 
@@ -46,6 +47,9 @@ program showparts
         stop
     end if
     
+    ! Start DISLIN
+    call DISINI()
+    
     ! Main loop: get particles, and inspect them
     iNumIter = 0
     do
@@ -70,6 +74,7 @@ program showparts
     end do
 
     ! Leave
+    call DISFIN()
     iRetCode = tPart % Close()
     
 end program showparts
