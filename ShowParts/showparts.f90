@@ -17,7 +17,7 @@ program showparts
     integer             :: iCountTotal
     integer             :: iMinTimeStamp
     
-    integer             :: n = 100
+    integer, parameter  :: n = 100
     integer             :: i
     integer             :: ic
     real, dimension(n)  :: xray, yray1, yray2
