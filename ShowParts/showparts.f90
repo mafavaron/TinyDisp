@@ -31,7 +31,7 @@ program showparts
     ! Get configuration
     iRetCode = tCfg % Read(10, sConfigFile)
     if(iRetCode /= 0) then
-        print *, "Error: Configuration not read"
+        print *, "Error: Configuration not read - Return code = ", iRetCode
         stop
     end if
     
