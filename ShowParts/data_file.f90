@@ -38,11 +38,6 @@ contains
         this % iLUN     = -1
         this % iNumPart =  0
         
-        ! Clean storage space
-        if(allocated(this % rvX))         deallocate(this % rvX)
-        if(allocated(this % rvY))         deallocate(this % rvY)
-        if(allocated(this % ivTimeStamp)) deallocate(this % ivTimeStamp)
-        
         ! Try accessing file
         open(iLUN, file=sFileName, action='read', status='old', access='stream', iostat=iErrCode)
         if(iErrCode /= 0) then
@@ -60,11 +55,6 @@ contains
             close(iLUN)
             return
         end if
-        
-        ! Reserve storage space
-        allocate(this % rvX(iNumData))
-        allocate(this % rvY(iNumData))
-        allocate(this % ivTimeStamp(iNumData))
         
         ! Inform this file is accessible
         this % iLUN = iLUN
@@ -91,23 +81,26 @@ contains
             iRetCode = -1
             return
         end if
-        read(this % iLUN, iostat = iErrCode) this % rvX(1:this % iNumPart)
-        if(iErrCode /= 0) then
-            this % iNumPart = 0
-            iRetCode = -1
-            return
-        end if
-        read(this % iLUN, iostat = iErrCode) this % rvY(1:this % iNumPart)
-        if(iErrCode /= 0) then
-            this % iNumPart = 0
-            iRetCode = -1
-            return
-        end if
-        read(this % iLUN, iostat = iErrCode) this % ivTimeStamp(1:this % iNumPart)
-        if(iErrCode /= 0) then
-            this % iNumPart = 0
-            iRetCode = -1
-            return
+        
+        if(this % iNumPart > 0) then
+        
+            ! Reserve storage space
+            if(allocated(this % rvX))         deallocate(this % rvX)
+            if(allocated(this % rvY))         deallocate(this % rvY)
+            if(allocated(this % ivTimeStamp)) deallocate(this % ivTimeStamp)
+            allocate(this % rvX(this % iNumPart))
+            allocate(this % rvY(this % iNumPart))
+            allocate(this % ivTimeStamp(this % iNumPart))
+            
+            ! Get actual data
+            read(this % iLUN, iostat = iErrCode) this % rvX, this % rvY, this % ivTimeStamp
+            if(iErrCode /= 0) then
+                this % iNumPart = 0
+                iRetCode = -1
+                deallocate(this % rvX, this % rvY, this % ivTimeStamp)
+                return
+            end if
+            
         end if
         
     end function Read

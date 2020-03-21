@@ -21,7 +21,6 @@ program showpart
     type(PartType)      :: tPart
     integer             :: iRetCode
     character(len=256)  :: sIniFileName
-    character(len=256)  :: sFileName
     
     ! Get parameters
     if(command_argument_count() /= 1) then
@@ -36,14 +35,6 @@ program showpart
         stop 1
     end if
     call get_command_argument(1, sIniFileName)
-    
-    ! Get configuration
-    iRetCode = tCfg % Read(10, sIniFileName)
-    if(iRetCode /= 0) stop 2
-    
-    ! Start accessing particles file
-    iRetCode = tPart % Open(10, tCfg % sParticlesFile)
-    if(iRetCode /= 0) stop 3
     
     ! These calls only initialize our run
     call init_random()
@@ -63,12 +54,24 @@ program showpart
     ! before entering the run loop
     call stoprun()
     
-    iRetCode = tPart % Open(10, sFileName)
+    ! Get configuration
+    iRetCode = tCfg % Read(10, sIniFileName)
+    if(iRetCode /= 0) stop 2
+    
+    ! Start accessing particles file
+    iRetCode = tPart % Open(10, tCfg % sParticlesFile)
+    if(iRetCode /= 0) stop 3
+    
+    ! Main loop: process data
+    iRetCode = tPart % Open(10, tCfg % sParticlesFile)
     if(iRetCode /= 0) then
         call closewindow(ALL_WINDOWS)
         stop "Particle file not opened"
     end if
     do while(playing)
+    
+        ! Get next particle set
+        !iRetCode = tPart % Read()
     
         ! This routine will handle actually drawing the
         ! current grid to the screen
