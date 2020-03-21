@@ -23,8 +23,8 @@ program showparts
     real, dimension(n)  :: xray, yray1, yray2
     
     xray = [((i-1)*360./99., i = 1, 100)]
-    yray1 = sin(xray)
-    yray2 = cos(xray)
+    yray1 = sin(xray * 3.1415927/180.)
+    yray2 = cos(xray * 3.1415927/180.)
     
     ! Check input parameters
     if(command_argument_count() /= 2) then
