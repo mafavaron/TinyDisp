@@ -57,31 +57,6 @@ program showparts
     end if
     
     ! Start DISLIN
-    call METAFL('CONS')
-    call SCRMOD('REVERS')
-    call DISINI()
-    call PAGERA()
-    call COMPLX()
-    call AXSPOS(450, 1800)
-    call AXSLEN(2200, 1200)
-    call NAME('X-axis', 'X')
-    call NAME('Y-axis', 'Y')
-    call LABDIG(-1, 'X')
-    call TICKS(10, 'XY')
-    call TITLIN('Curve(s)', 1)
-    call TITLIN('SIN(X), COS(X)', 3)
-    ic = INTRGB(0.95, 0.95, 0.95)
-    call AXSBGD(ic)
-    call GRAF(0., 360., 0., 90., -1., 1., -1., 0.5)
-    call SETRGB(0.7, 0.7, 0.7)
-    call GRID(1,1)
-    call COLOR('FORE')
-    call TITLE()
-    call COLOR('RED')
-    call CURVE(xray, yray1, n)
-    call COLOR('BLUE')
-    call CURVE(xray, yray2, n)
-    
     ! Main loop: get particles, and inspect them
     iNumIter = 0
     do
@@ -100,13 +75,21 @@ program showparts
             iMinTimeStamp = 0
         end if
         
+        call METAFL('PNG')
+        call SCRMOD('REVERS')
+        call DISINI()
+        call WINSIZ(800, 800)
+        call HSYMBL(3)
+        call COLOR('RED')
+        call QPLSCA(yray1, yray2, n)
+        call DISFIN()
+        
         ! Inform users
         print "(1x,2(i10,','),i10)", iNumIter, iCountTotal, iMinTimeStamp
         
     end do
 
     ! Leave
-    call DISFIN()
     iRetCode = tPart % Close()
     
 end program showparts
