@@ -83,18 +83,18 @@ program showparts
         call PAGE(2800, 2800)
         call DISINI()
         ! -1- Level 1
-        call AXSPOS( 200, 2600)
-        call AXSLEN(2400, 2400)
+        call AXSPOS( 350, 2450)
+        call AXSLEN(2300, 2300)
         call HSYMBL(3)
         call NOCHEK()
         call GRAF( &
             rXmin, rXmax, rXmin, tCfg % rEdgeLength / 5., &
             rYmin, rYmax, rYmin, tCfg % rEdgeLength / 5.  &
         )
+        call ENDGRF()
         ! -1- Level 2
         call COLOR('RED')
         call QPLSCA(tPart % rvX, tPart % rvY, iCountTotal)
-        call DISFIN()
         
         ! Add this plot to movie
         
