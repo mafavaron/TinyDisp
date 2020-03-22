@@ -16,15 +16,10 @@ program showparts
     integer             :: iNumIter
     integer             :: iCountTotal
     integer             :: iMinTimeStamp
-    
-    integer, parameter  :: n = 100
-    integer             :: i
-    integer             :: ic
-    real, dimension(n)  :: xray, yray1, yray2
-    
-    xray = [((i-1)*360./99., i = 1, 100)]
-    yray1 = sin(xray * 3.1415927/180.)
-    yray2 = cos(xray * 3.1415927/180.)
+    real                :: rXmin
+    real                :: rXmax
+    real                :: rYmin
+    real                :: rYmax
     
     ! Check input parameters
     if(command_argument_count() /= 2) then
@@ -56,32 +51,6 @@ program showparts
         stop
     end if
     
-    ! Start DISLIN
-    call METAFL('CONS')
-    call SCRMOD('REVERS')
-    call DISINI()
-    call PAGERA()
-    call COMPLX()
-    call AXSPOS(450, 1800)
-    call AXSLEN(2200, 1200)
-    call NAME('X-axis', 'X')
-    call NAME('Y-axis', 'Y')
-    call LABDIG(-1, 'X')
-    call TICKS(10, 'XY')
-    call TITLIN('Curve(s)', 1)
-    call TITLIN('SIN(X), COS(X)', 3)
-    ic = INTRGB(0.95, 0.95, 0.95)
-    call AXSBGD(ic)
-    call GRAF(0., 360., 0., 90., -1., 1., -1., 0.5)
-    call SETRGB(0.7, 0.7, 0.7)
-    call GRID(1,1)
-    call COLOR('FORE')
-    call TITLE()
-    call COLOR('RED')
-    call CURVE(xray, yray1, n)
-    call COLOR('BLUE')
-    call CURVE(xray, yray2, n)
-    
     ! Main loop: get particles, and inspect them
     iNumIter = 0
     do
@@ -100,13 +69,42 @@ program showparts
             iMinTimeStamp = 0
         end if
         
+        ! Define axis sizes
+        rXmin = -tCfg % rEdgeLength / 2.
+        rXmax = -rXmin
+        rYmin =  rXmin
+        rYmax =  rXmax
+        
+        ! Generate current snapshot
+        ! -1- Level 0
+        call METAFL('PNG')
+        call SCRMOD('REVERS')
+        call FILMOD('DELETE')
+        call PAGE(2800, 2800)
+        call DISINI()
+        ! -1- Level 1
+        call ERRMOD('PROTOCOL', 'OFF')
+        call AXSPOS( 350, 2450)
+        call AXSLEN(2300, 2300)
+        call HSYMBL(3)
+        call NOCHEK()
+        call GRAF( &
+            rXmin, rXmax, rXmin, tCfg % rEdgeLength / 5., &
+            rYmin, rYmax, rYmin, tCfg % rEdgeLength / 5.  &
+        )
+        call ENDGRF()
+        ! -1- Level 2
+        call COLOR('RED')
+        call QPLSCA(tPart % rvX, tPart % rvY, iCountTotal)
+        
+        ! Add this plot to movie
+        
         ! Inform users
         print "(1x,2(i10,','),i10)", iNumIter, iCountTotal, iMinTimeStamp
         
     end do
 
     ! Leave
-    call DISFIN()
     iRetCode = tPart % Close()
     
 end program showparts
