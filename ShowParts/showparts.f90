@@ -81,6 +81,7 @@ program showparts
         call SCRMOD('REVERS')
         call FILMOD('DELETE')
         call PAGE(2800, 2800)
+        call WINSIZ(2800, 2800)
         call DISINI()
         ! -1- Level 1
         call ERRMOD('PROTOCOL', 'OFF')
