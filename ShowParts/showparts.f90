@@ -80,12 +80,12 @@ program showparts
         call METAFL('PNG')
         call SCRMOD('REVERS')
         call FILMOD('DELETE')
+        call PAGE(800, 800)
         call DISINI()
-        call WINSIZ(800, 800)
+        ! -1- Level 1
         call AXSPOS(100, 700)
         call AXSLEN(600, 600)
         call HSYMBL(3)
-        ! -1- Level 1
         call NOCHEK()
         call GRAF( &
             rXmin, rXmax, rXmin, tCfg % rEdgeLength / 5., &
