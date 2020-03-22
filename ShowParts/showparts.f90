@@ -83,6 +83,7 @@ program showparts
         call PAGE(2800, 2800)
         call DISINI()
         ! -1- Level 1
+        call ERRMOD('PROTOCOL', 'OFF')
         call AXSPOS( 350, 2450)
         call AXSLEN(2300, 2300)
         call HSYMBL(3)
