@@ -16,6 +16,10 @@ program showparts
     integer             :: iNumIter
     integer             :: iCountTotal
     integer             :: iMinTimeStamp
+    real                :: rXmin
+    real                :: rXmax
+    real                :: rYmin
+    real                :: rYmax
     
     integer, parameter  :: n = 100
     integer             :: i
@@ -75,18 +79,34 @@ program showparts
             iMinTimeStamp = 0
         end if
         
+        ! Define axis sizes
+        rXmin = -tCfg % rEdgeLength / 2.
+        rXmax = -rXmin
+        rYmin =  rXmin
+        rYmax =  rXmax
+        
         ! Generate current snapshot
+        ! -1- Level 0
         call METAFL('PNG')
         call SCRMOD('REVERS')
         call FILMOD('DELETE')
+        call NOCHEK()
         call DISINI()
         call WINSIZ(800, 800)
         call AXSPOS(100, 700)
         call AXSLEN(600, 600)
         call HSYMBL(3)
+        ! -1- Level 1
+        call GRAF( &
+            rXmin, rXmax, rXmin, tCfg % rEdgeLength / 5., &
+            rYmin, rYmax, rYmin, tCfg % rEdgeLength / 5.  &
+        )
+        ! -1- Level 2
         call COLOR('RED')
         call QPLSCA(tPart % rvX, tPart % rvY, iCountTotal)
         call DISFIN()
+        
+        ! Add this plot to movie
         
         ! Inform users
         print "(1x,2(i10,','),i10)", iNumIter, iCountTotal, iMinTimeStamp
