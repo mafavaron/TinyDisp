@@ -83,8 +83,8 @@ program showparts
         call PAGE(2800, 2800)
         call DISINI()
         ! -1- Level 1
-        call AXSPOS( 100, 2700)
-        call AXSLEN(2600, 2600)
+        call AXSPOS( 200, 2600)
+        call AXSLEN(2400, 2400)
         call HSYMBL(3)
         call NOCHEK()
         call GRAF( &
