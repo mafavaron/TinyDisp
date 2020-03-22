@@ -75,13 +75,17 @@ program showparts
             iMinTimeStamp = 0
         end if
         
+        ! Generate current snapshot
         call METAFL('PNG')
         call SCRMOD('REVERS')
+        call FILMOD('DELETE')
         call DISINI()
         call WINSIZ(800, 800)
+        call AXSPOS(100, 700)
+        call AXSLEN(600, 600)
         call HSYMBL(3)
         call COLOR('RED')
-        call QPLSCA(yray1, yray2, n)
+        call QPLSCA(tPart % rvX, tPart % rvY, iCountTotal)
         call DISFIN()
         
         ! Inform users
