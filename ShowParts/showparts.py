@@ -26,7 +26,6 @@ def connect(sDataFile):
 
     # Assume success (will falsify on failure)
     iRetCode = 0
-    bDataOK  = False
 
     # Start reading the particle binary file
     try:
@@ -50,7 +49,6 @@ def connect(sDataFile):
         fParticles.close()
         return iRetCode
 
-    bDataOK = True
     return iRetCode
 
 
@@ -67,69 +65,50 @@ def update(iNumFrame):
     global yMin
     global yMax
 
-    # Assume success (will falsify on failure)
-    iRetCode = 0
-
     # Get additional data
     try:
         ivBuffer = fParticles.read(4)
         iIteration = struct.unpack('i', ivBuffer)[0]
     except:
-        iRetCode = 1
-        fParticles.close()
-        return iRetCode, None, None, None, None, None, None, None, None, None, None
+        return
     try:
         ivBuffer = fParticles.read(4)
         iCurTime = struct.unpack('i', ivBuffer)[0]
     except:
-        iRetCode = 1
         fParticles.close()
-        return iRetCode, None, None, None, None, None, None, None, None, None, None
+        return
     try:
         ivBuffer = fParticles.read(4)
         rU = struct.unpack('f', ivBuffer)[0]
     except:
-        iRetCode = 1
-        fParticles.close()
-        return iRetCode, None, None, None, None, None, None, None, None, None, None
+        return
     try:
         ivBuffer = fParticles.read(4)
         rV = struct.unpack('f', ivBuffer)[0]
     except:
-        iRetCode = 1
-        fParticles.close()
-        return iRetCode, None, None, None, None, None, None, None, None, None, None
+        return
     try:
         ivBuffer = fParticles.read(4)
         rStdDevU = struct.unpack('f', ivBuffer)[0]
     except:
-        iRetCode = 1
-        fParticles.close()
-        return iRetCode, None, None, None, None, None, None, None, None, None, None
+        return
     try:
         ivBuffer = fParticles.read(4)
         rStdDevV = struct.unpack('f', ivBuffer)[0]
     except:
-        iRetCode = 1
-        fParticles.close()
-        return iRetCode, None, None, None, None, None, None, None, None, None, None
+        return
     try:
         ivBuffer = fParticles.read(4)
         rCovUV = struct.unpack('f', ivBuffer)[0]
     except:
-        iRetCode = 1
-        fParticles.close()
-        return iRetCode, None, None, None, None, None, None, None, None, None, None
+        return
     try:
         ivBuffer = fParticles.read(4)
         iNumPart = struct.unpack('i', ivBuffer)[0]
     except:
-        iRetCode = 1
-        fParticles.close()
-        return iRetCode, None, None, None, None, None, None, None, None, None, None
+        return
     if iNumPart <= 0:
-        iRetCode = 2
-        return iRetCode, None, None, None, None, None, None, None, None, None, None
+        return
     sRealFmt = "%df" % iNumPart
     sIntFmt  = "%di" % iNumPart
     try:
@@ -140,9 +119,7 @@ def update(iNumFrame):
         bvBuffer = fParticles.read(4 * iNumPart)
         ivTimeStamp = np.array(struct.unpack(sIntFmt, bvBuffer))
     except:
-        iRetCode = -1
-        fParticles.close()
-        return iRetCode, None, None, None, None, None, None, None, None, None, None
+        return
 
     # Initialize plotting environment
     plt.style.use('seaborn-pastel')
@@ -153,7 +130,7 @@ def update(iNumFrame):
     ax.set_aspect('equal')
     plt.show()
 
-    return iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp
+    return
 
 
 if __name__ == "__main__":
