@@ -60,7 +60,7 @@ if __name__ == "__main__":
         print("Error: Configuration file not read")
         sys.exit(2)
     try:
-        sDataFile = cfg["General"]["DataFile"]
+        sDataFile = cfg["General"]["ParticlesFile"]
     except:
         print("Error: Data file name not found in configuration file")
         sys.exit(2)
@@ -69,3 +69,6 @@ if __name__ == "__main__":
     except:
         print("Error: Edge length not found or invalid in configuration file")
         sys.exit(2)
+
+    print(sDataFile)
+    print(rEdgeLength)
