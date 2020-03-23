@@ -14,8 +14,12 @@ global sDataFile
 global rEdgeLength
 global bDataOK
 global iNumParticlePools
+global xMin
+global xMax
+global yMin
+global yMax
 
-def init():
+def connect(sDataFile):
 
     global fParticles
     global iNumParticlePools
@@ -50,9 +54,18 @@ def init():
     return iRetCode
 
 
+def init():
+
+    pass
+
+
 def update(iNumFrame):
 
     global fParticles
+    global xMin
+    global xMax
+    global yMin
+    global yMax
 
     # Assume success (will falsify on failure)
     iRetCode = 0
@@ -145,6 +158,8 @@ def update(iNumFrame):
 
 if __name__ == "__main__":
 
+    global iNumParticlePools
+
     # Get parameters
     if len(sys.argv) != 3:
         print("showparts.py - Movie builder for TinyDisp airflow visualizer")
@@ -184,7 +199,7 @@ if __name__ == "__main__":
     yMin =  xMin
     yMax =  xMax
 
-    iRetCode = init()
+    iRetCode = connect(sDataFile)
     print("Init - Return code: %d" % iRetCode)
 
     iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp = update(1)
