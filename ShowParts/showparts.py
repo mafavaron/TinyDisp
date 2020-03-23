@@ -6,6 +6,7 @@ import matplotlib.animation as animation
 import configparser
 import os
 import sys
+import struct
 
 # System state
 global fParticles
@@ -21,11 +22,13 @@ def init():
     # Start reading the particle binary file
     try:
         fParticles = open(sDataFile, "rb")
-    except:
+    except Exception as e:
+        print(str(e))
         iRetCode = 1
         return iRetCode
     try:
-        iMaxPart = np.fromfile(fParticles, dtype=np.int32)
+        ivBuffer = fParticles.read(4)
+        iMaxPart = struct.unpack('i', ivBuffer)
     except:
         iRetCode = 2
         fParticles.close()
@@ -70,5 +73,5 @@ if __name__ == "__main__":
         print("Error: Edge length not found or invalid in configuration file")
         sys.exit(2)
 
-    print(sDataFile)
-    print(rEdgeLength)
+    iRetCode = init()
+    print("Return code: %d" % iRetCode)
