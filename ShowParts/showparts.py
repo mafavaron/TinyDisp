@@ -131,6 +131,15 @@ def update(iNumFrame):
         fParticles.close()
         return iRetCode, None, None, None, None, None, None, None, None, None, None
 
+    # Initialize plotting environment
+    plt.style.use('seaborn-pastel')
+    fig, ax = plt.subplots()
+    ax.scatter(rvX, rvY, s=0.5, alpha=0.5)
+    ax.set_xlim((xMin,xMax))
+    ax.set_ylim((yMin,yMax))
+    ax.set_aspect('equal')
+    plt.show()
+
     return iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp
 
 
@@ -174,12 +183,6 @@ if __name__ == "__main__":
     xMax = -xMin
     yMin =  xMin
     yMax =  xMax
-
-    # Initialize plotting environment
-    plt.style.use('seaborn-pastel')
-    figure = plt.figure()
-    axes   = plt.axes(xlim=(xMin,xMax), ylim=(yMin,yMax))
-    line,  = axes.plot([], [], lw=3)
 
     iRetCode = init()
     print("Init - Return code: %d" % iRetCode)
