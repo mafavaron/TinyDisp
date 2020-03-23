@@ -13,11 +13,12 @@ global fParticles
 global sDataFile
 global rEdgeLength
 global bDataOK
-
+global iNumParticlePools
 
 def init():
 
     global fParticles
+    global iNumParticlePools
 
     # Assume success (will falsify on failure)
     iRetCode = 0
@@ -37,6 +38,13 @@ def init():
         iRetCode = 2
         fParticles.close()
         return iRetCode
+    try:
+        ivBuffer = fParticles.read(4)
+        iNumParticlePools = struct.unpack('i', ivBuffer)[0]
+    except:
+        iRetCode = 2
+        fParticles.close()
+        return iRetCode
 
     bDataOK = True
     return iRetCode
@@ -52,14 +60,63 @@ def update(iNumFrame):
     # Get additional data
     try:
         ivBuffer = fParticles.read(4)
+        iIteration = struct.unpack('i', ivBuffer)[0]
+    except:
+        iRetCode = 1
+        fParticles.close()
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
+    try:
+        ivBuffer = fParticles.read(4)
+        iCurTime = struct.unpack('i', ivBuffer)[0]
+    except:
+        iRetCode = 1
+        fParticles.close()
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
+    try:
+        ivBuffer = fParticles.read(4)
+        rU = struct.unpack('f', ivBuffer)[0]
+    except:
+        iRetCode = 1
+        fParticles.close()
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
+    try:
+        ivBuffer = fParticles.read(4)
+        rV = struct.unpack('f', ivBuffer)[0]
+    except:
+        iRetCode = 1
+        fParticles.close()
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
+    try:
+        ivBuffer = fParticles.read(4)
+        rStdDevU = struct.unpack('f', ivBuffer)[0]
+    except:
+        iRetCode = 1
+        fParticles.close()
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
+    try:
+        ivBuffer = fParticles.read(4)
+        rStdDevV = struct.unpack('f', ivBuffer)[0]
+    except:
+        iRetCode = 1
+        fParticles.close()
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
+    try:
+        ivBuffer = fParticles.read(4)
+        rCovUV = struct.unpack('f', ivBuffer)[0]
+    except:
+        iRetCode = 1
+        fParticles.close()
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
+    try:
+        ivBuffer = fParticles.read(4)
         iNumPart = struct.unpack('i', ivBuffer)[0]
     except:
         iRetCode = 1
         fParticles.close()
-        return iRetCode, None, None, None
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
     if iNumPart <= 0:
         iRetCode = 2
-        return iRetCode, None, None, None
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
     sRealFmt = "%df" % iNumPart
     sIntFmt  = "%di" % iNumPart
     try:
@@ -72,9 +129,9 @@ def update(iNumFrame):
     except:
         iRetCode = -1
         fParticles.close()
-        return iRetCode, None, None, None
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
 
-    return iRetCode, rvX, rvY, ivTimeStamp
+    return iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp
 
 
 if __name__ == "__main__":
@@ -112,8 +169,20 @@ if __name__ == "__main__":
         print("Error: Edge length not found or invalid in configuration file")
         sys.exit(2)
 
+    # Define coordinates area
+    xMin = -rEdgeLength / 2.0
+    xMax = -xMin
+    yMin =  xMin
+    yMax =  xMax
+
+    # Initialize plotting environment
+    plt.style.use('seaborn-pastel')
+    figure = plt.figure()
+    axes   = plt.axes(xlim=(xMin,xMax), ylim=(yMin,yMax))
+    line,  = axes.plot([], [], lw=3)
+
     iRetCode = init()
     print("Init - Return code: %d" % iRetCode)
 
-    iRetCode = update(1)
+    iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp = update(1)
     print("Updt - Return code: %d" % iRetCode)
