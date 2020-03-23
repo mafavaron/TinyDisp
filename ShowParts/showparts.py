@@ -112,6 +112,18 @@ if __name__ == "__main__":
         print("Error: Edge length not found or invalid in configuration file")
         sys.exit(2)
 
+    # Define coordinates area
+    xMin = -rEdgeLength / 2.0
+    xMax = -xMin
+    yMin =  xMin
+    yMax =  yMax
+
+    # Initialize plotting environment
+    plt.style.use('seaborn-pastel')
+    figure = plt.figure()
+    axes   = plt.axes(xlim=(xMin,xMax), ylim=(yMin,yMax))
+    line,  = axes.plot([], [], lw=3)
+
     iRetCode = init()
     print("Init - Return code: %d" % iRetCode)
 
