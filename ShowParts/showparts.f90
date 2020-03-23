@@ -81,9 +81,10 @@ program showparts
         call SCRMOD('REVERS')
         call FILMOD('DELETE')
         call PAGE(2800, 2800)
+        call WINSIZ(1400, 1400)
         call DISINI()
         ! -1- Level 1
-        call ERRMOD('PROTOCOL', 'OFF')
+        call ERRMOD('ALL', 'OFF')
         call AXSPOS( 350, 2450)
         call AXSLEN(2300, 2300)
         call HSYMBL(3)
@@ -92,9 +93,7 @@ program showparts
             rXmin, rXmax, rXmin, tCfg % rEdgeLength / 5., &
             rYmin, rYmax, rYmin, tCfg % rEdgeLength / 5.  &
         )
-        call ENDGRF()
         ! -1- Level 2
-        call COLOR('RED')
         call QPLSCA(tPart % rvX, tPart % rvY, iCountTotal)
         
         ! Add this plot to movie
