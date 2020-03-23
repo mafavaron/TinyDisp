@@ -28,15 +28,14 @@ def init():
         return iRetCode
     try:
         ivBuffer = fParticles.read(4)
-        iMaxPart = struct.unpack('i', ivBuffer)
+        iMaxPart = struct.unpack('i', ivBuffer)[0]
     except:
         iRetCode = 2
         fParticles.close()
         return iRetCode
 
-    print(iMaxPart)
-
     return iRetCode
+
 
 if __name__ == "__main__":
 
