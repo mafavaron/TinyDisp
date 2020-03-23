@@ -116,7 +116,7 @@ if __name__ == "__main__":
     xMin = -rEdgeLength / 2.0
     xMax = -xMin
     yMin =  xMin
-    yMax =  yMax
+    yMax =  xMax
 
     # Initialize plotting environment
     plt.style.use('seaborn-pastel')
