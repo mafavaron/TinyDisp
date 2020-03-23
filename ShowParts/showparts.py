@@ -127,5 +127,5 @@ if __name__ == "__main__":
     iRetCode = init()
     print("Init - Return code: %d" % iRetCode)
 
-    iRetCode = update(1)
+    iRetCode, rvX, rvY, ivTimeStamp = update(1)
     print("Updt - Return code: %d" % iRetCode)
