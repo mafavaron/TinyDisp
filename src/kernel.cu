@@ -80,6 +80,7 @@ int main(int argc, char** argv)
     auto fOut = std::fstream(sOutFileName, std::ios::out | std::ios::binary);
     fOut.write((char*)&iNumPart, sizeof(int));
     int iNumData = tCfg.GetNumMeteoData();
+    fOut.write((char*)&iNumData, sizeof(int));
     thrust::counting_iterator<unsigned int> index_sequence_begin(0);
     unsigned int iIteration = 0;
     int iFirstTimeStamp = 0;
@@ -177,6 +178,13 @@ int main(int argc, char** argv)
                 }
             }
         }
+        fOut.write((char*)&i, sizeof(int));
+        fOut.write((char*)&iTimeStamp, sizeof(int));
+        fOut.write((char*)&rU, sizeof(float));
+        fOut.write((char*)&rV, sizeof(float));
+        fOut.write((char*)&rStdDevU, sizeof(float));
+        fOut.write((char*)&rStdDevV, sizeof(float));
+        fOut.write((char*)&rCovUV, sizeof(float));
         fOut.write((char*)&iNumActivePart, sizeof(int));
         for (auto i = 0; i < iNumPart; ++i) {
             if (ivTempTimeStamp[i] > 0) {
