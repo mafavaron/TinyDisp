@@ -12,12 +12,16 @@ import struct
 global fParticles
 global sDataFile
 global rEdgeLength
+global bDataOK
 
 
 def init():
 
+    global fParticles
+
     # Assume success (will falsify on failure)
     iRetCode = 0
+    bDataOK  = False
 
     # Start reading the particle binary file
     try:
@@ -33,6 +37,34 @@ def init():
         iRetCode = 2
         fParticles.close()
         return iRetCode
+
+    bDataOK = True
+    return iRetCode
+
+
+def update(iNumFrame):
+
+    global fParticles
+
+    # Assume success (will falsify on failure)
+    iRetCode = 0
+
+    # Get additional data
+    try:
+        ivBuffer = fParticles.read(4)
+        iNumPart = struct.unpack('i', ivBuffer)[0]
+    except:
+        iRetCode = 1
+        fParticles.close()
+        return iRetCode
+    if iNumPart <= 0:
+        iRetCode = 2
+        return iRetCode
+    sRealFmt = "%df" % iNumPart
+    try:
+        bvBuffer = fParticles.read(4 * iNumPart)
+        rvBuffer = np.array(struct.unpack(sRealFmt, bvBuffer))
+        print(rvBuffer)
 
     return iRetCode
 
@@ -73,4 +105,7 @@ if __name__ == "__main__":
         sys.exit(2)
 
     iRetCode = init()
-    print("Return code: %d" % iRetCode)
+    print("Init - Return code: %d" % iRetCode)
+
+    iRetCode = update(1)
+    print("Updt - Return code: %d" % iRetCode)
