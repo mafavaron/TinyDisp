@@ -56,20 +56,25 @@ def update(iNumFrame):
     except:
         iRetCode = 1
         fParticles.close()
-        return iRetCode
+        return iRetCode, None, None, None
     if iNumPart <= 0:
         iRetCode = 2
-        return iRetCode
+        return iRetCode, None, None, None
     sRealFmt = "%df" % iNumPart
+    sIntFmt  = "%di" % iNumPart
     try:
         bvBuffer = fParticles.read(4 * iNumPart)
-        rvBuffer = np.array(struct.unpack(sRealFmt, bvBuffer))
-        print(rvBuffer)
+        rvX = np.array(struct.unpack(sRealFmt, bvBuffer))
+        bvBuffer = fParticles.read(4 * iNumPart)
+        rvY = np.array(struct.unpack(sRealFmt, bvBuffer))
+        bvBuffer = fParticles.read(4 * iNumPart)
+        ivTimeStamp = np.array(struct.unpack(sIntFmt, bvBuffer))
     except:
         iRetCode = -1
         fParticles.close()
+        return iRetCode, None, None, None
 
-    return iRetCode
+    return iRetCode, rvX, rvY, ivTimeStamp
 
 
 if __name__ == "__main__":
