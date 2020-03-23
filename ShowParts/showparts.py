@@ -65,6 +65,9 @@ def update(iNumFrame):
         bvBuffer = fParticles.read(4 * iNumPart)
         rvBuffer = np.array(struct.unpack(sRealFmt, bvBuffer))
         print(rvBuffer)
+    except:
+        iRetCode = -1
+        fParticles.close()
 
     return iRetCode
 
