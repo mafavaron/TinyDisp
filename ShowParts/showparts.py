@@ -2,59 +2,46 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+from matplotlib import cm
+from celluloid import Camera
 import configparser
 import os
 import sys
 import struct
 
-# System state
-global fParticles
-global sDataFile
-global rEdgeLength
-global bDataOK
-global iNumParticlePools
 
-def init():
-
-    global fParticles
-    global iNumParticlePools
-
+def connect_particles_file(sDataFile):
     # Assume success (will falsify on failure)
     iRetCode = 0
-    bDataOK  = False
 
     # Start reading the particle binary file
     try:
         fParticles = open(sDataFile, "rb")
     except Exception as e:
-        print(str(e))
         iRetCode = 1
-        return iRetCode
+        return iRetCode, None, None
     try:
         ivBuffer = fParticles.read(4)
         iMaxPart = struct.unpack('i', ivBuffer)[0]
     except:
         iRetCode = 2
         fParticles.close()
-        return iRetCode
+        return iRetCode, None, None
     try:
         ivBuffer = fParticles.read(4)
         iNumParticlePools = struct.unpack('i', ivBuffer)[0]
     except:
         iRetCode = 2
         fParticles.close()
-        return iRetCode
+        return iRetCode, None, None
 
-    bDataOK = True
-    return iRetCode
+    return iRetCode, fParticles, iNumParticlePools
 
 
-def update(iNumFrame):
+def get_next_particles(fParticles):
+    # Function, gathering the next particle pool
 
-    global fParticles
-
-    # Assume success (will falsify on failure)
+    # Assume success (will falsify on failure
     iRetCode = 0
 
     # Get additional data
@@ -63,62 +50,54 @@ def update(iNumFrame):
         iIteration = struct.unpack('i', ivBuffer)[0]
     except:
         iRetCode = 1
-        fParticles.close()
         return iRetCode, None, None, None, None, None, None, None, None, None, None
     try:
         ivBuffer = fParticles.read(4)
         iCurTime = struct.unpack('i', ivBuffer)[0]
     except:
         iRetCode = 1
-        fParticles.close()
         return iRetCode, None, None, None, None, None, None, None, None, None, None
     try:
         ivBuffer = fParticles.read(4)
         rU = struct.unpack('f', ivBuffer)[0]
     except:
         iRetCode = 1
-        fParticles.close()
         return iRetCode, None, None, None, None, None, None, None, None, None, None
     try:
         ivBuffer = fParticles.read(4)
         rV = struct.unpack('f', ivBuffer)[0]
     except:
         iRetCode = 1
-        fParticles.close()
         return iRetCode, None, None, None, None, None, None, None, None, None, None
     try:
         ivBuffer = fParticles.read(4)
         rStdDevU = struct.unpack('f', ivBuffer)[0]
     except:
         iRetCode = 1
-        fParticles.close()
         return iRetCode, None, None, None, None, None, None, None, None, None, None
     try:
         ivBuffer = fParticles.read(4)
         rStdDevV = struct.unpack('f', ivBuffer)[0]
     except:
         iRetCode = 1
-        fParticles.close()
         return iRetCode, None, None, None, None, None, None, None, None, None, None
     try:
         ivBuffer = fParticles.read(4)
         rCovUV = struct.unpack('f', ivBuffer)[0]
     except:
         iRetCode = 1
-        fParticles.close()
         return iRetCode, None, None, None, None, None, None, None, None, None, None
     try:
         ivBuffer = fParticles.read(4)
         iNumPart = struct.unpack('i', ivBuffer)[0]
     except:
         iRetCode = 1
-        fParticles.close()
         return iRetCode, None, None, None, None, None, None, None, None, None, None
     if iNumPart <= 0:
-        iRetCode = 2
+        iRetCode = 1
         return iRetCode, None, None, None, None, None, None, None, None, None, None
     sRealFmt = "%df" % iNumPart
-    sIntFmt  = "%di" % iNumPart
+    sIntFmt = "%di" % iNumPart
     try:
         bvBuffer = fParticles.read(4 * iNumPart)
         rvX = np.array(struct.unpack(sRealFmt, bvBuffer))
@@ -127,23 +106,16 @@ def update(iNumFrame):
         bvBuffer = fParticles.read(4 * iNumPart)
         ivTimeStamp = np.array(struct.unpack(sIntFmt, bvBuffer))
     except:
-        iRetCode = -1
-        fParticles.close()
+        iRetCode = 2
         return iRetCode, None, None, None, None, None, None, None, None, None, None
-
-    # Initialize plotting environment
-    plt.style.use('seaborn-pastel')
-    fig, ax = plt.subplots()
-    ax.scatter(rvX, rvY, s=0.5, alpha=0.5)
-    ax.set_xlim((xMin,xMax))
-    ax.set_ylim((yMin,yMax))
-    ax.set_aspect('equal')
-    plt.show()
 
     return iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp
 
 
 if __name__ == "__main__":
+
+    global iNumParticlePools
+    global ax
 
     # Get parameters
     if len(sys.argv) != 3:
@@ -181,11 +153,40 @@ if __name__ == "__main__":
     # Define coordinates area
     xMin = -rEdgeLength / 2.0
     xMax = -xMin
-    yMin =  xMin
-    yMax =  xMax
+    yMin = xMin
+    yMax = xMax
 
-    iRetCode = init()
-    print("Init - Return code: %d" % iRetCode)
+    # Gather essential preliminary data from output file
+    iRetCode, fParticles, iNumParticlePools = connect_particles_file(sDataFile)
+    if iRetCode != 0:
+        print('Error accessing particle file - Return code: %d' % iRetCode)
+        sys.exit(3)
 
-    iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp = update(1)
-    print("Updt - Return code: %d" % iRetCode)
+    # Generate individual frames
+    plt.style.use('seaborn-pastel')
+    fig, ax = plt.subplots()
+    camera = Camera(fig)
+    for iNumIter in range(iNumParticlePools):
+
+        # Try getting new particle pool
+        iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp = get_next_particles(fParticles)
+
+        # Plot current particle pool
+        ax.scatter(rvX, rvY, s=0.5, alpha=0.5)
+        ax.set_xlim((xMin, xMax))
+        ax.set_ylim((yMin, yMax))
+        ax.set_aspect('equal')
+
+        # Take snapshot
+        camera.snap()
+
+        # Tell users which step is this
+        print("Frame %d of %d generated" % (iNumFrame, iNumParticlePools))
+
+    print('Animation completed: generating movie')
+    anim = camera.animate(blit=True)
+
+    print('Movie generated: saving it to ' + sMp4File)
+    anim.save(sMp4File)
+
+    print("*** END JOB ***")
