@@ -181,9 +181,10 @@ if __name__ == "__main__":
     # Gather essential preliminary data from output file
     iRetCode = connect(sDataFile)
     if iRetCode != 0:
-        print("Error accessing particle file - Return code: %d" % iRetCode)
+        print('Error accessing particle file - Return code: %d' % iRetCode)
         sys.exit(3)
 
     # Run animation
     anim = animate.FuncAnimation(fig, update, interval=20, frmes=iNumParticlePools, blit=True)
+    print('Animation completed: generating movie')
     anim.save(sMp4File, 'ffmpeg')
