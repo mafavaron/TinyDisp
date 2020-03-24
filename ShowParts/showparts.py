@@ -2,7 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import cm
+from matplotlib import animation
 from celluloid import Camera
 import configparser
 import os
@@ -123,14 +123,14 @@ if __name__ == "__main__":
         print()
         print("Usage:")
         print()
-        print("  python3 showparts.py <ConfigFile> <OutputMovie.mp4>")
+        print("  python3 showparts.py <ConfigFile> <OutputMovie.gif>")
         print()
         print("Copyright 2020 by Servizi Territorio srl")
         print("This is open-source software, covered by the MIT license.")
         print()
         sys.exit(1)
     sCfgFile = sys.argv[1]
-    sMp4File = sys.argv[2]
+    sGifFile = sys.argv[2]
 
     # Get configuration data
     cfg = configparser.ConfigParser()
@@ -172,7 +172,7 @@ if __name__ == "__main__":
         iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp = get_next_particles(fParticles)
 
         # Plot current particle pool
-        ax.scatter(rvX, rvY, s=0.5, alpha=0.5)
+        ax.scatter(rvX, rvY, s=0.5, c='red', alpha=0.5)
         ax.set_xlim((xMin, xMax))
         ax.set_ylim((yMin, yMax))
         ax.set_aspect('equal')
@@ -181,12 +181,12 @@ if __name__ == "__main__":
         camera.snap()
 
         # Tell users which step is this
-        print("Frame %d of %d generated" % (iNumFrame, iNumParticlePools))
+        print("Frame %d of %d generated" % (iNumIter, iNumParticlePools))
 
     print('Animation completed: generating movie')
     anim = camera.animate(blit=True)
 
-    print('Movie generated: saving it to ' + sMp4File)
-    anim.save(sMp4File)
+    print('Movie generated: saving it to ' + sGifFile)
+    anim.save(sGifFile, writer='PillowWriter', fps=50)
 
     print("*** END JOB ***")
