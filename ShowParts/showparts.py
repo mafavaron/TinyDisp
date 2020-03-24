@@ -186,7 +186,7 @@ if __name__ == "__main__":
     print('Animation completed: generating movie')
     anim = camera.animate(blit=True)
 
-    print('Movie generated: saving it to ' + sMp4File)
+    print('Movie generated: saving it to ' + sGifFile)
     anim.save(sGifFile, writer='PillowWriter', fps=50)
 
     print("*** END JOB ***")
