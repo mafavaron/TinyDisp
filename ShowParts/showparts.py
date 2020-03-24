@@ -185,6 +185,6 @@ if __name__ == "__main__":
         sys.exit(3)
 
     # Run animation
-    anim = animate.FuncAnimation(fig, update, interval=20, frmes=iNumParticlePools, blit=True)
+    anim = animation.FuncAnimation(fig, update, interval=20, frmes=iNumParticlePools, blit=True)
     print('Animation completed: generating movie')
     anim.save(sMp4File, 'ffmpeg')
