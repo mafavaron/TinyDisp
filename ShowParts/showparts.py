@@ -2,30 +2,15 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+from matplotlib import cm
+from celluloid import Camera
 import configparser
 import os
 import sys
 import struct
 
-# System state
-global fParticles
-global sDataFile
-global rEdgeLength
-global bDataOK
-global iNumParticlePools
-global xMin
-global xMax
-global yMin
-global yMax
-global fig
 
-
-def connect(sDataFile):
-
-    global fParticles
-    global iNumParticlePools
-
+def connect_particles_file(sDataFile):
     # Assume success (will falsify on failure)
     iRetCode = 0
 
@@ -33,29 +18,27 @@ def connect(sDataFile):
     try:
         fParticles = open(sDataFile, "rb")
     except Exception as e:
-        print(str(e))
         iRetCode = 1
-        return iRetCode
+        return iRetCode, None, None
     try:
         ivBuffer = fParticles.read(4)
         iMaxPart = struct.unpack('i', ivBuffer)[0]
     except:
         iRetCode = 2
         fParticles.close()
-        return iRetCode
+        return iRetCode, None, None
     try:
         ivBuffer = fParticles.read(4)
         iNumParticlePools = struct.unpack('i', ivBuffer)[0]
     except:
         iRetCode = 2
         fParticles.close()
-        return iRetCode
+        return iRetCode, None, None
 
-    return iRetCode
+    return iRetCode, fParticles, iNumParticlePools
 
 
 def update(iNumFrame):
-
     global fParticles
     global xMin
     global xMax
@@ -109,7 +92,7 @@ def update(iNumFrame):
     if iNumPart <= 0:
         return
     sRealFmt = "%df" % iNumPart
-    sIntFmt  = "%di" % iNumPart
+    sIntFmt = "%di" % iNumPart
     try:
         bvBuffer = fParticles.read(4 * iNumPart)
         rvX = np.array(struct.unpack(sRealFmt, bvBuffer))
@@ -122,12 +105,12 @@ def update(iNumFrame):
 
     # Plot current particle set
     ax.scatter(rvX, rvY, s=0.5, alpha=0.5)
-    ax.set_xlim((xMin,xMax))
-    ax.set_ylim((yMin,yMax))
+    ax.set_xlim((xMin, xMax))
+    ax.set_ylim((yMin, yMax))
     ax.set_aspect('equal')
 
     # Tell users which step is this
-    print("Frame %d of %d generated" % (i, iNumParticlePools))
+    print("Frame %d of %d generated" % (iNumFrame, iNumParticlePools))
 
     return
 
@@ -173,11 +156,11 @@ if __name__ == "__main__":
     # Define coordinates area
     xMin = -rEdgeLength / 2.0
     xMax = -xMin
-    yMin =  xMin
-    yMax =  xMax
+    yMin = xMin
+    yMax = xMax
 
     # Gather essential preliminary data from output file
-    iRetCode = connect(sDataFile)
+    iRetCode, fParticles, iNumParticlePools = connect_particles_file(sDataFile)
     if iRetCode != 0:
         print('Error accessing particle file - Return code: %d' % iRetCode)
         sys.exit(3)
