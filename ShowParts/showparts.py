@@ -185,6 +185,6 @@ if __name__ == "__main__":
     # Run animation
     plt.style.use('seaborn-pastel')
     fig, ax = plt.subplots()
-    anim = animation.FuncAnimation(fig, update, interval=20, frmes=iNumParticlePools, blit=True)
+    anim = animation.FuncAnimation(fig, update, interval=20, frames=iNumParticlePools, blit=True)
     print('Animation completed: generating movie')
     anim.save(sMp4File, 'ffmpeg')
