@@ -38,59 +38,64 @@ def connect_particles_file(sDataFile):
     return iRetCode, fParticles, iNumParticlePools
 
 
-def update(iNumFrame):
-    global fParticles
-    global xMin
-    global xMax
-    global yMin
-    global yMax
-    global ax
-    global iNumParticlePools
+def get_next_particles(fParticles):
+    # Function, gathering the next particle pool
+
+    # Assume success (will falsify on failure
+    iRetCode = 0
 
     # Get additional data
     try:
         ivBuffer = fParticles.read(4)
         iIteration = struct.unpack('i', ivBuffer)[0]
     except:
-        return
+        iRetCode = 1
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
     try:
         ivBuffer = fParticles.read(4)
         iCurTime = struct.unpack('i', ivBuffer)[0]
     except:
-        fParticles.close()
-        return
+        iRetCode = 1
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
     try:
         ivBuffer = fParticles.read(4)
         rU = struct.unpack('f', ivBuffer)[0]
     except:
-        return
+        iRetCode = 1
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
     try:
         ivBuffer = fParticles.read(4)
         rV = struct.unpack('f', ivBuffer)[0]
     except:
-        return
+        iRetCode = 1
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
     try:
         ivBuffer = fParticles.read(4)
         rStdDevU = struct.unpack('f', ivBuffer)[0]
     except:
-        return
+        iRetCode = 1
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
     try:
         ivBuffer = fParticles.read(4)
         rStdDevV = struct.unpack('f', ivBuffer)[0]
     except:
-        return
+        iRetCode = 1
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
     try:
         ivBuffer = fParticles.read(4)
         rCovUV = struct.unpack('f', ivBuffer)[0]
     except:
-        return
+        iRetCode = 1
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
     try:
         ivBuffer = fParticles.read(4)
         iNumPart = struct.unpack('i', ivBuffer)[0]
     except:
-        return
+        iRetCode = 1
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
     if iNumPart <= 0:
-        return
+        iRetCode = 1
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
     sRealFmt = "%df" % iNumPart
     sIntFmt = "%di" % iNumPart
     try:
@@ -101,18 +106,10 @@ def update(iNumFrame):
         bvBuffer = fParticles.read(4 * iNumPart)
         ivTimeStamp = np.array(struct.unpack(sIntFmt, bvBuffer))
     except:
-        return
+        iRetCode = 2
+        return iRetCode, None, None, None, None, None, None, None, None, None, None
 
-    # Plot current particle set
-    ax.scatter(rvX, rvY, s=0.5, alpha=0.5)
-    ax.set_xlim((xMin, xMax))
-    ax.set_ylim((yMin, yMax))
-    ax.set_aspect('equal')
-
-    # Tell users which step is this
-    print("Frame %d of %d generated" % (iNumFrame, iNumParticlePools))
-
-    return
+    return iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp
 
 
 if __name__ == "__main__":
@@ -165,9 +162,31 @@ if __name__ == "__main__":
         print('Error accessing particle file - Return code: %d' % iRetCode)
         sys.exit(3)
 
-    # Run animation
+    # Generate individual frames
     plt.style.use('seaborn-pastel')
     fig, ax = plt.subplots()
-    anim = animation.FuncAnimation(fig, update, interval=20, frames=iNumParticlePools, blit=True)
+    camera = Camera(fig)
+    for iNumIter in range(iNumParticlePools):
+
+        # Try getting new particle pool
+        iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp = get_next_particles(fParticles)
+
+        # Plot current particle pool
+        ax.scatter(rvX, rvY, s=0.5, alpha=0.5)
+        ax.set_xlim((xMin, xMax))
+        ax.set_ylim((yMin, yMax))
+        ax.set_aspect('equal')
+
+        # Take snapshot
+        camera.snap()
+
+        # Tell users which step is this
+        print("Frame %d of %d generated" % (iNumFrame, iNumParticlePools))
+
     print('Animation completed: generating movie')
-    anim.save(sMp4File, 'ffmpeg')
+    anim = camera.animate(blit=True)
+
+    print('Movie generated: saving it to ' + sMp4File)
+    anim.save(sMp4File)
+
+    print("*** END JOB ***")
