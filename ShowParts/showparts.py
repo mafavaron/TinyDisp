@@ -172,7 +172,7 @@ if __name__ == "__main__":
         iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp = get_next_particles(fParticles)
 
         # Plot current particle pool
-        ax.scatter(rvX, rvY, s=0.5, alpha=0.5)
+        ax.scatter(rvX, rvY, s=0.5, c='red', alpha=0.5)
         ax.set_xlim((xMin, xMax))
         ax.set_ylim((yMin, yMax))
         ax.set_aspect('equal')
