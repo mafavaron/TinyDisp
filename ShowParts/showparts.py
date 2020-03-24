@@ -18,6 +18,8 @@ global xMin
 global xMax
 global yMin
 global yMax
+global fig
+
 
 def connect(sDataFile):
 
@@ -52,11 +54,6 @@ def connect(sDataFile):
     return iRetCode
 
 
-def init():
-
-    pass
-
-
 def update(iNumFrame):
 
     global fParticles
@@ -64,6 +61,8 @@ def update(iNumFrame):
     global xMax
     global yMin
     global yMax
+    global fig
+    global iNumParticlePools
 
     # Get additional data
     try:
@@ -121,14 +120,16 @@ def update(iNumFrame):
     except:
         return
 
-    # Initialize plotting environment
+    # Plot current particle set
     plt.style.use('seaborn-pastel')
     fig, ax = plt.subplots()
     ax.scatter(rvX, rvY, s=0.5, alpha=0.5)
     ax.set_xlim((xMin,xMax))
     ax.set_ylim((yMin,yMax))
     ax.set_aspect('equal')
-    plt.show()
+
+    # Tell users which step is this
+    print("Frame %d of %d generated" % (i, iNumParticlePools))
 
     return
 
@@ -136,6 +137,7 @@ def update(iNumFrame):
 if __name__ == "__main__":
 
     global iNumParticlePools
+    global fig
 
     # Get parameters
     if len(sys.argv) != 3:
@@ -176,8 +178,12 @@ if __name__ == "__main__":
     yMin =  xMin
     yMax =  xMax
 
+    # Gather essential preliminary data from output file
     iRetCode = connect(sDataFile)
-    print("Init - Return code: %d" % iRetCode)
+    if iRetCode != 0:
+        print("Error accessing particle file - Return code: %d" % iRetCode)
+        sys.exit(3)
 
-    iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp = update(1)
-    print("Updt - Return code: %d" % iRetCode)
+    # Run animation
+    anim = animate.FuncAnimation(fig, update, interval=20)
+    anim.save(sMp4File, 'ffmpeg')
