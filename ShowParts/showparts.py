@@ -61,7 +61,7 @@ def update(iNumFrame):
     global xMax
     global yMin
     global yMax
-    global fig
+    global ax
     global iNumParticlePools
 
     # Get additional data
@@ -121,8 +121,6 @@ def update(iNumFrame):
         return
 
     # Plot current particle set
-    plt.style.use('seaborn-pastel')
-    fig, ax = plt.subplots()
     ax.scatter(rvX, rvY, s=0.5, alpha=0.5)
     ax.set_xlim((xMin,xMax))
     ax.set_ylim((yMin,yMax))
@@ -137,7 +135,7 @@ def update(iNumFrame):
 if __name__ == "__main__":
 
     global iNumParticlePools
-    global fig
+    global ax
 
     # Get parameters
     if len(sys.argv) != 3:
@@ -185,6 +183,8 @@ if __name__ == "__main__":
         sys.exit(3)
 
     # Run animation
+    plt.style.use('seaborn-pastel')
+    fig, ax = plt.subplots()
     anim = animation.FuncAnimation(fig, update, interval=20, frmes=iNumParticlePools, blit=True)
     print('Animation completed: generating movie')
     anim.save(sMp4File, 'ffmpeg')
