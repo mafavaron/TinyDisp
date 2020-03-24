@@ -123,14 +123,14 @@ if __name__ == "__main__":
         print()
         print("Usage:")
         print()
-        print("  python3 showparts.py <ConfigFile> <OutputMovie.mp4>")
+        print("  python3 showparts.py <ConfigFile> <OutputMovie.gif>")
         print()
         print("Copyright 2020 by Servizi Territorio srl")
         print("This is open-source software, covered by the MIT license.")
         print()
         sys.exit(1)
     sCfgFile = sys.argv[1]
-    sMp4File = sys.argv[2]
+    sGifFile = sys.argv[2]
 
     # Get configuration data
     cfg = configparser.ConfigParser()
@@ -187,6 +187,6 @@ if __name__ == "__main__":
     anim = camera.animate(blit=True)
 
     print('Movie generated: saving it to ' + sMp4File)
-    anim.save(sMp4File)
+    anim.save(sGifFile, writer='PillowWriter', fps=50)
 
     print("*** END JOB ***")
