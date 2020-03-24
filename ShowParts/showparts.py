@@ -181,7 +181,7 @@ if __name__ == "__main__":
         camera.snap()
 
         # Tell users which step is this
-        print("Frame %d of %d generated" % (iNumFrame, iNumParticlePools))
+        print("Frame %d of %d generated" % (iNumIter, iNumParticlePools))
 
     print('Animation completed: generating movie')
     anim = camera.animate(blit=True)
