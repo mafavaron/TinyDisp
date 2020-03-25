@@ -2,7 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import animation
+from matplotlib.animation import PillowWriter
 from celluloid import Camera
 import configparser
 import os
@@ -172,7 +172,7 @@ if __name__ == "__main__":
         iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp = get_next_particles(fParticles)
 
         # Plot current particle pool
-        ax.scatter(rvX, rvY, s=0.5, c='red', alpha=0.5)
+        ax.scatter(rvX, rvY, s=0.75, c='red', alpha=0.2)
         ax.set_xlim((xMin, xMax))
         ax.set_ylim((yMin, yMax))
         ax.set_aspect('equal')
