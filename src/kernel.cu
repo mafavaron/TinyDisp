@@ -171,9 +171,9 @@ int main(int argc, char** argv)
         rvTempY = rvPartY;
         ivTempTimeStamp = ivPartTimeStamp;
         int iNumActivePart = 0;
-        for (auto i = 0; i < iNumPart; ++i) {
-            if (ivTempTimeStamp[i] > 0) {
-                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
+        for (auto j = 0; j < iNumPart; ++j) {
+            if (ivTempTimeStamp[j] > 0) {
+                if (tCfg.GetMinX() <= rvTempX[j] && rvTempX[j] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[j] && rvTempY[j] <= -tCfg.GetMinY()) {
                     ++iNumActivePart;
                 }
             }
@@ -186,30 +186,30 @@ int main(int argc, char** argv)
         fOut.write((char*)&rStdDevV, sizeof(float));
         fOut.write((char*)&rCovUV, sizeof(float));
         fOut.write((char*)&iNumActivePart, sizeof(int));
-        for (auto i = 0; i < iNumPart; ++i) {
-            if (ivTempTimeStamp[i] > 0) {
-                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
-                    fOut.write((char*)&rvTempX[i], sizeof(float));
+        for (auto j = 0; j < iNumPart; ++j) {
+            if (ivTempTimeStamp[j] > 0) {
+                if (tCfg.GetMinX() <= rvTempX[j] && rvTempX[j] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[j] && rvTempY[j] <= -tCfg.GetMinY()) {
+                    fOut.write((char*)&rvTempX[j], sizeof(float));
                 }
             }
         }
-        for (auto i = 0; i < iNumPart; ++i) {
-            if (ivTempTimeStamp[i] > 0) {
-                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
-                    fOut.write((char*)&rvTempY[i], sizeof(float));
+        for (auto j = 0; j < iNumPart; ++j) {
+            if (ivTempTimeStamp[j] > 0) {
+                if (tCfg.GetMinX() <= rvTempX[j] && rvTempX[j] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[j] && rvTempY[j] <= -tCfg.GetMinY()) {
+                    fOut.write((char*)&rvTempY[j], sizeof(float));
                 }
             }
         }
-        for (auto i = 0; i < iNumPart; ++i) {
-            if (ivTempTimeStamp[i] > 0) {
-                if (tCfg.GetMinX() <= rvTempX[i] && rvTempX[i] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[i] && rvTempY[i] <= -tCfg.GetMinY()) {
-                    fOut.write((char*)&ivTempTimeStamp[i], sizeof(int));
+        for (auto j = 0; j < iNumPart; ++j) {
+            if (ivTempTimeStamp[j] > 0) {
+                if (tCfg.GetMinX() <= rvTempX[j] && rvTempX[j] <= -tCfg.GetMinX() && tCfg.GetMinY() <= rvTempY[j] && rvTempY[j] <= -tCfg.GetMinY()) {
+                    fOut.write((char*)&ivTempTimeStamp[j], sizeof(int));
                 }
             }
         }
 
         // Inform users of the progress
-        std::cout << iIteration << " of " << iNumData << ", " << iTimeStamp << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
+        std::cout << iIteration << " of " << iNumData << ", Written:" << iNumActivePart <<", " << iTimeStamp << ", " << rU << ", " << rV << ", " << rStdDevU << ", " << rStdDevV << ", " << rCovUV << std::endl;
 
     }
 
