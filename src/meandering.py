@@ -14,7 +14,7 @@ if __name__ == "__main__":
     for i in range(n):
         cur_time = time.gmtime(calendar.timegm(start_time) + i)
         x = 6 * math.pi * i / n
-        u = cos(x)
-        v = sin(x)
+        u = math.cos(x)
+        v = math.sin(x)
         f.write("%s, %f, %f, 0.3, 0.3, 0.0\n" % (cur_time, u, v))
     f.close()
