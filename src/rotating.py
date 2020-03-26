@@ -13,7 +13,7 @@ if __name__ == "__main__":
     f.write("Time.Stamp, U, V, sU, sV, cUV\n")
     for i in range(n):
         cur_time = time.gmtime(calendar.timegm(start_time) + i)
-        x = 6 * math.pi * i / n
+        x = 6 * math.pi * i / (n-1)
         u = math.cos(x)
         v = math.sin(x)
         f.write("%s, %f, %f, 0.3, 0.3, 0.0\n" % (time.strftime("%Y-%m-%d %H:%M:%S", cur_time), u, v))
