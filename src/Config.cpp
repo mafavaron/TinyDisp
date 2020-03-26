@@ -69,7 +69,7 @@ Config::Config(const std::string sConfigFile) {
 						float rV       = stof(svFields[2]);
 						float rStdDevU = stof(svFields[3]);
 						float rStdDevV = stof(svFields[4]);
-						float rCovUV   = stof(svFields[3]);
+						float rCovUV   = stof(svFields[5]);
 						if (rU > -9999.0f && rV > -9999.0f && rStdDevU > -9999.0f && rStdDevV > -9999.0f && rCovUV > -9999.0f) {
 							std::istringstream ss{svFields[0]};
 							struct tm tTimeStamp;
