@@ -9,7 +9,16 @@ module data_file
     
     type PartType
         integer                             :: iLUN
+        integer                             :: iNumData
+        integer                             :: iNumMeteoData
         integer                             :: iNumPart
+        integer                             :: iNumIteration
+        integer                             :: iCurrentTime
+        real                                :: rU
+        real                                :: rV
+        real                                :: rStdDevU
+        real                                :: rStdDevV
+        real                                :: rCovUV
         real, dimension(:), allocatable     :: rvX
         real, dimension(:), allocatable     :: rvY
         integer, dimension(:), allocatable  :: ivTimeStamp
@@ -32,6 +41,7 @@ contains
         ! Locals
         integer     :: iErrCode
         integer     :: iNumData
+        integer     :: iNumMeteoData
         
         ! Assume success (will falsify on failure)
         iRetCode        =  0
@@ -55,9 +65,22 @@ contains
             close(iLUN)
             return
         end if
+        read(iLUN, iostat=iErrCode) iNumMeteoData
+        if(iErrCode /= 0) then
+            iRetCode = 4
+            close(iLUN)
+            return
+        end if
+        if(iNumMeteoData <= 0) then
+            iRetCode = 5
+            close(iLUN)
+            return
+        end if
         
         ! Inform this file is accessible
-        this % iLUN = iLUN
+        this % iLUN          = iLUN
+        this % iNumData      = iNumData
+        this % iNumMeteoData = iNumMeteoData
         
     end function Open
     
