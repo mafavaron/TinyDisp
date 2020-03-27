@@ -99,7 +99,15 @@ contains
         iRetCode = 0
         
         ! Try gathering a value
-        read(this % iLUN, iostat = iErrCode) this % iNumPart
+        read(this % iLUN, iostat = iErrCode) &
+            this % iNumIteration, &
+            this % iCurrentTime, &
+            this % rU, &
+            this % rV, &
+            this % rStdDevU, &
+            this % rStdDevV, &
+            this % rCovUV, &
+            this % iNumPart
         if(iErrCode /= 0) then
             iRetCode = -1
             return
@@ -140,6 +148,10 @@ contains
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
+        
+        ! Leave
+        deallocate(this % rvX, this % rvY, this % ivTimeStamp)
+        close(this % iLUN)
         
     end function Close
 
