@@ -1,7 +1,50 @@
 module Meteo
 
+	implicit none
+	
+	private
+	
+	! Public interface
+	
+	! Data type
+	type MeteoType
+		integer, dimension(:), allocatable	:: ivTimeStamp
+		real, dimension(:), allocatable		:: rvU
+		real, dimension(:), allocatable		:: rvV
+		real, dimension(:), allocatable		:: rvW
+		real, dimension(:), allocatable		:: rvStdDevU
+		real, dimension(:), allocatable		:: rvStdDevV
+		real, dimension(:), allocatable		:: rvStdDevW
+		real, dimension(:), allocatable		:: rvCovUV
+		real, dimension(:), allocatable		:: rvCovUW
+		real, dimension(:), allocatable		:: rvCovVW
+	contains
+		procedure 							:: read		=> met_read
+		procedure							:: resample	=> met_resample
+	end type MeteoType
+
 contains
 
+	function met_read(this, iLUN, sFileName) result(iRetCode)
+	
+		! Routine arguments
+		class(MeteoType), intent(out)	:: this
+		integer, intent(in)				:: iLUN
+		character(len=*), intent(in)	:: sFileName
+		integer							:: iRetCode
+		
+		! Locals
+		integer	:: iErrCode
+		
+		! Assume success (will falsify on failure)
+		iRetCode = 0
+		
+		! Get data
+		open(iLUN, file=sFileName, status='old', action='read', iostat=iErrCode)
+		if(iErrCode /= 0) then
+			iRetCode = 1
+			return
+		end if
 
 			// Gather meteo data. By construction, meteo data are sorted
 			// ascending with respect to time stamps
