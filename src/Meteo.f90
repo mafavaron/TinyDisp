@@ -34,7 +34,11 @@ contains
 		integer							:: iRetCode
 		
 		! Locals
-		integer	:: iErrCode
+		integer				:: iErrCode
+		integer				:: iNumData
+		integer				:: iData
+		character(len=256)	:: sBuffer
+		integer				:: iYear, iMonth, iDay, iHour, iMinute, iSecond
 		
 		! Assume success (will falsify on failure)
 		iRetCode = 0
@@ -45,7 +49,36 @@ contains
 			iRetCode = 1
 			return
 		end if
+		iNumData = -1	! Not 0, to account for the header line
+		do
+			read(iLUN, "(a)", iostat=iErrCode) sBuffer
+			if(iErrCode /= 0) exit
+			iNumData = iNumData + 1
+		end do
+		rewind(iLUN)
+		read(iLUN, "(a)") sBuffer	! Skip header (now, the "normal way"
+		do iData = 1, iNumData
+			read(iLUN, "(a)") sBuffer
+			read(sBuffer(1:19), "(i4,5()1x,i2)") iYear, iMonth, iDay, iHour, iMinute, iSecond
+			read(21:), *) &
+				this % rvU(iData), &
+				this % rvV(iData), &
+				this % rvW(iData), &
+				this % rvStdDevU(iData), &
+				this % rvStdDevV(iData), &
+				this % rvStdDevW(iData), &
+		end do
+		close(iLUN)
+		
+	end function met_read
+	
+	
+	function met_resample(this) result(iRetCode)
 
+		! Routine arguments
+		class(MeteoType), intent(out)	:: this
+		integer							:: iRetCode
+		
 			// Gather meteo data. By construction, meteo data are sorted
 			// ascending with respect to time stamps
 			std::string			sBuffer;
