@@ -115,6 +115,7 @@ contains
 		real, dimension(:), allocatable		:: rvCovUW
 		real, dimension(:), allocatable		:: rvCovVW
 		integer								:: iIdx
+		integer								:: iNext
 		integer								:: iTimeStamp
 		integer								:: iLastTime
 		integer								:: iNumElements
@@ -144,49 +145,47 @@ contains
 		
 		! Main loop: locate sampling time stamps, and linearly interpolate the original data
 		! at them
-			std::vector<float> rvInterpDeltaTime;
-			this->ivTimeStamp.reserve(iNumElements);
-			this->rvU.reserve(iNumElements);
-			this->rvV.reserve(iNumElements);
-			this->rvStdDevU.reserve(iNumElements);
-			this->rvStdDevV.reserve(iNumElements);
-			this->rvCovUV.reserve(iNumElements);
-			while (iTimeStamp <= iLastTime) {
+		iNext = 1
+		do while iTimeStamp <= iLastTime
 
-				// Exactly the same?
-				if (iTimeStamp == ivTimeStamp[iIdx]) {
+			if(iTimeStamp == ivTimeStamp(iIdx)) then
 
-					// Yes! Just get values
-					this->ivTimeStamp.push_back( iTimeStamp);
-					this->rvU.push_back(         rvU[iIdx]       );
-					this->rvV.push_back(         rvV[iIdx]       );
-					this->rvStdDevU.push_back(   rvStdDevU[iIdx] );
-					this->rvStdDevV.push_back(   rvStdDevV[iIdx] );
-					this->rvCovUV.push_back(     rvCovUV[iIdx]   );
+				! Exact time match: retrieve actual values
+				ivTimeStamp(iNext) = iTimeStamp
+				rvU(iNext)         = this % rvU(iIdx)
+				rvV(iNext)         = this % rvV(iIdx)
+				rvW(iNext)         = this % rvW(iIdx)
+				rvStdDevU(iNext)   = this % rvStdDevU(iIdx)
+				rvStdDevV(iNext)   = this % rvStdDevV(iIdx)
+				rvStdDevW(iNext)   = this % rvStdDevW(iIdx)
+				rvCovUV(iNext)     = this % rvCovUV(iIdx)
+				rvCovUW(iNext)     = this % rvCovUW(iIdx)
+				rvCovVW(iNext)     = this % rvCovVW(iIdx)
 
-				}
-				else {
+			else
 
-					// No: Locate iIdx so that ivTimeStamp[iIdx] <= iTimeStamp < ivTimeStamp[iIdx+1]
-					while (iTimeStamp < iLastTime && iTimeStamp >= ivTimeStamp[iIdx + 1]) {
-						++iIdx;
-					}
+				! Locate the first useful 'iIdx' value so that ivTimeStamp(iIdx) <= iTimeStamp < ivTimeStamp(iIdx+1)
+				do while (iTimeStamp < iLastTime .and. iTimeStamp >= ivTimeStamp(iIdx + 1))
+					iIdx = iIdx + 1
+				end do
 
-					// Check whether time is the same or not
-					if (iTimeStamp == ivTimeStamp[iIdx]) {
+				if(iTimeStamp == ivTimeStamp(iIdx)) then
 						
-						// Same! Just get values
-						this->ivTimeStamp.push_back(iTimeStamp);
-						this->rvU.push_back(rvU[iIdx]);
-						this->rvV.push_back(rvV[iIdx]);
-						this->rvStdDevU.push_back(rvStdDevU[iIdx]);
-						this->rvStdDevV.push_back(rvStdDevV[iIdx]);
-						this->rvCovUV.push_back(rvCovUV[iIdx]);
+					! Exact time match: retrieve actual values
+					ivTimeStamp(iNext) = iTimeStamp
+					rvU(iNext)         = this % rvU(iIdx)
+					rvV(iNext)         = this % rvV(iIdx)
+					rvW(iNext)         = this % rvW(iIdx)
+					rvStdDevU(iNext)   = this % rvStdDevU(iIdx)
+					rvStdDevV(iNext)   = this % rvStdDevV(iIdx)
+					rvStdDevW(iNext)   = this % rvStdDevW(iIdx)
+					rvCovUV(iNext)     = this % rvCovUV(iIdx)
+					rvCovUW(iNext)     = this % rvCovUW(iIdx)
+					rvCovVW(iNext)     = this % rvCovVW(iIdx)
 
-					}
-					else {
+				else
 
-						// Somewhere in-between: linear interpolation
+					! Time is somewhere in-between: linear interpolation
 						this->ivTimeStamp.push_back(iTimeStamp);
 						float rFraction = (float)(iTimeStamp - ivTimeStamp[iIdx]) / (ivTimeStamp[iIdx + 1] - ivTimeStamp[iIdx]);
 						this->rvU.push_back(rvU[iIdx] + rFraction * (rvU[iIdx + 1] - rvU[iIdx]));
@@ -195,12 +194,14 @@ contains
 						this->rvStdDevV.push_back(rvStdDevV[iIdx] + rFraction * (rvStdDevV[iIdx + 1] - rvStdDevV[iIdx]));
 						this->rvCovUV.push_back(rvCovUV[iIdx] + rFraction * (rvCovUV[iIdx + 1] - rvCovUV[iIdx]));
 
-					}
+				end if
 
-				}
+			end if
 
-				iTimeStamp += this->iTimeStep;
+			iTimeStamp = iTimeStamp + iTimeStep
 				
+		end do
+		
 		! Leave
 		deallocate(rvCovVW)
 		deallocate(rvCovUW)
