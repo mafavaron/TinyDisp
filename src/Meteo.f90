@@ -74,7 +74,7 @@ contains
 			return
 		end if
 		rewind(iLUN)
-		print *, '1'
+		print *, '1', iNumData
 		read(iLUN, "(a)") sBuffer	! Skip header (now, the "normal way"
 		do iData = 1, iNumData
 			read(iLUN, "(a)") sBuffer
