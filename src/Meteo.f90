@@ -74,13 +74,32 @@
 				return
 			end if
 			rewind(iLUN)
+			if(allocated(this % ivTimeStamp)) deallocate(this % ivTimeStamp)
+			if(allocated(this % rvU))         deallocate(this % rvU)
+			if(allocated(this % rvV))         deallocate(this % rvV)
+			if(allocated(this % rvW))         deallocate(this % rvW)
+			if(allocated(this % rvStdDevU))   deallocate(this % rvStdDevU)
+			if(allocated(this % rvStdDevV))   deallocate(this % rvStdDevV)
+			if(allocated(this % rvStdDevW))   deallocate(this % rvStdDevW)
+			if(allocated(this % rvCovUV))     deallocate(this % rvCovUV)
+			if(allocated(this % rvCovUW))     deallocate(this % rvCovUW)
+			if(allocated(this % rvCovVW))     deallocate(this % rvCovVW)
+			allocate(this % ivTimeStamp(iNumData))
+			allocate(this % rvU(iNumData))
+			allocate(this % rvV(iNumData))
+			allocate(this % rvW(iNumData))
+			allocate(this % rvStdDevU(iNumData))
+			allocate(this % rvStdDevV(iNumData))
+			allocate(this % rvStdDevW(iNumData))
+			allocate(this % rvCovUV(iNumData))
+			allocate(this % rvCovUW(iNumData))
+			allocate(this % rvCovVW(iNumData))
 			read(iLUN, "(a)") sBuffer	! Skip header (now, the "normal way"
 			do iData = 1, iNumData
 				read(iLUN, "(a)") sBuffer
 				do i = 20, len_trim(sBuffer)
 					if(sBuffer(i:i) == ',') sBuffer(i:i) = ' '
 				end do
-				print *, trim(sBuffer)
 				read(sBuffer(1:19), "(i4,5(1x,i2))") iYear, iMonth, iDay, iHour, iMinute, iSecond
 				call PackTime(this % ivTimeStamp(iData), iYear, iMonth, iDay, iHour, iMinute, iSecond)
 				read(sBuffer(21:), *) &
@@ -95,7 +114,6 @@
 					this % rvCovVW(iData)
 			end do
 			close(iLUN)
-			print *, '2'
 			
 			! Check data are sorted with respect to time
 			lSorted = .TRUE.
@@ -108,7 +126,6 @@
 			if(.not.lSorted) then
 				iRetCode = 3
 			end if
-			print *, '3'
 			
 		end function met_read
 		
