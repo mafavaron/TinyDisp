@@ -158,7 +158,7 @@ contains
 		! Main loop: locate sampling time stamps, and linearly interpolate the original data
 		! at them
 		iNext = 1
-		do while iTimeStamp <= iLastTime
+		do while(iTimeStamp <= iLastTime)
 
 			if(iTimeStamp == ivTimeStamp(iIdx)) then
 
