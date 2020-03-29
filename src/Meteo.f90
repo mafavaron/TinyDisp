@@ -210,8 +210,52 @@ contains
 		end do
 		
 		! Check all was good
+		if(iNext /= iNumElements) then
+			iRetCode = 2
+			deallocate(rvCovVW)
+			deallocate(rvCovUW)
+			deallocate(rvCovUV)
+			deallocate(rvStdDevW)
+			deallocate(rvStdDevV)
+			deallocate(rvStdDevU)
+			deallocate(rvW)
+			deallocate(rvV)
+			deallocate(rvU)
+			deallocate(ivTimeStamp)
+			return
+		end if
 		
 		! Transfer results
+		deallocate(this % ivTimeStamp)
+		deallocate(this % rvU)
+		deallocate(this % rvV)
+		deallocate(this % rvW)
+		deallocate(this % rvStdDevU)
+		deallocate(this % rvStdDevV)
+		deallocate(this % rvStdDevW)
+		deallocate(this % rvCovUV)
+		deallocate(this % rvCovUW)
+		deallocate(this % rvCovVW)
+		allocate(this % ivTimeStamp(iNumElements))
+		allocate(this % rvU(iNumElements))
+		allocate(this % rvV(iNumElements))
+		allocate(this % rvW(iNumElements))
+		allocate(this % rvStdDevU(iNumElements))
+		allocate(this % rvStdDevV(iNumElements))
+		allocate(this % rvStdDevW(iNumElements))
+		allocate(this % rvCovUV(iNumElements))
+		allocate(this % rvCovUW(iNumElements))
+		allocate(this % rvCovVW(iNumElements))
+		this % ivTimeStamp = ivTimeStamp
+		this % rvU         = rvU
+		this % rvV         = rvV
+		this % rvW         = rvW
+		this % rvStdDevU   = rvStdDevU
+		this % rvStdDevV   = rvStdDevV
+		this % rvStdDevW   = rvStdDevW
+		this % rvCovUV     = rvCovUV
+		this % rvCovUW     = rvCovUW
+		this % rvCovVW     = rvCovVW
 		
 		! Leave
 		deallocate(rvCovVW)
