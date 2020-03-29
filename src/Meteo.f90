@@ -78,7 +78,7 @@ contains
 			read(iLUN, "(a)") sBuffer
 			read(sBuffer(1:19), "(i4,5()1x,i2)") iYear, iMonth, iDay, iHour, iMinute, iSecond
 			call PackTime(this % ivTimeStamp(iData), iYear, iMonth, iDay, iHour, iMinute, iSecond)
-			read(21:), *) &
+			read(sBuffer(21:), *) &
 				this % rvU(iData), &
 				this % rvV(iData), &
 				this % rvW(iData), &
