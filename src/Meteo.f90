@@ -119,6 +119,7 @@ contains
 		integer								:: iTimeStamp
 		integer								:: iLastTime
 		integer								:: iNumElements
+		real								:: rFraction
 		
 		! Assume success (will falsify on failure)
 		iRetCode = 0
@@ -186,21 +187,31 @@ contains
 				else
 
 					! Time is somewhere in-between: linear interpolation
-						this->ivTimeStamp.push_back(iTimeStamp);
-						float rFraction = (float)(iTimeStamp - ivTimeStamp[iIdx]) / (ivTimeStamp[iIdx + 1] - ivTimeStamp[iIdx]);
-						this->rvU.push_back(rvU[iIdx] + rFraction * (rvU[iIdx + 1] - rvU[iIdx]));
-						this->rvV.push_back(rvV[iIdx] + rFraction * (rvV[iIdx + 1] - rvV[iIdx]));
-						this->rvStdDevU.push_back(rvStdDevU[iIdx] + rFraction * (rvStdDevU[iIdx + 1] - rvStdDevU[iIdx]));
-						this->rvStdDevV.push_back(rvStdDevV[iIdx] + rFraction * (rvStdDevV[iIdx + 1] - rvStdDevV[iIdx]));
-						this->rvCovUV.push_back(rvCovUV[iIdx] + rFraction * (rvCovUV[iIdx + 1] - rvCovUV[iIdx]));
+					ivTimeStamp(iNext) = iTimeStamp
+					rFraction          = real(iTimeStamp - this % ivTimeStamp(iIdx)) / &
+										 real(this % ivTimeStamp(iIdx + 1) - this % ivTimeStamp(iIdx))
+					rvU(iNext)         = this % rvU(iIdx) + rFraction * (this % rvU(iIdx + 1) - this % rvU(iIdx))
+					rvV(iNext)         = this % rvV(iIdx) + rFraction * (this % rvV(iIdx + 1) - this % rvV(iIdx))
+					rvW(iNext)         = this % rvW(iIdx) + rFraction * (this % rvW(iIdx + 1) - this % rvW(iIdx))
+					rvStdDevU(iNext)   = this % rvStdDevU(iIdx) + rFraction * (this % rvStdDevU(iIdx + 1) - this % rvStdDevU(iIdx))
+					rvStdDevV(iNext)   = this % rvStdDevV(iIdx) + rFraction * (this % rvStdDevV(iIdx + 1) - this % rvStdDevV(iIdx))
+					rvStdDevW(iNext)   = this % rvStdDevW(iIdx) + rFraction * (this % rvStdDevW(iIdx + 1) - this % rvStdDevW(iIdx))
+					rvCovUV(iNext)     = this % rvCovUV(iIdx) + rFraction * (this % rvCovUV(iIdx + 1) - this % rvCovUV(iIdx))
+					rvCovUW(iNext)     = this % rvCovUW(iIdx) + rFraction * (this % rvCovUW(iIdx + 1) - this % rvCovUW(iIdx))
+					rvCovVW(iNext)     = this % rvCovVW(iIdx) + rFraction * (this % rvCovVW(iIdx + 1) - this % rvCovVW(iIdx))
 
 				end if
 
 			end if
 
+			iNext      = iNext + 1
 			iTimeStamp = iTimeStamp + iTimeStep
 				
 		end do
+		
+		! Check all was good
+		
+		! Transfer results
 		
 		! Leave
 		deallocate(rvCovVW)
