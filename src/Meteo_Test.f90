@@ -35,7 +35,6 @@ program Meteo_Test
 		print *, 'Test 1 not passed - Resampling meteo data - Return code = ', iRetCode
 		stop
 	end if
-	print *, '*** I''m here!'
 	open(10, file='.\\test1.out', status='unknown', action='write')
 	write(10, "('Time.Stamp, U, V, W, StdDev.U, StdDev.V, StdDev.W, Cov.UV, Cov.UW, Cov.VW')")
 	do i = 1, size(tMet % ivTimeStamp)
