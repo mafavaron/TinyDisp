@@ -1,3 +1,11 @@
+! Meteo - Fortran module for reading TinyDisp specific meteorological information, and
+! refining it by linear interpolation.
+!
+! Copyright 2020 by Servizi Territorio srl
+!                   This is open-source software, covered by the MIT license.
+!
+! Author: Patti M. Favaron
+!
 module Meteo
 
 	use calendar
@@ -40,6 +48,7 @@ contains
 		integer				:: iErrCode
 		integer				:: iNumData
 		integer				:: iData
+		integer				:: i
 		character(len=256)	:: sBuffer
 		integer				:: iYear, iMonth, iDay, iHour, iMinute, iSecond
 		logical				:: lSorted
@@ -65,18 +74,44 @@ contains
 			return
 		end if
 		rewind(iLUN)
+		if(allocated(this % ivTimeStamp)) deallocate(this % ivTimeStamp)
+		if(allocated(this % rvU))         deallocate(this % rvU)
+		if(allocated(this % rvV))         deallocate(this % rvV)
+		if(allocated(this % rvW))         deallocate(this % rvW)
+		if(allocated(this % rvStdDevU))   deallocate(this % rvStdDevU)
+		if(allocated(this % rvStdDevV))   deallocate(this % rvStdDevV)
+		if(allocated(this % rvStdDevW))   deallocate(this % rvStdDevW)
+		if(allocated(this % rvCovUV))     deallocate(this % rvCovUV)
+		if(allocated(this % rvCovUW))     deallocate(this % rvCovUW)
+		if(allocated(this % rvCovVW))     deallocate(this % rvCovVW)
+		allocate(this % ivTimeStamp(iNumData))
+		allocate(this % rvU(iNumData))
+		allocate(this % rvV(iNumData))
+		allocate(this % rvW(iNumData))
+		allocate(this % rvStdDevU(iNumData))
+		allocate(this % rvStdDevV(iNumData))
+		allocate(this % rvStdDevW(iNumData))
+		allocate(this % rvCovUV(iNumData))
+		allocate(this % rvCovUW(iNumData))
+		allocate(this % rvCovVW(iNumData))
 		read(iLUN, "(a)") sBuffer	! Skip header (now, the "normal way"
 		do iData = 1, iNumData
 			read(iLUN, "(a)") sBuffer
-			read(sBuffer(1:19), "(i4,5()1x,i2)") iYear, iMonth, iDay, iHour, iMinute, iSecond
+			do i = 20, len_trim(sBuffer)
+				if(sBuffer(i:i) == ',') sBuffer(i:i) = ' '
+			end do
+			read(sBuffer(1:19), "(i4,5(1x,i2))") iYear, iMonth, iDay, iHour, iMinute, iSecond
 			call PackTime(this % ivTimeStamp(iData), iYear, iMonth, iDay, iHour, iMinute, iSecond)
-			read(21:), *) &
+			read(sBuffer(21:), *) &
 				this % rvU(iData), &
 				this % rvV(iData), &
 				this % rvW(iData), &
 				this % rvStdDevU(iData), &
 				this % rvStdDevV(iData), &
 				this % rvStdDevW(iData), &
+				this % rvCovUV(iData), &
+				this % rvCovUW(iData), &
+				this % rvCovVW(iData)
 		end do
 		close(iLUN)
 		
@@ -98,7 +133,7 @@ contains
 	function met_resample(this, iTimeStep) result(iRetCode)
 
 		! Routine arguments
-		class(MeteoType), intent(out)	:: this
+		class(MeteoType), intent(inout)	:: this
 		integer, intent(in)				:: iTimeStep
 		integer							:: iRetCode
 		
@@ -128,7 +163,7 @@ contains
 		iIdx         = 1
 		iTimeStamp   = this % ivTimeStamp(iIdx)
 		iLastTime    = this % ivTimeStamp(size(this % ivTimeStamp))
-		iNumElements = (iLastTime - iTimeStamp) / iTimeStep
+		iNumElements = (iLastTime - iTimeStamp) / iTimeStep + 1
 		if(iNumElements <= 1) then
 			iRetCode = 1
 			return
@@ -147,7 +182,7 @@ contains
 		! Main loop: locate sampling time stamps, and linearly interpolate the original data
 		! at them
 		iNext = 1
-		do while iTimeStamp <= iLastTime
+		do while(iTimeStamp <= iLastTime)
 
 			if(iTimeStamp == ivTimeStamp(iIdx)) then
 
@@ -210,8 +245,52 @@ contains
 		end do
 		
 		! Check all was good
+		if(iNext /= iNumElements + 1) then
+			iRetCode = 2
+			deallocate(rvCovVW)
+			deallocate(rvCovUW)
+			deallocate(rvCovUV)
+			deallocate(rvStdDevW)
+			deallocate(rvStdDevV)
+			deallocate(rvStdDevU)
+			deallocate(rvW)
+			deallocate(rvV)
+			deallocate(rvU)
+			deallocate(ivTimeStamp)
+			return
+		end if
 		
 		! Transfer results
+		deallocate(this % ivTimeStamp)
+		deallocate(this % rvU)
+		deallocate(this % rvV)
+		deallocate(this % rvW)
+		deallocate(this % rvStdDevU)
+		deallocate(this % rvStdDevV)
+		deallocate(this % rvStdDevW)
+		deallocate(this % rvCovUV)
+		deallocate(this % rvCovUW)
+		deallocate(this % rvCovVW)
+		allocate(this % ivTimeStamp(iNumElements))
+		allocate(this % rvU(iNumElements))
+		allocate(this % rvV(iNumElements))
+		allocate(this % rvW(iNumElements))
+		allocate(this % rvStdDevU(iNumElements))
+		allocate(this % rvStdDevV(iNumElements))
+		allocate(this % rvStdDevW(iNumElements))
+		allocate(this % rvCovUV(iNumElements))
+		allocate(this % rvCovUW(iNumElements))
+		allocate(this % rvCovVW(iNumElements))
+		this % ivTimeStamp = ivTimeStamp
+		this % rvU         = rvU
+		this % rvV         = rvV
+		this % rvW         = rvW
+		this % rvStdDevU   = rvStdDevU
+		this % rvStdDevV   = rvStdDevV
+		this % rvStdDevW   = rvStdDevW
+		this % rvCovUV     = rvCovUV
+		this % rvCovUW     = rvCovUW
+		this % rvCovVW     = rvCovVW
 		
 		! Leave
 		deallocate(rvCovVW)
