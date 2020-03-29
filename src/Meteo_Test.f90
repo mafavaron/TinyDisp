@@ -5,7 +5,7 @@
 !
 ! Author: Patti M. Favaron
 !
-mprogram Meteo_Test
+program Meteo_Test
 
 	use Meteo
 	use Calendar
