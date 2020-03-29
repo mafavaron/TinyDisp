@@ -40,7 +40,7 @@ program Meteo_Test
 	write(10, "('Time.Stamp, U, V, W, StdDev.U, StdDev.V, StdDev.W, Cov.UV, Cov.UW, Cov.VW')")
 	do i = 1, size(tMet % ivTimeStamp)
 		call UnpackTime(tMet % ivTimeStamp(i), iYear, iMonth, iDay, iHour, iMinute, iSecond)
-		write(10, "(i4.4,2('-',i2.2),'T',i2.2,2(':',i2.2),9(',',f7.3)") &
+		write(10, "(i4.4,2('-',i2.2),'T',i2.2,2(':',i2.2),9(',',f7.3))") &
 			iYear, iMonth, iDay, iHour, iMinute, iSecond, &
 			tMet % rvU(i), &
 			tMet % rvV(i), &
