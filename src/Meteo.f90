@@ -85,6 +85,9 @@ contains
 				this % rvStdDevU(iData), &
 				this % rvStdDevV(iData), &
 				this % rvStdDevW(iData), &
+				this % rvCovUV(iData), &
+				this % rvCovUW(iData), &
+				this % rvCovVW(iData)
 		end do
 		close(iLUN)
 		
