@@ -163,8 +163,7 @@ contains
 		iIdx         = 1
 		iTimeStamp   = this % ivTimeStamp(iIdx)
 		iLastTime    = this % ivTimeStamp(size(this % ivTimeStamp))
-		print *, iTimeStamp, iLastTime
-		iNumElements = (iLastTime - iTimeStamp) / iTimeStep
+		iNumElements = (iLastTime - iTimeStamp) / iTimeStep + 1
 		if(iNumElements <= 1) then
 			iRetCode = 1
 			return
@@ -246,7 +245,7 @@ contains
 		end do
 		
 		! Check all was good
-		if(iNext /= iNumElements) then
+		if(iNext /= iNumElements + 1) then
 			print *, iNext, iNumElements
 			iRetCode = 2
 			deallocate(rvCovVW)
