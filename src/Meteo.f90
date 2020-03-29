@@ -246,7 +246,6 @@ contains
 		
 		! Check all was good
 		if(iNext /= iNumElements + 1) then
-			print *, iNext, iNumElements
 			iRetCode = 2
 			deallocate(rvCovVW)
 			deallocate(rvCovUW)
