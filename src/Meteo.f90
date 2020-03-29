@@ -76,7 +76,7 @@ contains
 		read(iLUN, "(a)") sBuffer	! Skip header (now, the "normal way"
 		do iData = 1, iNumData
 			read(iLUN, "(a)") sBuffer
-			read(sBuffer(1:19), "(i4,5()1x,i2)") iYear, iMonth, iDay, iHour, iMinute, iSecond
+			read(sBuffer(1:19), "(i4,5(1x,i2))") iYear, iMonth, iDay, iHour, iMinute, iSecond
 			call PackTime(this % ivTimeStamp(iData), iYear, iMonth, iDay, iHour, iMinute, iSecond)
 			read(sBuffer(21:), *) &
 				this % rvU(iData), &
