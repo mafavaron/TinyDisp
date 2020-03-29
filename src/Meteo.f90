@@ -48,6 +48,7 @@ contains
 		integer				:: iErrCode
 		integer				:: iNumData
 		integer				:: iData
+		integer				:: i
 		character(len=256)	:: sBuffer
 		integer				:: iYear, iMonth, iDay, iHour, iMinute, iSecond
 		logical				:: lSorted
@@ -73,9 +74,13 @@ contains
 			return
 		end if
 		rewind(iLUN)
+		print *, '1'
 		read(iLUN, "(a)") sBuffer	! Skip header (now, the "normal way"
 		do iData = 1, iNumData
 			read(iLUN, "(a)") sBuffer
+			do i = 20, len_trim(sBuffer)
+				if(sBuffer(i:i) == ',') sBuffer(i:i) = ' '
+			end do
 			read(sBuffer(1:19), "(i4,5(1x,i2))") iYear, iMonth, iDay, iHour, iMinute, iSecond
 			call PackTime(this % ivTimeStamp(iData), iYear, iMonth, iDay, iHour, iMinute, iSecond)
 			read(sBuffer(21:), *) &
@@ -90,6 +95,7 @@ contains
 				this % rvCovVW(iData)
 		end do
 		close(iLUN)
+		print *, '2'
 		
 		! Check data are sorted with respect to time
 		lSorted = .TRUE.
@@ -102,6 +108,7 @@ contains
 		if(.not.lSorted) then
 			iRetCode = 3
 		end if
+		print *, '3'
 		
 	end function met_read
 	
