@@ -128,8 +128,8 @@ contains
 
 		! Compute the coefficients of the Cholesky decomposition of covariances matrix
 		rL11 = SQRT(rUU)
-		rL12 = rUV/L11
-		rL13 = rUW/L11
+		rL12 = rUV/rL11
+		rL13 = rUW/rL11
 		rL22 = SQRT(-(rUV**2/rUU) + rVV)
 		rL23 = (-rUV*rUW + rUU*rVW) / SQRT(rUU*(-rUV**2 + rUU*rVV))
 		rL33 = SQRT(-(rUW**2/rUU) - (-rUV*rUW + rUU*rVW) * (-rUV*rUW + rUU*rVW) / (rUU**2*(-(rUV**2/rUU) + rVV)) + rWW)
