@@ -1,4 +1,4 @@
-! Test driver for module "NormalDeviates.f90".
+! Main program of TinyDisp
 !
 ! Copyright 2020 by Servizi Territorio srl
 !                   This is open-source software, covered by the MIT license.
