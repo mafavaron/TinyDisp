@@ -155,9 +155,9 @@ contains
 			deallocate(rvNormX, rvNormY, rvNormZ)
 			return
 		end if
-		rvNormU = L11*rvNormX + L12*rvNormY + L13*rvNormZ + rU
-		rvNormV =               L22*rvNormY + L23*rvNormZ + rV
-		rvNormW =                             L33*rvNormZ + rW
+		rvNormU = rL11*rvNormX + rL12*rvNormY + rL13*rvNormZ + rU
+		rvNormV =                rL22*rvNormY + rL23*rvNormZ + rV
+		rvNormW =                               rL33*rvNormZ + rW
 		
 		! Leave
 		deallocate(rvNormX, rvNormY, rvNormZ)
