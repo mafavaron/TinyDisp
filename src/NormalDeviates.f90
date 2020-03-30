@@ -14,6 +14,7 @@ module NormalDeviates
 	
 	! Public interface
 	public	:: Norm
+	public	:: MultiNorm
 
 contains
 
@@ -95,30 +96,72 @@ contains
 		integer							:: iRetCode
 		
 		! Locals
+		integer							:: n
+		integer							:: iErrCode
+		real							:: rL11
+		real							:: rL12
+		real							:: rL13
+		real							:: rL22
+		real							:: rL23
+		real							:: rL33
+		real, dimension(:), allocatable	:: rvNormX
+		real, dimension(:), allocatable	:: rvNormY
+		real, dimension(:), allocatable	:: rvNormZ
 		
+		! Assume success (will falsify on failure)
+		iRetCode = 0
+		
+		! Check input parameters
+		if(rUU < 0. .or. rVV < 0. .or. rWW < 0.) then
+			iRetCode = 1
+			return
+		end if
+		n = size(rvNormU)
+		if(n <= 0) then
+			iRetCode = 2
+			return
+		end if
+		if(size(rvNormV) /= n .or. size(rvNormW) /= n) then
+			iRetCode = 2
+			return
+		end if
 
 		! Compute the coefficients of the Cholesky decomposition of covariances matrix
-		L11 = SQRT(rUU)
-		L12 = rUV/L11
-		L13 = rUW/L11
-		L22 = SQRT(-(rUV**2/rUU) + rVV)
-		L23 = (-rUV*rUW + rUU*rVW) / &
-				SQRT(rUU*(-rUV**2 + rUU*rVV))
-		L33 = SQRT(-(rUW**2/rUU) - &
-				(-rUV*rUW + rUU*rVW) * &
-				(-rUV*rUW + rUU*rVW) / &
-				(rUU**2*(-(rUV**2/rUU) + rVV)) + rWW)
+		rL11 = SQRT(rUU)
+		rL12 = rUV/L11
+		rL13 = rUW/L11
+		rL22 = SQRT(-(rUV**2/rUU) + rVV)
+		rL23 = (-rUV*rUW + rUU*rVW) / SQRT(rUU*(-rUV**2 + rUU*rVV))
+		rL33 = SQRT(-(rUW**2/rUU) - (-rUV*rUW + rUU*rVW) * (-rUV*rUW + rUU*rVW) / (rUU**2*(-(rUV**2/rUU) + rVV)) + rWW)
+
+		! Generate three random values distributed according to the multivariate
+		! normal distribution with same covariance matrix as computed
+		allocate(rvNormX(n), rvNormY(n), rvNormZ(n))
+		iErrCode = Norm(rvNormX)
+		if(iErrCode /= 0) then
+			iRetCode = 3
+			deallocate(rvNormX, rvNormY, rvNormZ)
+			return
+		end if
+		iErrCode = Norm(rvNormY)
+		if(iErrCode /= 0) then
+			iRetCode = 3
+			deallocate(rvNormX, rvNormY, rvNormZ)
+			return
+		end if
+		iErrCode = Norm(rvNormZ)
+		if(iErrCode /= 0) then
+			iRetCode = 3
+			deallocate(rvNormX, rvNormY, rvNormZ)
+			return
+		end if
+		rvNormU = L11*rvNormX + L12*rvNormY + L13*rvNormZ + rU
+		rvNormV =               L22*rvNormY + L23*rvNormZ + rV
+		rvNormW =                             L33*rvNormZ + rW
 		
-		! Update particles positions
-		DO i = 1, iNumPart
+		! Leave
+		deallocate(rvNormX, rvNormY, rvNormZ)
 		
-			! Generate three random values distributed according to the multivariate
-			! normal distribution with same covariance matrix as computed
-			rRandX = random_Normal()
-			rRandY = random_Normal()
-			rRandZ = random_Normal()
-			rRandU = L11*rRandX + L12*rRandY + L13*rRandZ
-			rRandV =              L22*rRandY + L23*rRandZ
-			rRandW =                           L33*rRandZ
+	end function MultiNorm
 
 end module NormalDeviates
