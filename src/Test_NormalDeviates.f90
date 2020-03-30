@@ -35,4 +35,12 @@ program Test_NormalDeviates
 	end do
 	close(10)
 
+	! Generate a multivariate sample
+	iRetCode = MultiNorm(rU, rV, rW, rUU, rVV, rWW, rUV, rUW, rVW, rvNormU, rvNormV, rvNormW)
+	open(10, file='Norm_Mul.csv', status='unknown', action='write')
+	do i = 1, size(rvNormU)
+		write(10, "(e15.7,2(',',e15.7))") rvNormU(i), rvNormV(i), rvNormW(i)
+	end do
+	close(10)
+
 end program Test_NormalDeviates
