@@ -184,8 +184,6 @@ contains
 		iNext = 1
 		do while(iTimeStamp <= iLastTime)
 		
-			print *, iTimeStamp, iLastTime, iNext, iIdx
-
 			if(iTimeStamp == ivTimeStamp(iIdx)) then
 
 				! Exact time match: retrieve actual values
