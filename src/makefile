@@ -1,3 +1,6 @@
+Test_NormalDeviates.exe : Test_NormalDeviates.obj NormalDeviates.obj
+	opgfortran -o Test_NormalDeviates.exe Test_NormalDeviates.obj NormalDeviates.obj
+
 Meteo_Test.exe : Meteo_Test.obj Meteo.obj Calendar.obj
 	opgfortran -o Meteo_Test.exe Meteo_Test.obj Meteo.obj Calendar.obj
 
