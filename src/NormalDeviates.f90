@@ -18,17 +18,27 @@ module NormalDeviates
 contains
 
 	function random_normal() result(rNorm)
+	
+		! Routine arguments
+		real	:: rNorm
 
 		! Locals
-	REAL     :: s = 0.449871, t = -0.386595, a = 0.19600, b = 0.25472,           &
-				r1 = 0.27597, r2 = 0.27846, u, v, x, y, q
+		real	:: u, v, x, y, q
+		
+		! Constants
+		real, parameter	:: s  =  0.449871
+		real, parameter	:: t  = -0.386595
+		real, parameter	:: a  =  0.19600
+		real, parameter	:: b  =  0.25472
+		real, parameter	:: r1 =  0.27597
+		real, parameter	:: r2 =  0.27846
 
 	!     Generate P = (u,v) uniform in rectangle enclosing acceptance region
 
 	DO
 	  CALL RANDOM_NUMBER(u)
 	  CALL RANDOM_NUMBER(v)
-	  v = 1.7156 * (v - half)
+	  v = 1.7156 * (v - 0.5)
 
 	!     Evaluate the quadratic form
 	  x = u - s
