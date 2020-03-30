@@ -17,10 +17,12 @@ module NormalDeviates
 
 contains
 
-	function random_normal() result(rNorm)
+	! Credit: this routine has been obtained by refactoring of function "random_normal"
+	! by Alan Miller (CSIRO Division of Mathematics & Statistics), module 'random.f90'
+	elemental function rNorm() result(rNormValue)
 	
 		! Routine arguments
-		real	:: rNorm
+		real	:: rNormValue
 
 		! Locals
 		real	:: u, v, x, y, q
@@ -33,30 +35,30 @@ contains
 		real, parameter	:: r1 =  0.27597
 		real, parameter	:: r2 =  0.27846
 
-	!     Generate P = (u,v) uniform in rectangle enclosing acceptance region
+		! Main loop: generate P = (u,v) uniform in rectangle enclosing
+		! acceptance region, and iterate until point is really within
+		! the acceptance region
+		do
+		
+			! Get uniform deviates using the compiler's generator
+			call RANDOM_NUMBER(u)
+			call RANDOM_NUMBER(v)
+			v = 1.7156 * (v - 0.5)
 
-	DO
-	  CALL RANDOM_NUMBER(u)
-	  CALL RANDOM_NUMBER(v)
-	  v = 1.7156 * (v - 0.5)
+			! Evaluate the quadratic form
+			x = u - s
+			y = ABS(v) - t
+			q = x**2 + y*(a*y - b*x)
 
-	!     Evaluate the quadratic form
-	  x = u - s
-	  y = ABS(v) - t
-	  q = x**2 + y*(a*y - b*x)
+			! Accept/reject
+			if(q < r1) exit
+			if(q > r2) cycle
+			if(v**2 < -4.0*LOG(u)*u**2) exit
+		end do
 
-	!     Accept P if inside inner ellipse
-	  IF (q < r1) EXIT
-	!     Reject P if outside outer ellipse
-	  IF (q > r2) CYCLE
-	!     Reject P if outside acceptance region
-	  IF (v**2 < -4.0*LOG(u)*u**2) EXIT
-	END DO
+		! Return ratio of P's coordinates as the normal deviate
+		rNormValue = v/u
 
-	!     Return ratio of P's coordinates as the normal deviate
-	random_normal = v/u
-	RETURN
-
-	end function random_normal
+	end function rNorm
 
 end module NormalDeviates
