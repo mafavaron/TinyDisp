@@ -183,7 +183,7 @@ contains
 		! at them
 		iNext = 1
 		do while(iTimeStamp <= iLastTime)
-
+		
 			if(iTimeStamp == ivTimeStamp(iIdx)) then
 
 				! Exact time match: retrieve actual values
@@ -201,7 +201,7 @@ contains
 			else
 
 				! Locate the first useful 'iIdx' value so that ivTimeStamp(iIdx) <= iTimeStamp < ivTimeStamp(iIdx+1)
-				do while (iTimeStamp < iLastTime .and. iTimeStamp >= ivTimeStamp(iIdx + 1))
+				do while (iTimeStamp < iLastTime .and. iTimeStamp >= this % ivTimeStamp(iIdx + 1))
 					iIdx = iIdx + 1
 				end do
 
