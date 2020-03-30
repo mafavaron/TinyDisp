@@ -183,6 +183,8 @@ contains
 		! at them
 		iNext = 1
 		do while(iTimeStamp <= iLastTime)
+		
+			print *, iTimeStamp, iLastTime, iNext, iIdx
 
 			if(iTimeStamp == ivTimeStamp(iIdx)) then
 
