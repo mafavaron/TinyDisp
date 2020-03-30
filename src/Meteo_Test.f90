@@ -101,27 +101,10 @@ program Meteo_Test
 		stop
 	end if
 	iRetCode = tMet % resample(3601)
-	if(iRetCode /= 0) then
-		print *, 'Test 3 not passed - Resampling meteo data - Return code = ', iRetCode
+	if(iRetCode == 0) then
+		print *, 'Test 3 not passed - Resampling meteo data - Success reported (failure expected)'
 		stop
 	end if
-	open(10, file='.\\test3.out', status='unknown', action='write')
-	write(10, "('Time.Stamp, U, V, W, StdDev.U, StdDev.V, StdDev.W, Cov.UV, Cov.UW, Cov.VW')")
-	do i = 1, size(tMet % ivTimeStamp)
-		call UnpackTime(tMet % ivTimeStamp(i), iYear, iMonth, iDay, iHour, iMinute, iSecond)
-		write(10, "(i4.4,2('-',i2.2),'T',i2.2,2(':',i2.2),9(',',f7.3))") &
-			iYear, iMonth, iDay, iHour, iMinute, iSecond, &
-			tMet % rvU(i), &
-			tMet % rvV(i), &
-			tMet % rvW(i), &
-			tMet % rvStdDevU(i), &
-			tMet % rvStdDevV(i), &
-			tMet % rvStdDevW(i), &
-			tMet % rvCovUV(i), &
-			tMet % rvCovUW(i), &
-			tMet % rvCovVW(i)
-	end do
-	close(10)
 	
 end program Meteo_Test
 
