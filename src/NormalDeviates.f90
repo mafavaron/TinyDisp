@@ -13,7 +13,7 @@ module NormalDeviates
 	private
 	
 	! Public interface
-	public	:: random_normal
+	public	:: rNorm
 
 contains
 
