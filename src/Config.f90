@@ -20,6 +20,7 @@ module Config
 	type ConfigType
 		! General
 		logical				:: lValid
+		logical				:: lDebug
 		! Domain
 		real				:: rEdgeLength
 		! Particles
@@ -68,6 +69,7 @@ contains
 		
 		! Locals
 		type(IniFile)	:: tIni
+		integer			:: iErrCode
 		
 		! Assume success (will falsify on failure)
 		iRetCode = 0
@@ -76,6 +78,22 @@ contains
 		iErrCode = tIni % read(iLUN, sFileName)
 		if(iErrCode /= 0) then
 			iRetCode = 1
+			return
+		end if
+		
+		! Domain
+		iErrCode = tIni % getReal4("Domain", "EdgeLength", this % rEdgeLength, 1000.)
+		if(iErrCode /= 0) then
+			iRetCode = 2
+			return
+		end if
+		if(this % rEdgeLength <= 0.) then
+			iRetCode = 2
+			return
+		end if
+		iErrCode = tIni % getReal4("Particles", "EdgeLength", this % rEdgeLength, 1000.)
+		if(iErrCode /= 0) then
+			iRetCode = 2
 			return
 		end if
 		
