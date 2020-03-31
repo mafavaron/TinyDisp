@@ -35,6 +35,22 @@ module Config
 		procedure			:: get
 	end type ConfigType
 	
+	type IniFile
+		logical, private										:: lIsUseable
+		integer, private										:: iNumKeys
+		character(len=256), dimension(:), allocatable, private	:: svLine
+		character(len=256), dimension(:), allocatable, private	:: svKey
+		character(len=256), dimension(:), allocatable, private	:: svValue
+	contains
+		! Constructor
+		procedure, public	:: read       => iniRead
+		procedure, public	:: dump       => iniDump
+		procedure, public	:: getString  => iniGetString
+		procedure, public	:: getReal4   => iniGetReal4
+		procedure, public	:: getReal8   => iniGetReal8
+		procedure, public	:: getInteger => iniGetInteger
+	end type IniFile
+
 contains
 
 	function get(this, iLUN, sFileName) result(iRetCode)
