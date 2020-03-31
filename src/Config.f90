@@ -19,18 +19,23 @@ module Config
 	
 	type ConfigType
 		! General
-		logical				:: lTwoDimensionalRun
+		logical				:: lValid
 		! Domain
 		real				:: rEdgeLength
 		! Particles
 		integer				:: iNumPartsEmittedPerStep
 		integer				:: iTimeStep
+		! Particles dump
+		character(len=256)	:: sParticlesFile
+		logical				:: lTwoDimensional
 		! Counting grid
+		logical				:: lEnableCounting
 		integer				:: iNumCells
 		real				:: rXmin
 		real				:: rYmin
 		real				:: rXmax
 		real				:: rYmax
+		character(len=256)	:: sCountingFile
 	contains
 		procedure			:: get
 	end type ConfigType
@@ -62,9 +67,17 @@ contains
 		integer							:: iRetCode
 		
 		! Locals
+		type(IniFile)	:: tIni
 		
 		! Assume success (will falsify on failure)
 		iRetCode = 0
+		
+		! Access configuration file
+		iErrCode = tIni % read(iLUN, sFileName)
+		if(iErrCode /= 0) then
+			iRetCode = 1
+			return
+		end if
 		
 	end function get
 	
