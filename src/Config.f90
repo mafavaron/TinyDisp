@@ -26,10 +26,10 @@ module Config
 		! Particles
 		integer				:: iNumPartsEmittedPerStep
 		integer				:: iTimeStep
-		! Particles dump
+		! Dump
 		character(len=256)	:: sParticlesFile
 		logical				:: lTwoDimensional
-		! Counting grid
+		! Grid
 		logical				:: lEnableCounting
 		integer				:: iNumCells
 		real				:: rXmin
