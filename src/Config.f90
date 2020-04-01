@@ -98,6 +98,19 @@ contains
 			iRetCode = 3
 			return
 		end if
+		if(this % iNumPartsEmittedPerStep <= 0) then
+			iRetCode = 3
+			return
+		end if
+		iErrCode = tIni % getInteger("Particles", "TimeStep", this % iTimeStep, 0)
+		if(iErrCode /= 0) then
+			iRetCode = 4
+			return
+		end if
+		if(this % iTimeStep <= 0) then
+			iRetCode = 4
+			return
+		end if
 		
 	end function get
 	
