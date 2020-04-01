@@ -20,7 +20,7 @@ module Config
 	type ConfigType
 		! General
 		logical				:: lValid
-		logical				:: lDebug
+		integer				:: iDebugLevel
 		! Domain
 		real				:: rEdgeLength
 		! Particles
@@ -81,34 +81,45 @@ contains
 			return
 		end if
 		
-		! Domain
-		iErrCode = tIni % getReal4("Domain", "EdgeLength", this % rEdgeLength, 0.)
+		! General
+		iErrCode = tIni % getInteger("Particles", "NumPartsEmittedPerStep", this % iDebugLevel, 0)
 		if(iErrCode /= 0) then
 			iRetCode = 2
 			return
 		end if
-		if(this % rEdgeLength <= 0.) then
+		if(this % iDebugLevel < 0) then
 			iRetCode = 2
+			return
+		end if
+		
+		! Domain
+		iErrCode = tIni % getReal4("Domain", "EdgeLength", this % rEdgeLength, 0.)
+		if(iErrCode /= 0) then
+			iRetCode = 3
+			return
+		end if
+		if(this % rEdgeLength <= 0.) then
+			iRetCode = 3
 			return
 		end if
 		
 		! Particles
 		iErrCode = tIni % getInteger("Particles", "NumPartsEmittedPerStep", this % iNumPartsEmittedPerStep, 0)
 		if(iErrCode /= 0) then
-			iRetCode = 3
+			iRetCode = 4
 			return
 		end if
 		if(this % iNumPartsEmittedPerStep <= 0) then
-			iRetCode = 3
+			iRetCode = 4
 			return
 		end if
 		iErrCode = tIni % getInteger("Particles", "TimeStep", this % iTimeStep, 0)
 		if(iErrCode /= 0) then
-			iRetCode = 4
+			iRetCode = 5
 			return
 		end if
 		if(this % iTimeStep <= 0) then
-			iRetCode = 4
+			iRetCode = 5
 			return
 		end if
 		
