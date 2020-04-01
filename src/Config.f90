@@ -82,7 +82,7 @@ contains
 		end if
 		
 		! Domain
-		iErrCode = tIni % getReal4("Domain", "EdgeLength", this % rEdgeLength, 1000.)
+		iErrCode = tIni % getReal4("Domain", "EdgeLength", this % rEdgeLength, 0.)
 		if(iErrCode /= 0) then
 			iRetCode = 2
 			return
@@ -91,9 +91,11 @@ contains
 			iRetCode = 2
 			return
 		end if
-		iErrCode = tIni % getReal4("Particles", "EdgeLength", this % rEdgeLength, 1000.)
+		
+		! Particles
+		iErrCode = tIni % getInteger("Particles", "NumPartsEmittedPerStep", this % iNumPartsEmittedPerStep, 0)
 		if(iErrCode /= 0) then
-			iRetCode = 2
+			iRetCode = 3
 			return
 		end if
 		
