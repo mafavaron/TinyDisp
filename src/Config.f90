@@ -70,6 +70,7 @@ contains
         ! Locals
         type(IniFile)       :: tIni
         integer             :: iErrCode
+        integer             :: iDimensions
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -122,6 +123,23 @@ contains
             iRetCode = 5
             return
         end if
+        
+        ! Dump
+        iErrCode = tIni % getString("Dump", "ParticlesFile", this % sParticlesFile, "")
+        if(iErrCode /= 0) then
+            iRetCode = 6
+            return
+        end if
+        iErrCode = tIni % getInteger("Dump", "Dimensions", iDimensions, 0)
+        if(iErrCode /= 0) then
+            iRetCode = 7
+            return
+        end if
+        if(iDimensions /= 2 .and. iDimensions /= 3) then
+            iRetCode = 7
+            return
+        end if
+        this % lTwoDimensional = iDimensions == 2
         
     end function get
     
