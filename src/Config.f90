@@ -141,6 +141,22 @@ contains
         end if
         this % lTwoDimensional = iDimensions == 2
         
+        ! Grid
+        iErrCode = tIni % getString("Grid", "CountingFile", this % sCountingFile, "")
+        if(iErrCode /= 0) then
+            iRetCode = 8
+            return
+        end if
+        iErrCode = tIni % getInteger("Grid", "NumCells", this % iNumCells, 0)
+        if(iErrCode /= 0) then
+            iRetCode = 9
+            return
+        end if
+        if(this % iNumCells <= 0) then
+            iRetCode = 9
+            return
+        end if
+        
     end function get
     
 
