@@ -36,6 +36,7 @@ module Config
         real                    :: rYmin
         real                    :: rXmax
         real                    :: rYmax
+        real                    :: rDxy
         character(len=256)      :: sCountingFile
     contains
         procedure               :: get
@@ -155,6 +156,22 @@ contains
         if(this % iNumCells <= 0) then
             iRetCode = 9
             return
+        end if
+        this % lEnableCounting = this % sCountingFile /= " "
+        
+        ! Compute derived quantities
+        if(this % lEnableCounting) then
+            this % rDxy  =  this % rEdgeLength / this % iNumCells
+            this % rXmin = -this % rEdgeLength / 2.
+            this % rXmax = -this % rXmin
+            this % rYmin =  this % rXmin
+            this % rYmax =  this % rXmax
+        else
+            this % rDxy  = 0.
+            this % rXmin = 0.
+            this % rXmax = 0.
+            this % rYmin = 0.
+            this % rYmax = 0.
         end if
         
     end function get
