@@ -26,6 +26,8 @@ module Config
         ! Particles
         integer                 :: iNumPartsEmittedPerStep
         integer                 :: iTimeStep
+        integer                 :: iSurvivalTime            ! Proper multiple of iTimeStep
+        integer                 :: iMaxPart
         ! Dump
         character(len=256)      :: sParticlesFile
         logical                 :: lTwoDimensional
@@ -124,20 +126,29 @@ contains
             iRetCode = 5
             return
         end if
-        
-        ! Dump
-        iErrCode = tIni % getString("Dump", "ParticlesFile", this % sParticlesFile, "")
+        iErrCode = tIni % getInteger("Particles", "SurvivalTime", this % iSurvivalTime, 0)
         if(iErrCode /= 0) then
             iRetCode = 6
             return
         end if
-        iErrCode = tIni % getInteger("Dump", "Dimensions", iDimensions, 0)
+        if(mod(this % iSurvivalTime, this % iTimeStep) /= 0) then
+            iRetCode = 6
+            return
+        end if
+        
+        ! Dump
+        iErrCode = tIni % getString("Dump", "ParticlesFile", this % sParticlesFile, "")
         if(iErrCode /= 0) then
             iRetCode = 7
             return
         end if
+        iErrCode = tIni % getInteger("Dump", "Dimensions", iDimensions, 0)
+        if(iErrCode /= 0) then
+            iRetCode = 8
+            return
+        end if
         if(iDimensions /= 2 .and. iDimensions /= 3) then
-            iRetCode = 7
+            iRetCode = 8
             return
         end if
         this % lTwoDimensional = iDimensions == 2
@@ -145,21 +156,22 @@ contains
         ! Grid
         iErrCode = tIni % getString("Grid", "CountingFile", this % sCountingFile, "")
         if(iErrCode /= 0) then
-            iRetCode = 8
+            iRetCode = 9
             return
         end if
         iErrCode = tIni % getInteger("Grid", "NumCells", this % iNumCells, 0)
         if(iErrCode /= 0) then
-            iRetCode = 9
+            iRetCode = 10
             return
         end if
         if(this % iNumCells <= 0) then
-            iRetCode = 9
+            iRetCode = 10
             return
         end if
         this % lEnableCounting = this % sCountingFile /= " "
         
         ! Compute derived quantities
+        this % iMaxPart = this % iNumPartsEmittedPerStep * this % iSurvivalTime / this % iTimeStep
         if(this % lEnableCounting) then
             this % rDxy  =  this % rEdgeLength / this % iNumCells
             this % rXmin = -this % rEdgeLength / 2.
