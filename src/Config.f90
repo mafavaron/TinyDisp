@@ -1,4 +1,4 @@
-    ! NormalDeviates - Fortran module for generating univariate and three-variate
+! NormalDeviates - Fortran module for generating univariate and three-variate
 !                  random deviates.
 !
 ! Copyright 2020 by Servizi Territorio srl
