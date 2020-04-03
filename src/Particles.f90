@@ -26,6 +26,26 @@ module Particles
         real, dimension(:), allocatable     :: rvV
         real, dimension(:), allocatable     :: rvW
         integer, dimension(:), allocatable  :: ivTimeStampAtBirth
+    contains
+        procedure   :: Emit
     end type ParticlesPoolType
+    
+contains
+
+    function Emit(this, iNumNewParts, rU, rV) result(iRetCode)
+    
+        ! Routine arguments
+        class(ParticlesPoolType), intent(inout) :: this
+        integer, intent(in)                     :: iNumNewParts
+        real, intent(in)                        :: rU
+        real, intent(in)                        :: rV
+        integer                                 :: iRetCode
+        
+        ! Locals
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
+    
+    end function Emit
 
 end module Particles
