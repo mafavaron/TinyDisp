@@ -1,5 +1,4 @@
-! NormalDeviates - Fortran module for generating univariate and three-variate
-!                  random deviates.
+! Config - Fortran module for retrieving and distributing configuration data.
 !
 ! Copyright 2020 by Servizi Territorio srl
 !                   This is open-source software, covered by the MIT license.
