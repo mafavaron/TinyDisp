@@ -45,6 +45,19 @@ contains
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
+        
+        ! Check parameters
+        if(.not.allocated(this % ivTimeStampAtBirth)) then
+            iRetCode = 1
+            return
+        end if
+        if(iNumNewParts <= 0) then
+            iRetCode = 2
+            return
+        end if
+        
+        ! Emit new particles
+        
     
     end function Emit
 
