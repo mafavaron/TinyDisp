@@ -7,4 +7,25 @@
 !
 module Particles
 
+    use NormalDeviates
+    
+    implicit none
+    
+    private
+    
+    ! Public interface
+    public  :: ParticlesPoolType
+    
+    ! Data types
+    type ParticlesPoolType
+        integer                             :: iNextPart
+        real, dimension(:), allocatable     :: rvX
+        real, dimension(:), allocatable     :: rvY
+        real, dimension(:), allocatable     :: rvZ
+        real, dimension(:), allocatable     :: rvU
+        real, dimension(:), allocatable     :: rvV
+        real, dimension(:), allocatable     :: rvW
+        integer, dimension(:), allocatable  :: ivTimeStampAtBirth
+    end type ParticlesPoolType
+
 end module Particles
