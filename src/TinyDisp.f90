@@ -66,6 +66,35 @@ program TinyDisp
 	
 	! Main loop: iterate over all time steps, and simulate transport and diffusion
     do iMeteo = 1, size(tMeteo % ivTimeStamp)
+    
+        ! Release new particles
+        iRetCode = tPart % Emit( &
+            tCfg % iNumPartsEmittedPerStep, &
+            tMeteo % ivTimeStamp(iMeteo), &
+            tMeteo % rvU(iMeteo), &
+            tMeteo % rvV(iMeteo), &
+            tMeteo % rvW(iMeteo)  &
+        )
+        if(iRetCode /= 0) then
+            print *, "TinyDisp:: Error: Particles not emitted - Return code = ", iRetCode
+            stop
+        end if
+        
+        ! Move particles
+        iRetCode = tPart % Move( &
+            tMeteo % rvU(iMeteo), &
+            tMeteo % rvV(iMeteo), &
+            tMeteo % rvW(iMeteo), &
+            tMeteo % rvStdDevU(iMeteo)**2, &
+            tMeteo % rvStdDevV(iMeteo)**2, &
+            tMeteo % rvStdDevW(iMeteo)**2, &
+            tMeteo % rvCovUV(iMeteo), &
+            tMeteo % rvCovUW(iMeteo), &
+            tMeteo % rvCovVW(iMeteo), &
+            float(tCfg % iTimeStep), &
+            tCfg % rInertia &
+        )
+        
     end do
 
     !$omp parallel private(thread_id)

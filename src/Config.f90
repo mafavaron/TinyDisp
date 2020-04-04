@@ -27,6 +27,7 @@ module Config
         ! Particles
         integer                 :: iNumPartsEmittedPerStep
         integer                 :: iTimeStep
+        real                    :: rInertia                 ! In [0,1]; 0: previous speed not considered; 1: previous speed considered
         integer                 :: iSurvivalTime            ! Proper multiple of iTimeStep
         integer                 :: iMaxPart
         ! Dump
@@ -128,29 +129,38 @@ contains
             iRetCode = 5
             return
         end if
-        iErrCode = tIni % getInteger("Particles", "SurvivalTime", this % iSurvivalTime, 0)
+        iErrCode = tIni % getReal4("Particles", "inertia", this % rInertia, 0.)
         if(iErrCode /= 0) then
             iRetCode = 6
             return
         end if
-        if(mod(this % iSurvivalTime, this % iTimeStep) /= 0) then
+        if(this % rInertia < 0. .or. this % rInertia > 1.) then
             iRetCode = 6
+            return
+        end if
+        iErrCode = tIni % getInteger("Particles", "SurvivalTime", this % iSurvivalTime, 0)
+        if(iErrCode /= 0) then
+            iRetCode = 7
+            return
+        end if
+        if(mod(this % iSurvivalTime, this % iTimeStep) /= 0) then
+            iRetCode = 7
             return
         end if
         
         ! Dump
         iErrCode = tIni % getString("Dump", "ParticlesFile", this % sParticlesFile, "")
         if(iErrCode /= 0) then
-            iRetCode = 7
+            iRetCode = 8
             return
         end if
         iErrCode = tIni % getInteger("Dump", "Dimensions", iDimensions, 0)
         if(iErrCode /= 0) then
-            iRetCode = 8
+            iRetCode = 9
             return
         end if
         if(iDimensions /= 2 .and. iDimensions /= 3) then
-            iRetCode = 8
+            iRetCode = 9
             return
         end if
         this % lTwoDimensional = iDimensions == 2
@@ -158,16 +168,16 @@ contains
         ! Grid
         iErrCode = tIni % getString("Grid", "CountingFile", this % sCountingFile, "")
         if(iErrCode /= 0) then
-            iRetCode = 9
+            iRetCode = 10
             return
         end if
         iErrCode = tIni % getInteger("Grid", "NumCells", this % iNumCells, 0)
         if(iErrCode /= 0) then
-            iRetCode = 10
+            iRetCode = 11
             return
         end if
         if(this % iNumCells <= 0) then
-            iRetCode = 10
+            iRetCode = 11
             return
         end if
         this % lEnableCounting = this % sCountingFile /= " "
@@ -175,12 +185,12 @@ contains
         ! Meteo
         iErrCode = tIni % getString("Meteo", "MeteoFile", this % sMeteoFile, "")
         if(iErrCode /= 0) then
-            iRetCode = 11
+            iRetCode = 12
             return
         end if
         inquire(file=this % sMeteoFile, exist=lIsMeteo)
         if(.not.lIsMeteo) then
-            iRetCode = 11
+            iRetCode = 12
             return
         end if
         
