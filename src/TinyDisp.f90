@@ -8,16 +8,41 @@
 program TinyDisp
 
     use omp_lib
-	use Meteo
+    use Config
+    use Meteo
+    use Particles
 	
     implicit none
 	
 	! Locals
-    integer:: thread_id, nthreads
+    character(len=256)      :: sCfgFile
+    type(ConfigType)        :: tCfg
+    type(MeteoType)         :: tMeteo
+    type(ParticlesPoolType) :: tPart
+    integer                 :: thread_id, nthreadsù
+    integer                 :: iRetCode
 	
 	! Get input parameters
+    if(command_argument_count() /= 1) then
+        print *, "TinyDisp - Main processing module"
+        print *
+        print *, "Usage:"
+        print *
+        print *, "  TinyDisp <Configuration_File_Name>"
+        print *
+        print *, "Copyright 2020 by Servizi Territorio srl"
+        print *, "                  This is open-source code, covered by the MIT license"
+        print *
+        stop
+    end if
+    call get_command_argument(1, sCfgFile)
 	
 	! Get configuration
+    iRetCode = tCfg % get(10, sCfgFile)
+    if(iRetCode /= 0) then
+        print *, "TinyDisp:: Error: Configuration file not read - Return code = ", iRetCode
+        stop
+    end if
 	
 	! Read meteo data, and expand it to the desired time step
 	
