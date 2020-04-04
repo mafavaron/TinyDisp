@@ -563,4 +563,70 @@ contains
 
     end function iniGetInteger
 
+
+	! **********************
+	! * Internal functions *
+	! **********************
+
+    function isSection(sString, sSection) result(lIsSection)
+
+        ! Routine arguments
+        character(len=*), intent(in)    :: sString
+        character(len=*), intent(out)   :: sSection
+        logical                         :: lIsSection
+
+		! Locals
+        integer     :: iPos
+        integer     :: iLast
+
+		! Check first and last character are compatible with a section-type string
+        iPos = verify(sString, ' ')
+        iLast = len_trim(sString)
+        if(iPos >= 1 .and. iPos <= iLast) then
+            ! Some blanks before the string real beginning: parse from there
+            lIsSection = sString(iPos:iPos) == '[' .and. sString(iLast:iLast) == ']'
+            if(lIsSection) then
+                sSection = sString((iPos+1):(iLast-1))
+            else
+                sSection = ' '
+            end if
+        else
+            ! String begins with a non-blank
+            lIsSection = sString(1:1) == '[' .and. sString(iLast:iLast) == ']'
+            if(lIsSection) then
+                sSection = sString(1:(iLast-1))
+            else
+                sSection = ' '
+            end if
+        end if
+
+    end function isSection
+
+
+	subroutine removeChar(sString, cChar)
+
+		! Routine arguments
+		character(len=*), intent(inout)	:: sString
+		character, intent(in)			:: cChar
+
+		! Locals
+		integer	:: i, j, n
+
+		! Copy all desired characters, and them only, to the string, in place
+		n = len_trim(sString)
+		j = 0
+		do i = 1, n
+			if(sString(i:i) /= cChar) then
+				j = j + 1
+				if(j /= i) then
+					sString(j:j) = sString(i:i)
+				end if
+			end if
+		end do
+		if(j < n) then
+			sString((j+1):n) = ' '
+		end if
+
+	end subroutine removeChar
+
 end module Config
