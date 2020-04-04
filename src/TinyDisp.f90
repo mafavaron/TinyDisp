@@ -81,6 +81,19 @@ program TinyDisp
         end if
         
         ! Move particles
+        iRetCode = tPart % Move( &
+            tMeteo % rvU(iMeteo), &
+            tMeteo % rvV(iMeteo), &
+            tMeteo % rvW(iMeteo), &
+            tMeteo % rvStdDevU(iMeteo)**2, &
+            tMeteo % rvStdDevV(iMeteo)**2, &
+            tMeteo % rvStdDevW(iMeteo)**2, &
+            tMeteo % rvCovUV(iMeteo), &
+            tMeteo % rvCovUW(iMeteo), &
+            tMeteo % rvCovVW(iMeteo), &
+            float(tCfg % iTimeStep), &
+            tCfg % rInertia &
+        )
         
     end do
 
