@@ -45,6 +45,11 @@ program TinyDisp
     end if
 	
 	! Read meteo data, and expand it to the desired time step
+    iRetCode = tMeteo % read(10, tCfg % sMeteoFile)
+    if(iRetCode /= 0) then
+        print *, "TinyDisp:: Error: Meteorological file not read - Return code = ", iRetCode
+        stop
+    end if
 	
 	! Initialize particles count
 	
