@@ -51,7 +51,12 @@ program TinyDisp
         stop
     end if
 	
-	! Initialize particles count
+	! Initialize particles pool
+    iRetCode = tPart % Create(tCfg % iMaxPart, tCfg % lTwoDimensional)
+    if(iRetCode /= 0) then
+        print *, "TinyDisp:: Error: Particle pool not initialized - Return code = ", iRetCode
+        stop
+    end if
 	
 	! Main loop: iterate over all time steps, and simulate transport and diffusion
 
