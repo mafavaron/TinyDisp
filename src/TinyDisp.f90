@@ -19,7 +19,7 @@ program TinyDisp
     type(ConfigType)        :: tCfg
     type(MeteoType)         :: tMeteo
     type(ParticlesPoolType) :: tPart
-    integer                 :: thread_id, nthreadsù
+    integer                 :: thread_id, nthreads
     integer                 :: iRetCode
 	
 	! Get input parameters
