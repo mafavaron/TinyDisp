@@ -129,7 +129,7 @@ contains
             iRetCode = 5
             return
         end if
-        iErrCode = tIni % getReal4("Particles", "inertia", this % rInertia, 0.)
+        iErrCode = tIni % getReal4("Particles", "Inertia", this % rInertia, 0.)
         if(iErrCode /= 0) then
             iRetCode = 6
             return
