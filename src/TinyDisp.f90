@@ -44,6 +44,7 @@ program TinyDisp
         print *, "TinyDisp:: Error: Configuration file not read - Return code = ", iRetCode
         stop
     end if
+    if(tCfg % iDebugLevel >= 1) print *, "Configuration read"
 	
 	! Read meteo data, and expand it to the desired time step
     iRetCode = tMeteo % read(10, tCfg % sMeteoFile)
@@ -51,11 +52,13 @@ program TinyDisp
         print *, "TinyDisp:: Error: Meteorological file not read - Return code = ", iRetCode
         stop
     end if
+    if(tCfg % iDebugLevel >= 1) print *, "Meteo file read"
     iRetCode = tMeteo % resample(tCfg % iTimeStep)
     if(iRetCode /= 0) then
         print *, "TinyDisp:: Error: Meteorological data not resampled - Return code = ", iRetCode
         stop
     end if
+    if(tCfg % iDebugLevel >= 1) print *, "Meteo data resampled"
 	
 	! Initialize particles pool
     iRetCode = tPart % Create(tCfg % iMaxPart, tCfg % lTwoDimensional)
@@ -63,6 +66,7 @@ program TinyDisp
         print *, "TinyDisp:: Error: Particle pool not initialized - Return code = ", iRetCode
         stop
     end if
+    if(tCfg % iDebugLevel >= 1) print *, "Particle pool initialized"
 	
 	! Main loop: iterate over all time steps, and simulate transport and diffusion
     do iMeteo = 1, size(tMeteo % ivTimeStamp)
@@ -94,6 +98,8 @@ program TinyDisp
             float(tCfg % iTimeStep), &
             tCfg % rInertia &
         )
+        
+        if(tCfg % iDebugLevel >= 1) print *, "Step: ", tMeteo % ivTimeStamp(iMeteo)
         
     end do
 
