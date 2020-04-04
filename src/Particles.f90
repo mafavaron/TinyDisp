@@ -26,10 +26,14 @@ module Particles
         real, dimension(:), allocatable     :: rvU
         real, dimension(:), allocatable     :: rvV
         real, dimension(:), allocatable     :: rvW
+        real, dimension(:), allocatable     :: rvN1
+        real, dimension(:), allocatable     :: rvN2
+        real, dimension(:), allocatable     :: rvN3
         integer, dimension(:), allocatable  :: ivTimeStampAtBirth
     contains
         procedure   :: Create
         procedure   :: Emit
+        procedure   :: Move
     end type ParticlesPoolType
     
 contains
@@ -55,13 +59,26 @@ contains
         end if
         
         ! Reserve workspace
-        if(allocated(this % ivTimeStampAtBirth)) allocate(this % ivTimeStampAtBirth(iNumParts))
-        if(allocated(this % rvX))                allocate(this % rvX(iNumParts))
-        if(allocated(this % rvY))                allocate(this % rvY(iNumParts))
-        if(allocated(this % rvZ))                allocate(this % rvZ(iNumParts))
-        if(allocated(this % rvU))                allocate(this % rvU(iNumParts))
-        if(allocated(this % rvV))                allocate(this % rvV(iNumParts))
-        if(allocated(this % rvW))                allocate(this % rvW(iNumParts))
+        if(allocated(this % ivTimeStampAtBirth)) deallocate(this % ivTimeStampAtBirth)
+        if(allocated(this % rvX))                deallocate(this % rvX)
+        if(allocated(this % rvY))                deallocate(this % rvY)
+        if(allocated(this % rvZ))                deallocate(this % rvZ)
+        if(allocated(this % rvU))                deallocate(this % rvU)
+        if(allocated(this % rvV))                deallocate(this % rvV)
+        if(allocated(this % rvW))                deallocate(this % rvW)
+        if(allocated(this % rvN1))               deallocate(this % rvN1)
+        if(allocated(this % rvN2))               deallocate(this % rvN2)
+        if(allocated(this % rvN3))               deallocate(this % rvN3)
+        allocate(this % ivTimeStampAtBirth(iNumParts))
+        allocate(this % rvX(iNumParts))
+        allocate(this % rvY(iNumParts))
+        allocate(this % rvZ(iNumParts))
+        allocate(this % rvU(iNumParts))
+        allocate(this % rvV(iNumParts))
+        allocate(this % rvW(iNumParts))
+        allocate(this % rvN1(iNumParts))
+        allocate(this % rvN2(iNumParts))
+        allocate(this % rvN3(iNumParts))
         
         ! Initialize with relevant values
         this % ivTimeStampAtBirth = -1  ! Meaning "inactive"
@@ -115,5 +132,36 @@ contains
         if(this % iNextPart > size(this % ivTimeStampAtBirth)) this % iNextPart = 1
     
     end function Emit
+    
+    
+    function Move(this, rU, rV, rW, rUU, rVV, rWW, rUV, rUW, rVW) result(iRetCode)
+    
+        ! Routine arguments
+        class(ParticlesPoolType), intent(inout) :: this
+        real, intent(in)                        :: rU
+        real, intent(in)                        :: rV
+        real, intent(in)                        :: rW
+        real, intent(in)                        :: rUU
+        real, intent(in)                        :: rVV
+        real, intent(in)                        :: rWW
+        real, intent(in)                        :: rUV
+        real, intent(in)                        :: rUW
+        real, intent(in)                        :: rVW
+        integer                                 :: iRetCode
+        
+        ! Locals
+        integer :: iErrCode
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
+        
+        ! Generate tri-variate normal deviates
+        iErrCode = MultiNorm(rU, rV, rW, rUU, rVV, rWW, rUV, rUW, rVW, this % rvN1, this % rvN2, this % rvN3)
+        if(iErrCode /= 0) then
+            iRetCode = 1
+            return
+        end if
+    
+    end function Move
 
 end module Particles
