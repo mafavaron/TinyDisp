@@ -21,6 +21,7 @@ program TinyDisp
     type(ParticlesPoolType) :: tPart
     integer                 :: thread_id, nthreads
     integer                 :: iRetCode
+    integer                 :: iMeteo
 	
 	! Get input parameters
     if(command_argument_count() /= 1) then
@@ -50,6 +51,11 @@ program TinyDisp
         print *, "TinyDisp:: Error: Meteorological file not read - Return code = ", iRetCode
         stop
     end if
+    iRetCode = tMeteo % resample(tCfg % iTimeStep)
+    if(iRetCode /= 0) then
+        print *, "TinyDisp:: Error: Meteorological data not resampled - Return code = ", iRetCode
+        stop
+    end if
 	
 	! Initialize particles pool
     iRetCode = tPart % Create(tCfg % iMaxPart, tCfg % lTwoDimensional)
@@ -59,6 +65,8 @@ program TinyDisp
     end if
 	
 	! Main loop: iterate over all time steps, and simulate transport and diffusion
+    do iMeteo = 1, size(tMeteo % ivTimeStamp)
+    end do
 
     !$omp parallel private(thread_id)
 
