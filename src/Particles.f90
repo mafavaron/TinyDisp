@@ -134,7 +134,7 @@ contains
     end function Emit
     
     
-    function Move(this, rU, rV, rW, rUU, rVV, rWW, rUV, rUW, rVW) result(iRetCode)
+    function Move(this, rU, rV, rW, rUU, rVV, rWW, rUV, rUW, rVW, rDeltaT, rInertia) result(iRetCode)
     
         ! Routine arguments
         class(ParticlesPoolType), intent(inout) :: this
@@ -147,6 +147,8 @@ contains
         real, intent(in)                        :: rUV
         real, intent(in)                        :: rUW
         real, intent(in)                        :: rVW
+        real, intent(in)                        :: rDeltaT
+        real, intent(in)                        :: rInertia
         integer                                 :: iRetCode
         
         ! Locals
@@ -155,12 +157,28 @@ contains
         ! Assume success (will falsify on failure)
         iRetCode = 0
         
-        ! Generate tri-variate normal deviates
+        ! Generate tri-variate normal deviates ("mean wind + turbulence")
         iErrCode = MultiNorm(rU, rV, rW, rUU, rVV, rWW, rUV, rUW, rVW, this % rvN1, this % rvN2, this % rvN3)
         if(iErrCode /= 0) then
             iRetCode = 1
             return
         end if
+        
+        ! Update wind speed components
+        this % rvU = rInertia * this % rvU + (1.-rInertia) * this % rvN1
+        this % rvV = rInertia * this % rvV + (1.-rInertia) * this % rvN2
+        this % rvW = rInertia * this % rvW + (1.-rInertia) * this % rvN3
+        
+        ! Update position
+        this % rvX = this % rvX + rDeltaT * this % rvU
+        this % rvY = this % rvY + rDeltaT * this % rvV
+        this % rvZ = this % rvZ + rDeltaT * this % rvW
+        
+        ! Manage reflection at ground
+        where(this % rvZ < 0.)
+            this % rvZ = -this % rvZ
+            this % rvW = -this % rvW
+        end where
     
     end function Move
 
