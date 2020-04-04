@@ -18,6 +18,7 @@ module Particles
     
     ! Data types
     type ParticlesPoolType
+        logical                             :: lTwoDimensional
         integer                             :: iNextPart
         real, dimension(:), allocatable     :: rvX
         real, dimension(:), allocatable     :: rvY
@@ -27,21 +28,61 @@ module Particles
         real, dimension(:), allocatable     :: rvW
         integer, dimension(:), allocatable  :: ivTimeStampAtBirth
     contains
+        procedure   :: Create
         procedure   :: Emit
     end type ParticlesPoolType
     
 contains
 
-    function Emit(this, iNumNewParts, rU, rV) result(iRetCode)
+    function Create(this, iNumParts, lTwoDimensional) result(iRetCode)
+    
+        ! Routine arguments
+        class(ParticlesPoolType), intent(inout) :: this
+        integer, intent(in)                     :: iNumParts
+        logical, intent(in)                     :: lTwoDimensional
+        integer                                 :: iRetCode
+        
+        ! Locals
+        ! --none--
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
+        
+        ! Check parameters
+        if(iNumParts <= 0) then
+            iRetCode = 1
+            return
+        end if
+        
+        ! Reserve workspace
+        if(allocated(this % ivTimeStampAtBirth)) allocate(this % ivTimeStampAtBirth(iNumParts))
+        if(allocated(this % rvX))                allocate(this % rvX(iNumParts))
+        if(allocated(this % rvY))                allocate(this % rvY(iNumParts))
+        if(allocated(this % rvZ))                allocate(this % rvZ(iNumParts))
+        if(allocated(this % rvU))                allocate(this % rvU(iNumParts))
+        if(allocated(this % rvV))                allocate(this % rvV(iNumParts))
+        if(allocated(this % rvW))                allocate(this % rvW(iNumParts))
+        
+        ! Initialize with relevant values
+        this % ivTimeStampAtBirth = -1  ! Meaning "inactive"
+        this % iNextPart          =  1
+    
+    end function Create
+
+
+    function Emit(this, iNumNewParts, iTimeStamp, rU, rV, rW) result(iRetCode)
     
         ! Routine arguments
         class(ParticlesPoolType), intent(inout) :: this
         integer, intent(in)                     :: iNumNewParts
+        integer, intent(in)                     :: iTimeStamp
         real, intent(in)                        :: rU
         real, intent(in)                        :: rV
+        real, intent(in)                        :: rW
         integer                                 :: iRetCode
         
         ! Locals
+        ! --none--
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -55,9 +96,23 @@ contains
             iRetCode = 2
             return
         end if
+        if(mod(size(this % ivTimeStampAtBirth), iNumNewParts) /= 0) then
+            iRetCode = 3
+            return
+        end if
         
         ! Emit new particles
+        this % ivTimeStampAtBirth(this % iNextPart : this % iNextPart + iNumNewParts) = iTimeStamp
+        this % rvX(this % iNextPart : this % iNextPart + iNumNewParts)                = 0.
+        this % rvY(this % iNextPart : this % iNextPart + iNumNewParts)                = 0.
+        this % rvZ(this % iNextPart : this % iNextPart + iNumNewParts)                = 0.
+        this % rvU(this % iNextPart : this % iNextPart + iNumNewParts)                = rU
+        this % rvV(this % iNextPart : this % iNextPart + iNumNewParts)                = rV
+        this % rvW(this % iNextPart : this % iNextPart + iNumNewParts)                = rW
         
+        ! Update next particle index
+        this % iNextPart = this % iNextPart + iNumNewParts
+        if(this % iNextPart > size(this % ivTimeStampAtBirth)) this % iNextPart = 1
     
     end function Emit
 
