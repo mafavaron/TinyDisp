@@ -8,22 +8,65 @@
 program TinyDisp
 
     use omp_lib
-	use Meteo
+    use Config
+    use Meteo
+    use Particles
 	
     implicit none
 	
 	! Locals
-    integer:: thread_id, nthreads
+    character(len=256)      :: sCfgFile
+    type(ConfigType)        :: tCfg
+    type(MeteoType)         :: tMeteo
+    type(ParticlesPoolType) :: tPart
+    integer                 :: thread_id, nthreads
+    integer                 :: iRetCode
+    integer                 :: iMeteo
 	
 	! Get input parameters
+    if(command_argument_count() /= 1) then
+        print *, "TinyDisp - Main processing module"
+        print *
+        print *, "Usage:"
+        print *
+        print *, "  TinyDisp <Configuration_File_Name>"
+        print *
+        print *, "Copyright 2020 by Servizi Territorio srl"
+        print *, "                  This is open-source code, covered by the MIT license"
+        print *
+        stop
+    end if
+    call get_command_argument(1, sCfgFile)
 	
 	! Get configuration
+    iRetCode = tCfg % get(10, sCfgFile)
+    if(iRetCode /= 0) then
+        print *, "TinyDisp:: Error: Configuration file not read - Return code = ", iRetCode
+        stop
+    end if
 	
 	! Read meteo data, and expand it to the desired time step
+    iRetCode = tMeteo % read(10, tCfg % sMeteoFile)
+    if(iRetCode /= 0) then
+        print *, "TinyDisp:: Error: Meteorological file not read - Return code = ", iRetCode
+        stop
+    end if
+    iRetCode = tMeteo % resample(tCfg % iTimeStep)
+    if(iRetCode /= 0) then
+        print *, "TinyDisp:: Error: Meteorological data not resampled - Return code = ", iRetCode
+        stop
+    end if
 	
-	! Initialize particles count
+	! Initialize particles pool
+    iRetCode = tPart % Create(tCfg % iMaxPart, tCfg % lTwoDimensional)
+    if(iRetCode /= 0) then
+        print *, "TinyDisp:: Error: Particle pool not initialized - Return code = ", iRetCode
+        stop
+    end if
 	
 	! Main loop: iterate over all time steps, and simulate transport and diffusion
+    do iMeteo = 1, size(tMeteo % ivTimeStamp)
+    end do
 
     !$omp parallel private(thread_id)
 
