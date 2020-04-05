@@ -105,7 +105,7 @@ program TinyDisp
         )
         
         ! Write particles
-        iNumActiveParticles = count(tPart % ivTimeStamp >= 0)
+        iNumActiveParticles = count(tPart % ivTimeStampAtBirth >= 0)
         write(10) iNumActiveParticles
         
         if(tCfg % iDebugLevel >= 1) print *, "Step: ", tMeteo % ivTimeStamp(iMeteo)
