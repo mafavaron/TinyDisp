@@ -22,6 +22,7 @@ program TinyDisp
     integer                 :: thread_id, nthreads
     integer                 :: iRetCode
     integer                 :: iMeteo
+    integer                 :: i
     integer                 :: iNumActiveParticles
 	
 	! Get input parameters
@@ -106,7 +107,55 @@ program TinyDisp
         
         ! Write particles
         iNumActiveParticles = count(tPart % ivTimeStampAtBirth >= 0)
-        write(10) iNumActiveParticles
+        if(tPart % lTwoDimensional) then
+            write(10) &
+                iMeteo, &
+                tMeteo % ivTimeStamp(iMeteo), &
+                tMeteo % rvU(iMeteo), &
+                tMeteo % rvV(iMeteo), &
+                tMeteo % rvStdDevU(iMeteo)**2, &
+                tMeteo % rvStdDevV(iMeteo)**2, &
+                tMeteo % rvCovUV(iMeteo), &
+                iNumActiveParticles
+        else
+            write(10) &
+                iMeteo, &
+                tMeteo % ivTimeStamp(iMeteo), &
+                tMeteo % rvU(iMeteo), &
+                tMeteo % rvV(iMeteo), &
+                tMeteo % rvW(iMeteo), &
+                tMeteo % rvStdDevU(iMeteo)**2, &
+                tMeteo % rvStdDevV(iMeteo)**2, &
+                tMeteo % rvStdDevW(iMeteo)**2, &
+                tMeteo % rvCovUV(iMeteo), &
+                tMeteo % rvCovUW(iMeteo), &
+                tMeteo % rvCovVW(iMeteo), &
+                iNumActiveParticles
+        end if
+        if(iNumActiveParticles > 0) then
+            do i = 1, tCfg % iMaxPart
+                if(tPart % ivTimeStampAtBirth(i) >= 0) then
+                    write(10) tPart % rvX(i)
+                end if
+            end do
+            do i = 1, tCfg % iMaxPart
+                if(tPart % ivTimeStampAtBirth(i) >= 0) then
+                    write(10) tPart % rvY(i)
+                end if
+            end do
+            if(.not. tPart % lTwoDimensional) then
+                do i = 1, tCfg % iMaxPart
+                    if(tPart % ivTimeStampAtBirth(i) >= 0) then
+                        write(10) tPart % rvZ(i)
+                    end if
+                end do
+            end if
+            do i = 1, tCfg % iMaxPart
+                if(tPart % ivTimeStampAtBirth(i) >= 0) then
+                    write(10) tPart % ivTimeStampAtBirth(i)
+                end if
+            end do
+        end if
         
         if(tCfg % iDebugLevel >= 1) print *, "Step: ", tMeteo % ivTimeStamp(iMeteo)
         
