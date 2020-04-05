@@ -22,6 +22,7 @@ program TinyDisp
     integer                 :: thread_id, nthreads
     integer                 :: iRetCode
     integer                 :: iMeteo
+    integer                 :: iNumActiveParticles
 	
 	! Get input parameters
     if(command_argument_count() /= 1) then
@@ -67,6 +68,10 @@ program TinyDisp
         stop
     end if
     if(tCfg % iDebugLevel >= 1) print *, "Particle pool initialized"
+    
+    ! Initialize particles file
+    open(10, file=tCfg % sParticlesFile, status='unknown', action='write', access='stream')
+    write(10) tCfg % iMaxPart, size(tMeteo % ivTimeStamp)
 	
 	! Main loop: iterate over all time steps, and simulate transport and diffusion
     do iMeteo = 1, size(tMeteo % ivTimeStamp)
@@ -98,6 +103,10 @@ program TinyDisp
             float(tCfg % iTimeStep), &
             tCfg % rInertia &
         )
+        
+        ! Write particles
+        iNumActiveParticles = count(tPart % ivTimeStamp >= 0)
+        write(10) iNumActiveParticles
         
         if(tCfg % iDebugLevel >= 1) print *, "Step: ", tMeteo % ivTimeStamp(iMeteo)
         
