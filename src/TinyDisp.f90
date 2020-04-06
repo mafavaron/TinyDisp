@@ -196,23 +196,4 @@ program TinyDisp
         close(11)
     end if
 	
-    !$omp parallel private(thread_id)
-
-    thread_id = omp_get_thread_num()
-    write (*,*) 'Hello World from thread', thread_id
-
-    !$omp barrier
-    if ( thread_id == 0 ) then
-        nthreads = omp_get_num_threads()
-        write (*,*) 'There are', nthreads, 'threads'
-    end if
-    
-    !$omp end parallel
-	
-		! Emit new particles
-		
-		! Move particles
-		
-		! Save active particles
-
 end program TinyDisp
