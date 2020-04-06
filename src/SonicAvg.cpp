@@ -23,5 +23,11 @@ int main(int argc, char** argv)
     std::string sOutFile = argv[3];
 
     // Iterate over directory and build file list
+    std::vector<std::string> svFiles;
+    std::filesystem::path pDataPath(sDataPath);
+    if (!std::filesystem::exists(pDataPath)) {
+        std::cerr << "SonicAvg:: error: Data path does not exist" << std::endl;
+        return 2;
+    }
 
 }
