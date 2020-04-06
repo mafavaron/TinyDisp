@@ -1,6 +1,8 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
+#include <filesystem>
 
 int main(int argc, char** argv)
 {
@@ -19,4 +21,7 @@ int main(int argc, char** argv)
     int iAvgTime = 0;
     data >> iAvgTime;
     std::string sOutFile = argv[3];
+
+    // Iterate over directory and build file list
+
 }
