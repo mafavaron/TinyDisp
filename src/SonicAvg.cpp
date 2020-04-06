@@ -32,7 +32,7 @@ int main(int argc, char** argv)
     for (const auto& fEntry : std::filesystem::directory_iterator(pDataPath)) {
         if (fEntry.is_regular_file()) {
             if (fEntry.path().extension() == ".fsr") {
-                std::string sFileName = fEntry.path().filename().string();
+                std::string sFileName = fEntry.path().string();
                 std::cout << sFileName << std::endl;
             }
         }
