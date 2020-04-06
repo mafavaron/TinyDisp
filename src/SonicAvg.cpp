@@ -29,8 +29,10 @@ int main(int argc, char** argv)
         std::cerr << "SonicAvg:: error: Data path does not exist" << std::endl;
         return 2;
     }
-    for (auto& pDataFile : std::filesystem::directory_iterator(pDataPath)) {
-        std::cout << pDataPath.has_parent_path() << std::endl;
+    for (const auto& fEntry : std::filesystem::directory_iterator(pDataPath)) {
+        if (fEntry.is_regular_file()) {
+            std::cout << fEntry.path().filename().string() << std::endl;
+        }
     }
 
 }
