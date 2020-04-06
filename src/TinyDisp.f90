@@ -15,15 +15,18 @@ program TinyDisp
     implicit none
 	
 	! Locals
-    character(len=256)      :: sCfgFile
-    type(ConfigType)        :: tCfg
-    type(MeteoType)         :: tMeteo
-    type(ParticlesPoolType) :: tPart
-    integer                 :: thread_id, nthreads
-    integer                 :: iRetCode
-    integer                 :: iMeteo
-    integer                 :: i
-    integer                 :: iNumActiveParticles
+    character(len=256)                      :: sCfgFile
+    type(ConfigType)                        :: tCfg
+    type(MeteoType)                         :: tMeteo
+    type(ParticlesPoolType)                 :: tPart
+    integer                                 :: thread_id, nthreads
+    integer                                 :: iRetCode
+    integer                                 :: iMeteo
+    integer                                 :: i
+    integer                                 :: iNumActiveParticles
+    integer, dimension(:,:), allocatable    :: imCount
+    integer                                 :: iPartX
+    integer                                 :: iPartY
 	
 	! Get input parameters
     if(command_argument_count() /= 1) then
@@ -73,6 +76,13 @@ program TinyDisp
     ! Initialize particles file
     open(10, file=tCfg % sParticlesFile, status='unknown', action='write', access='stream')
     write(10) tCfg % iMaxPart, size(tMeteo % ivTimeStamp)
+    
+    ! Initialize grid file, if requested
+    if(tCfg % lEnableCounting) then
+        open(11, file=tCfg % sCountingFile, status='unknown', action='write', access='stream')
+        allocate(imCount(tCfg % iNumCells, tCfg % iNumCells))
+        write(11) tCfg % rXmin, tCfg % rYmin, tCfg % rDxy, tCfg % iNumCells
+    end if
 	
 	! Main loop: iterate over all time steps, and simulate transport and diffusion
     do iMeteo = 1, size(tMeteo % ivTimeStamp)
@@ -158,11 +168,34 @@ program TinyDisp
         end if
         
         ! If requested, generate and save gridded counts
-        
-        if(tCfg % iDebugLevel >= 1) print *, "Step: ", tMeteo % ivTimeStamp(iMeteo)
+        if(tCfg % lEnableCounting) then
+            imCount = 0
+            do i = 1, tCfg % iMaxPart
+                if(tPart % ivTimeStampAtBirth(i) >= 0) then
+                    iPartX = floor((tPart % rvX(i) - tCfg % rXmin) / tCfg % rDxy) + 1
+                    iPartY = floor((tPart % rvY(i) - tCfg % rYmin) / tCfg % rDxy) + 1
+                    if(1 <= iPartX .and. iPartX <= tCfg % iNumCells .and. 1 <= iPartY .and. iPartY <= tCfg % iNumCells) then
+                        imCount(iPartX,iPartY) = imCount(iPartX,iPartY) + 1
+                    end if
+                end if
+            end do
+            write(11) tMeteo % ivTimeStamp(iMeteo)
+            do i = 1, iPartY
+                write(11) imCount(:,i)
+            end do
+        end if
+
+        ! Inform users of progress
+        if(tCfg % iDebugLevel >= 2) print *, "Step: ", tMeteo % ivTimeStamp(iMeteo)
         
     end do
 
+    ! Release connection with grid file, if requested
+    if(tCfg % lEnableCounting) then
+        deallocate(imCount)
+        close(11)
+    end if
+	
     !$omp parallel private(thread_id)
 
     thread_id = omp_get_thread_num()
