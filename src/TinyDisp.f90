@@ -186,7 +186,7 @@ program TinyDisp
         end if
 
         ! Inform users of progress
-        if(tCfg % iDebugLevel >= 2) print *, "Step: ", iMeteo, " of ", size(tMeteo % ivTimeStamp)
+        if(tCfg % iDebugLevel >= 2) print *, "Step: ", iMeteo, " of ", size(tMeteo % ivTimeStamp), " - P: ", iNumActiveParticles
         
     end do
 
