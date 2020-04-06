@@ -33,9 +33,12 @@ int main(int argc, char** argv)
         if (fEntry.is_regular_file()) {
             if (fEntry.path().extension() == ".fsr") {
                 std::string sFileName = fEntry.path().string();
-                std::cout << sFileName << std::endl;
+                svFiles.push_back(sFileName);
             }
         }
     }
+
+    // Leave
+    std::cerr << "*** END JOB ***" << std::endl;
 
 }
