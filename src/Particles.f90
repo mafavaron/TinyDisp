@@ -120,12 +120,12 @@ contains
         
         ! Emit new particles
         this % ivTimeStampAtBirth(this % iNextPart : this % iNextPart + iNumNewParts) = iTimeStamp
-        this % rvX(this % iNextPart : this % iNextPart + iNumNewParts)                = 0.
-        this % rvY(this % iNextPart : this % iNextPart + iNumNewParts)                = 0.
-        this % rvZ(this % iNextPart : this % iNextPart + iNumNewParts)                = 0.
-        this % rvU(this % iNextPart : this % iNextPart + iNumNewParts)                = rU
-        this % rvV(this % iNextPart : this % iNextPart + iNumNewParts)                = rV
-        this % rvW(this % iNextPart : this % iNextPart + iNumNewParts)                = rW
+        this % rvX(this % iNextPart : this % iNextPart + iNumNewParts - 1)            = 0.
+        this % rvY(this % iNextPart : this % iNextPart + iNumNewParts - 1)            = 0.
+        this % rvZ(this % iNextPart : this % iNextPart + iNumNewParts - 1)            = 0.
+        this % rvU(this % iNextPart : this % iNextPart + iNumNewParts - 1)            = rU
+        this % rvV(this % iNextPart : this % iNextPart + iNumNewParts - 1)            = rV
+        this % rvW(this % iNextPart : this % iNextPart + iNumNewParts - 1)            = rW
         
         ! Update next particle index
         this % iNextPart = this % iNextPart + iNumNewParts
