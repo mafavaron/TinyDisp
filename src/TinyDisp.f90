@@ -157,6 +157,8 @@ program TinyDisp
             end do
         end if
         
+        ! If requested, generate and save gridded counts
+        
         if(tCfg % iDebugLevel >= 1) print *, "Step: ", tMeteo % ivTimeStamp(iMeteo)
         
     end do
