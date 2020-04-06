@@ -11,6 +11,7 @@ int main(int argc, char** argv)
         std::cerr << "           data to a TinyDisp met input file" << std::endl;
         std::cerr << "\nUsage:\n\n";
         std::cerr << "  ./SonicAvg <DataPath> <AvgTime> <OutFileName>\n" << std::endl;
+        return 1;
     }
     std::string sDataPath = argv[1];
     std::string sBuffer   = argv[2];
