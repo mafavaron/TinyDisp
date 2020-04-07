@@ -49,11 +49,15 @@ int main(int argc, char** argv)
         // Retrieve this (binary!) file
         std::ifstream fInData(sFileName, std::ios::binary);
         int iNumData;
-        int iNumQuantities;
+        short int iNumQuantities;
         float rTemporary;
+        double rFill;
         if (fInData.is_open()) {
             fInData.read((char*)&iNumData, sizeof(iNumData));
             fInData.read((char*)&iNumQuantities, sizeof(iNumQuantities));
+            for (int i = 0; i < iNumQuantities; ++i) {
+                fInData.read((char*)&rFill, sizeof(rFill));
+            }
             for (int i = 0; i < iNumData; ++i) {
                 fInData.read((char*)&rTemporary, sizeof(rTemporary));
                 rvTimeStamp.push_back(rTemporary);
@@ -73,6 +77,15 @@ int main(int argc, char** argv)
         }
         fInData.close();
 
+        // Generate the vector of time indices
+        float rMinTime = 1.e30f;
+        float rMaxTime = -1.f;
+        for (int i = 0; i < iNumData; ++i) {
+            rMinTime = rvTimeStamp[i] < rMinTime ? rvTimeStamp[i] : rMinTime;
+            rMaxTime = rvTimeStamp[i] > rMaxTime ? rvTimeStamp[i] : rMaxTime;
+        }
+
+        std::wcout << rMinTime << ", " << rMaxTime << "\n";
         std::cout << "Data: " << iNumData << "    File: " << sFileName << "\n";
 
     }
