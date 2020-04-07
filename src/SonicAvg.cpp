@@ -41,6 +41,7 @@ int main(int argc, char** argv)
 
     // Main loop: iterate over files
     std::vector<float> rvTimeStamp;
+    std::vector<int>   ivTimeIndex;
     std::vector<float> rvU;
     std::vector<float> rvV;
     std::vector<float> rvW;
@@ -53,6 +54,11 @@ int main(int argc, char** argv)
         float rTemporary;
         double rFill;
         if (fInData.is_open()) {
+            rvTimeStamp.clear();
+            ivTimeIndex.clear();
+            rvU.clear();
+            rvV.clear();
+            rvW.clear();
             fInData.read((char*)&iNumData, sizeof(iNumData));
             fInData.read((char*)&iNumQuantities, sizeof(iNumQuantities));
             for (int i = 0; i < iNumQuantities; ++i) {
@@ -77,15 +83,16 @@ int main(int argc, char** argv)
         }
         fInData.close();
 
+        // Compute number of blocks in an hour
+        int iNumBlocks = 3600 / iAvgTime;
+
         // Generate the vector of time indices
-        float rMinTime = 1.e30f;
-        float rMaxTime = -1.f;
         for (int i = 0; i < iNumData; ++i) {
-            rMinTime = rvTimeStamp[i] < rMinTime ? rvTimeStamp[i] : rMinTime;
-            rMaxTime = rvTimeStamp[i] > rMaxTime ? rvTimeStamp[i] : rMaxTime;
+            int iTimeIndex = (int)(rvTimeStamp[i] / iAvgTime);
+            if (iTimeIndex < 0 || iTimeIndex >= iNumBlocks) iTimeIndex = -1;
+            ivTimeIndex.push_back(iTimeIndex);
         }
 
-        std::wcout << rMinTime << ", " << rMaxTime << "\n";
         std::cout << "Data: " << iNumData << "    File: " << sFileName << "\n";
 
     }
