@@ -23,6 +23,9 @@ int main(int argc, char** argv)
     data >> iAvgTime;
     std::string sOutFile = argv[3];
 
+    // Compute number of blocks in an hour
+    int iNumBlocks = 3600 / iAvgTime;
+
     // Iterate over directory and build file list
     std::vector<std::string> svFiles;
     std::filesystem::path pDataPath(sDataPath);
@@ -83,15 +86,14 @@ int main(int argc, char** argv)
         }
         fInData.close();
 
-        // Compute number of blocks in an hour
-        int iNumBlocks = 3600 / iAvgTime;
-
         // Generate the vector of time indices
         for (int i = 0; i < iNumData; ++i) {
             int iTimeIndex = (int)(rvTimeStamp[i] / iAvgTime);
             if (iTimeIndex < 0 || iTimeIndex >= iNumBlocks) iTimeIndex = -1;
             ivTimeIndex.push_back(iTimeIndex);
         }
+
+        // Accumulate data
 
         std::cout << "Data: " << iNumData << "    File: " << sFileName << "\n";
 
