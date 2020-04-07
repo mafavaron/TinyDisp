@@ -1,6 +1,7 @@
     #include <iostream>
-    #include <sstream>
-    #include <string>
+#include <sstream>
+#include <fstream>
+#include <string>
     #include <vector>
     #include <filesystem>
 
@@ -39,7 +40,38 @@
         }
 
         // Main loop: iterate over files
+        std::vector<float> rvTimeStamp;
+        std::vector<float> rvU;
+        std::vector<float> rvV;
+        std::vector<float> rvW;
         for (const auto& sFileName : svFiles) {
+
+            // Retrieve this (binary!) file
+            std::ifstream fInData(sFileName, std::ios::binary);
+            int iNumData;
+            int iNumQuantities;
+            float rTemporary;
+            if (fInData.is_open()) {
+                fInData.read((char*)iNumData, sizeof(iNumData));
+                fInData.read((char*)iNumQuantities, sizeof(iNumQuantities));
+                for (int i = 0; i < iNumData; ++i) {
+                    fInData.read((char*)rTemporary, sizeof(rTemporary));
+                    rvTimeStamp.push_back(rTemporary);
+                }
+                for (int i = 0; i < iNumData; ++i) {
+                    fInData.read((char*)rTemporary, sizeof(rTemporary));
+                    rvU.push_back(rTemporary);
+                }
+                for (int i = 0; i < iNumData; ++i) {
+                    fInData.read((char*)rTemporary, sizeof(rTemporary));
+                    rvV.push_back(rTemporary);
+                }
+                for (int i = 0; i < iNumData; ++i) {
+                    fInData.read((char*)rTemporary, sizeof(rTemporary));
+                    rvW.push_back(rTemporary);
+                }
+            }
+            fInData.close();
 
         }
 
