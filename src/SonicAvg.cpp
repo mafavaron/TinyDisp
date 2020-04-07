@@ -73,6 +73,8 @@
             }
             fInData.close();
 
+            std::cout << "Data: " << iNumData << "    File: " << sFileName << "\n";
+
         }
 
         // Leave
