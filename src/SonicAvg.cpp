@@ -52,22 +52,22 @@
             int iNumQuantities;
             float rTemporary;
             if (fInData.is_open()) {
-                fInData.read((char*)iNumData, sizeof(iNumData));
-                fInData.read((char*)iNumQuantities, sizeof(iNumQuantities));
+                fInData.read((char*)&iNumData, sizeof(iNumData));
+                fInData.read((char*)&iNumQuantities, sizeof(iNumQuantities));
                 for (int i = 0; i < iNumData; ++i) {
-                    fInData.read((char*)rTemporary, sizeof(rTemporary));
+                    fInData.read((char*)&rTemporary, sizeof(rTemporary));
                     rvTimeStamp.push_back(rTemporary);
                 }
                 for (int i = 0; i < iNumData; ++i) {
-                    fInData.read((char*)rTemporary, sizeof(rTemporary));
+                    fInData.read((char*)&rTemporary, sizeof(rTemporary));
                     rvU.push_back(rTemporary);
                 }
                 for (int i = 0; i < iNumData; ++i) {
-                    fInData.read((char*)rTemporary, sizeof(rTemporary));
+                    fInData.read((char*)&rTemporary, sizeof(rTemporary));
                     rvV.push_back(rTemporary);
                 }
                 for (int i = 0; i < iNumData; ++i) {
-                    fInData.read((char*)rTemporary, sizeof(rTemporary));
+                    fInData.read((char*)&rTemporary, sizeof(rTemporary));
                     rvW.push_back(rTemporary);
                 }
             }
