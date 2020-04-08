@@ -165,6 +165,41 @@ int main(int argc, char** argv)
         }
 
         // Render statistics and print them
+        std::vector<std::time_t> ivBlockTimeStamp;
+        std::vector<float> rvBlockU;
+        std::vector<float> rvBlockV;
+        std::vector<float> rvBlockW;
+        std::vector<float> rvBlockUU;
+        std::vector<float> rvBlockVV;
+        std::vector<float> rvBlockWW;
+        std::vector<float> rvBlockUV;
+        std::vector<float> rvBlockUW;
+        std::vector<float> rvBlockVW;
+        for (int i = 0; i < iNumBlocks; ++i) {
+            ivBlockTimeStamp.push_back(iTimeStamp + i * iAvgTime);
+            if (ivNumData[i] > 0) {
+                rvBlockU.push_back(rvSumU[i] / ivNumData[i]);
+                rvBlockV.push_back(rvSumV[i] / ivNumData[i]);
+                rvBlockW.push_back(rvSumW[i] / ivNumData[i]);
+                rvBlockUU.push_back(rvSumUU[i] / ivNumData[i] - rvSumU[i] * rvSumU[i] / ivNumData[i]);
+                rvBlockVV.push_back(rvSumVV[i] / ivNumData[i] - rvSumV[i] * rvSumV[i] / ivNumData[i]);
+                rvBlockWW.push_back(rvSumWW[i] / ivNumData[i] - rvSumW[i] * rvSumW[i] / ivNumData[i]);
+                rvBlockUU.push_back(rvSumUV[i] / ivNumData[i] - rvSumU[i] * rvSumV[i] / ivNumData[i]);
+                rvBlockVV.push_back(rvSumUW[i] / ivNumData[i] - rvSumU[i] * rvSumW[i] / ivNumData[i]);
+                rvBlockWW.push_back(rvSumVW[i] / ivNumData[i] - rvSumV[i] * rvSumW[i] / ivNumData[i]);
+            }
+            else {
+                rvBlockU.push_back(-9999.9f);
+                rvBlockV.push_back(-9999.9f);
+                rvBlockW.push_back(-9999.9f);
+                rvBlockUU.push_back(-9999.9f);
+                rvBlockVV.push_back(-9999.9f);
+                rvBlockWW.push_back(-9999.9f);
+                rvBlockUU.push_back(-9999.9f);
+                rvBlockVV.push_back(-9999.9f);
+                rvBlockWW.push_back(-9999.9f);
+            }
+        }
 
         std::cout << "Data: " << iNumData << "    File: " << sFileName << "\n";
 
