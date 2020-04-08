@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <math.h>
 #include <filesystem>
 
 int main(int argc, char** argv)
@@ -86,6 +87,8 @@ int main(int argc, char** argv)
     rvSumUV.reserve(iNumBlocks);
     rvSumUW.reserve(iNumBlocks);
     rvSumVW.reserve(iNumBlocks);
+    auto fOut = std::fstream(sOutFile, std::ios::out);
+    fOut << "Time.Stamp, U, V, W, StdDev.U, StdDev.V, StdDev.W, Cov.UV, Cov.UW, Cov.VW" << std::endl;
     for (int i; i < iNumBlocks; ++i) {
         ivNumData[i] = 0;
         rvU[i] = 0.f;
@@ -164,8 +167,9 @@ int main(int argc, char** argv)
             }
         }
 
-        // Render statistics and print them
+        // Render statistics
         std::vector<std::time_t> ivBlockTimeStamp;
+        std::vector<std::wstring> svBlockTimeStamp;
         std::vector<float> rvBlockU;
         std::vector<float> rvBlockV;
         std::vector<float> rvBlockW;
@@ -198,6 +202,21 @@ int main(int argc, char** argv)
                 rvBlockUU.push_back(-9999.9f);
                 rvBlockVV.push_back(-9999.9f);
                 rvBlockWW.push_back(-9999.9f);
+            }
+        }
+        for (int i = 0; i < iNumBlocks; ++i) {
+            if (rvBlockUU[i] >= 0.0f) {
+                fOut << svBlockTimeStamp[i]
+                    << ", " << rvBlockU[i]
+                    << ", " << rvBlockV[i]
+                    << ", " << rvBlockW[i]
+                    << ", " << sqrtf(rvBlockUU[i])
+                    << ", " << sqrtf(rvBlockVV[i])
+                    << ", " << sqrtf(rvBlockWW[i])
+                    << ", " << rvBlockUV[i]
+                    << ", " << rvBlockUW[i]
+                    << ", " << rvBlockVW[i]
+                    << std::endl;
             }
         }
 
