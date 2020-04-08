@@ -181,11 +181,11 @@ int main(int argc, char** argv)
         std::vector<float> rvBlockVW;
         for (int i = 0; i < iNumBlocks; ++i) {
             ivBlockTimeStamp.push_back(iTimeStamp + i * iAvgTime);
-            struct tm * timeinfo;
+            struct tm timeinfo;
             char cvBuffer[80];
             time_t iCurTime = ivBlockTimeStamp[i];
-            timeinfo = std::gmtime(&iCurTime);
-            std::strftime(cvBuffer, sizeof(cvBuffer), "%Y-%m-%d %H:%M:%S", timeinfo);
+            gmtime_s(&timeinfo, &iCurTime);
+            std::strftime(cvBuffer, sizeof(cvBuffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
             svBlockTimeStamp.push_back(cvBuffer);
             if (ivNumData[i] > 0) {
                 rvBlockU.push_back(rvSumU[i] / ivNumData[i]);
