@@ -49,7 +49,7 @@ int main(int argc, char** argv)
                 svFiles.push_back(sFileName);
 
                 // Get base name, convert it to an epoch time stamp, and store to vector
-                std::string sBaseName = fEntry.path().filename().wstring();
+                std::wstring sBaseName = fEntry.path().filename().wstring();
                 static const std::wstring timeStampFormat(L"%Y%m%d.%H");
                 std::wstringstream sd( sBaseName );
                 std::tm tTimeStamp;
@@ -91,15 +91,15 @@ int main(int argc, char** argv)
     fOut << "Time.Stamp, U, V, W, StdDev.U, StdDev.V, StdDev.W, Cov.UV, Cov.UW, Cov.VW" << std::endl;
     for (int i; i < iNumBlocks; ++i) {
         ivNumData[i] = 0;
-        rvU[i] = 0.f;
-        rvV[i] = 0.f;
-        rvW[i] = 0.f;
-        rvUU[i] = 0.f;
-        rvVV[i] = 0.f;
-        rvWW[i] = 0.f;
-        rvUV[i] = 0.f;
-        rvUV[i] = 0.f;
-        rvVW[i] = 0.f;
+        rvSumU[i]  = 0.f;
+        rvSumV[i]  = 0.f;
+        rvSumW[i]  = 0.f;
+        rvSumUU[i] = 0.f;
+        rvSumVV[i] = 0.f;
+        rvSumWW[i] = 0.f;
+        rvSumUV[i] = 0.f;
+        rvSumUV[i] = 0.f;
+        rvSumVW[i] = 0.f;
     }
     for (int iFileIdx = 0; iFileIdx < svFiles.size(); ++iFileIdx) {
 
