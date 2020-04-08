@@ -98,7 +98,11 @@ int main(int argc, char** argv)
         rvUV[i] = 0.f;
         rvVW[i] = 0.f;
     }
-    for (const auto& sFileName : svFiles) {
+    for (int iFileIdx = 0; iFileIdx < svFiles.size(); ++iFileIdx) {
+
+        // Retrieve the known file name and corresponding base time stamp
+        std::string sFileName = svFiles[iFileIdx];
+        std::time_t iTimeStamp = ivTimeStamp[iFileIdx];
 
         // Retrieve this (binary!) file
         std::ifstream fInData(sFileName, std::ios::binary);
