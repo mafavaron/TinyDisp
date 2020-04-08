@@ -25,13 +25,17 @@ int main(int argc, char** argv)
 
     // Compute number of blocks in an hour
     int iNumBlocks = 3600 / iAvgTime;
+    if (iNumBlocks <= 0) {
+        std::cerr << "SonicAvg:: error: No averaging blocks" << std::endl;
+        return 2;
+    }
 
     // Iterate over directory and build file list
     std::vector<std::string> svFiles;
     std::filesystem::path pDataPath(sDataPath);
     if (!std::filesystem::exists(pDataPath)) {
         std::cerr << "SonicAvg:: error: Data path does not exist" << std::endl;
-        return 2;
+        return 3;
     }
     for (const auto& fEntry : std::filesystem::directory_iterator(pDataPath)) {
         if (fEntry.is_regular_file()) {
@@ -48,6 +52,38 @@ int main(int argc, char** argv)
     std::vector<float> rvU;
     std::vector<float> rvV;
     std::vector<float> rvW;
+    std::vector<int>   ivNumData;
+    std::vector<float> rvSumU;
+    std::vector<float> rvSumV;
+    std::vector<float> rvSumW;
+    std::vector<float> rvSumUU;
+    std::vector<float> rvSumVV;
+    std::vector<float> rvSumWW;
+    std::vector<float> rvSumUV;
+    std::vector<float> rvSumUW;
+    std::vector<float> rvSumVW;
+    ivNumData.reserve(iNumBlocks);
+    rvSumU.reserve(iNumBlocks);
+    rvSumV.reserve(iNumBlocks);
+    rvSumW.reserve(iNumBlocks);
+    rvSumUU.reserve(iNumBlocks);
+    rvSumVV.reserve(iNumBlocks);
+    rvSumWW.reserve(iNumBlocks);
+    rvSumUV.reserve(iNumBlocks);
+    rvSumUW.reserve(iNumBlocks);
+    rvSumVW.reserve(iNumBlocks);
+    for (int i; i < iNumBlocks; ++i) {
+        ivNumData[i] = 0;
+        rvU[i] = 0.f;
+        rvV[i] = 0.f;
+        rvW[i] = 0.f;
+        rvUU[i] = 0.f;
+        rvVV[i] = 0.f;
+        rvWW[i] = 0.f;
+        rvUV[i] = 0.f;
+        rvUV[i] = 0.f;
+        rvVW[i] = 0.f;
+    }
     for (const auto& sFileName : svFiles) {
 
         // Retrieve this (binary!) file
@@ -94,6 +130,21 @@ int main(int argc, char** argv)
         }
 
         // Accumulate data
+        for (int i = 0; i < iNumData; ++i) {
+            int iIdx = ivTimeIndex[i];
+            if (iIdx >= 0) {
+                ++ivNumData[iIdx];
+                rvSumU[iIdx]  += rvU[i];
+                rvSumV[iIdx]  += rvV[i];
+                rvSumW[iIdx]  += rvW[i];
+                rvSumUU[iIdx] += rvU[i] * rvU[i];
+                rvSumVV[iIdx] += rvV[i] * rvV[i];
+                rvSumWW[iIdx] += rvW[i] * rvW[i];
+                rvSumUV[iIdx] += rvU[i] * rvV[i];
+                rvSumUW[iIdx] += rvU[i] * rvW[i];
+                rvSumVW[iIdx] += rvV[i] * rvW[i];
+            }
+        }
 
         std::cout << "Data: " << iNumData << "    File: " << sFileName << "\n";
 
