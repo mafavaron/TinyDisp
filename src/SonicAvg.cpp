@@ -169,7 +169,7 @@ int main(int argc, char** argv)
 
         // Render statistics
         std::vector<std::time_t> ivBlockTimeStamp;
-        std::vector<std::wstring> svBlockTimeStamp;
+        std::vector<std::string> svBlockTimeStamp;
         std::vector<float> rvBlockU;
         std::vector<float> rvBlockV;
         std::vector<float> rvBlockW;
