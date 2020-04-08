@@ -89,7 +89,7 @@ int main(int argc, char** argv)
     rvSumVW.reserve(iNumBlocks);
     auto fOut = std::fstream(sOutFile, std::ios::out);
     fOut << "Time.Stamp, U, V, W, StdDev.U, StdDev.V, StdDev.W, Cov.UV, Cov.UW, Cov.VW" << std::endl;
-    for (int i; i < iNumBlocks; ++i) {
+    for (int i = 0; i < iNumBlocks; ++i) {
         ivNumData[i] = 0;
         rvSumU[i]  = 0.f;
         rvSumV[i]  = 0.f;
