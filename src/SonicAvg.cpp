@@ -77,28 +77,20 @@ int main(int argc, char** argv)
     std::vector<float> rvSumUV;
     std::vector<float> rvSumUW;
     std::vector<float> rvSumVW;
-    ivNumData.reserve(iNumBlocks);
-    rvSumU.reserve(iNumBlocks);
-    rvSumV.reserve(iNumBlocks);
-    rvSumW.reserve(iNumBlocks);
-    rvSumUU.reserve(iNumBlocks);
-    rvSumVV.reserve(iNumBlocks);
-    rvSumWW.reserve(iNumBlocks);
-    rvSumUV.reserve(iNumBlocks);
-    rvSumUW.reserve(iNumBlocks);
-    rvSumVW.reserve(iNumBlocks);
     auto fOut = std::fstream(sOutFile, std::ios::out);
     fOut << "Time.Stamp, U, V, W, StdDev.U, StdDev.V, StdDev.W, Cov.UV, Cov.UW, Cov.VW" << std::endl;
-    std::fill(ivNumData.begin(), ivNumData.end(), 0);
-    std::fill(rvSumU.begin(), rvSumU.end(), 0.f);
-    std::fill(rvSumV.begin(), rvSumV.end(), 0.f);
-    std::fill(rvSumW.begin(), rvSumW.end(), 0.f);
-    std::fill(rvSumUU.begin(), rvSumUU.end(), 0.f);
-    std::fill(rvSumVV.begin(), rvSumVV.end(), 0.f);
-    std::fill(rvSumWW.begin(), rvSumWW.end(), 0.f);
-    std::fill(rvSumUV.begin(), rvSumUV.end(), 0.f);
-    std::fill(rvSumUW.begin(), rvSumUW.end(), 0.f);
-    std::fill(rvSumVW.begin(), rvSumVW.end(), 0.f);
+    for (int i = 0; i < iNumBlocks; ++i) {
+        ivNumData.push_back(0);
+        rvSumU.push_back(0.f);
+        rvSumV.push_back(0.f);
+        rvSumW.push_back(0.f);
+        rvSumUU.push_back(0.f);
+        rvSumVV.push_back(0.f);
+        rvSumWW.push_back(0.f);
+        rvSumUV.push_back(0.f);
+        rvSumUW.push_back(0.f);
+        rvSumVW.push_back(0.f);
+    }
     for (int iFileIdx = 0; iFileIdx < svFiles.size(); ++iFileIdx) {
 
         // Retrieve the known file name and corresponding base time stamp
