@@ -184,9 +184,9 @@ int main(int argc, char** argv)
                 rvBlockUU.push_back(rvSumUU[i] / ivNumData[i] - rvSumU[i] * rvSumU[i] / ivNumData[i]);
                 rvBlockVV.push_back(rvSumVV[i] / ivNumData[i] - rvSumV[i] * rvSumV[i] / ivNumData[i]);
                 rvBlockWW.push_back(rvSumWW[i] / ivNumData[i] - rvSumW[i] * rvSumW[i] / ivNumData[i]);
-                rvBlockUU.push_back(rvSumUV[i] / ivNumData[i] - rvSumU[i] * rvSumV[i] / ivNumData[i]);
-                rvBlockVV.push_back(rvSumUW[i] / ivNumData[i] - rvSumU[i] * rvSumW[i] / ivNumData[i]);
-                rvBlockWW.push_back(rvSumVW[i] / ivNumData[i] - rvSumV[i] * rvSumW[i] / ivNumData[i]);
+                rvBlockUV.push_back(rvSumUV[i] / ivNumData[i] - rvSumU[i] * rvSumV[i] / ivNumData[i]);
+                rvBlockUW.push_back(rvSumUW[i] / ivNumData[i] - rvSumU[i] * rvSumW[i] / ivNumData[i]);
+                rvBlockVW.push_back(rvSumVW[i] / ivNumData[i] - rvSumV[i] * rvSumW[i] / ivNumData[i]);
             }
             else {
                 rvBlockU.push_back(-9999.9f);
@@ -195,9 +195,9 @@ int main(int argc, char** argv)
                 rvBlockUU.push_back(-9999.9f);
                 rvBlockVV.push_back(-9999.9f);
                 rvBlockWW.push_back(-9999.9f);
-                rvBlockUU.push_back(-9999.9f);
-                rvBlockVV.push_back(-9999.9f);
-                rvBlockWW.push_back(-9999.9f);
+                rvBlockUV.push_back(-9999.9f);
+                rvBlockUW.push_back(-9999.9f);
+                rvBlockVW.push_back(-9999.9f);
             }
         }
         for (int i = 0; i < iNumBlocks; ++i) {
