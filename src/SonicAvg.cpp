@@ -1,3 +1,4 @@
+#include <ctime>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -32,6 +33,7 @@ int main(int argc, char** argv)
 
     // Iterate over directory and build file list
     std::vector<std::string> svFiles;
+    std::vector<std::time_t> ivTimeStamp;
     std::filesystem::path pDataPath(sDataPath);
     if (!std::filesystem::exists(pDataPath)) {
         std::cerr << "SonicAvg:: error: Data path does not exist" << std::endl;
@@ -40,8 +42,20 @@ int main(int argc, char** argv)
     for (const auto& fEntry : std::filesystem::directory_iterator(pDataPath)) {
         if (fEntry.is_regular_file()) {
             if (fEntry.path().extension() == ".fsr") {
+
+                // Get full file name and save it to vector
                 std::string sFileName = fEntry.path().string();
                 svFiles.push_back(sFileName);
+
+                // Get base name, convert it to an epoch time stamp, and store to vector
+                std::string sBaseName = fEntry.path().filename().wstring();
+                static const std::wstring timeStampFormat(L"%Y%m%d.%H");
+                std::wstringstream sd( sBaseName );
+                std::tm tTimeStamp;
+                sd >> std::get_time(&tTimeStamp, timeStampFormat.c_str());
+                std::time_t iTimeStamp = std::mktime( &tTimeStamp );
+                ivTimeStamp.push_back( iTimeStamp );
+
             }
         }
     }
@@ -145,6 +159,8 @@ int main(int argc, char** argv)
                 rvSumVW[iIdx] += rvV[i] * rvW[i];
             }
         }
+
+        // Render statistics and print them
 
         std::cout << "Data: " << iNumData << "    File: " << sFileName << "\n";
 
