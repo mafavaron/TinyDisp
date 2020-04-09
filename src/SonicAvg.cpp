@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 
                 // Get base name, convert it to an epoch time stamp, and store to vector
                 std::wstring sBaseName = fEntry.path().filename().wstring();
-                static const std::wstring timeStampFormat(L"%Y%m%d.%H");
+                static const std::wstring timeStampFormat(L"%Y%m%d.%H.fsr");
                 std::wstringstream sd( sBaseName );
                 std::tm tTimeStamp;
                 sd >> std::get_time(&tTimeStamp, timeStampFormat.c_str());
