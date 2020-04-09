@@ -170,6 +170,7 @@ int main(int argc, char** argv)
         std::vector<float> rvBlockUW;
         std::vector<float> rvBlockVW;
         for (int i = 0; i < iNumBlocks; ++i) {
+            iTimeStamp = ivBlockTimeStamp[i];
             ivBlockTimeStamp.push_back(iTimeStamp + i * iAvgTime);
             struct tm timeinfo;
             char cvBuffer[80];
