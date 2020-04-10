@@ -51,12 +51,12 @@ int main(int argc, char** argv)
 
                 // Get base name, convert it to an epoch time stamp, and store to vector
                 std::string sBaseName = fEntry.path().filename().string();
-                std::istringstream sd( sBaseName );
                 std::string sYear = sBaseName.substr(0, 4);
                 std::string sMonth = sBaseName.substr(4, 6);
                 std::string sDay = sBaseName.substr(6, 2);
                 std::string sHour = sBaseName.substr(9, 2);
-                std::string sDateTime = sYear + "-" + s;onth + "-" + sDay + "T" + sHour + ":00:00";
+                std::string sDateTime = sYear + "-" + sMonth + "-" + sDay + "T" + sHour + ":00:00";
+                std::istringstream sd(sDateTime);
                 std::tm tTimeStamp = {};
                 if (!(sd >> std::get_time(&tTimeStamp, "%Y-%m-%dT%H:%M:%S"))) {
                     std::cerr << "SonicAvg:: error: Date-time not parsed from FSR input file name" << std::endl;
