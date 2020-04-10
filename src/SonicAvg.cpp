@@ -6,6 +6,7 @@
 #include <vector>
 #include <math.h>
 #include <filesystem>
+#include <iomanip>
 
 int main(int argc, char** argv)
 {
@@ -49,11 +50,18 @@ int main(int argc, char** argv)
                 svFiles.push_back(sFileName);
 
                 // Get base name, convert it to an epoch time stamp, and store to vector
-                std::wstring sBaseName = fEntry.path().filename().wstring();
-                static const std::wstring timeStampFormat(L"%Y%m%d.%H.fsr");
-                std::wstringstream sd( sBaseName );
-                std::tm tTimeStamp;
-                sd >> std::get_time(&tTimeStamp, timeStampFormat.c_str());
+                std::string sBaseName = fEntry.path().filename().string();
+                std::istringstream sd( sBaseName );
+                std::string sYear = sBaseName.substr(0, 4);
+                std::string sMonth = sBaseName.substr(4, 6);
+                std::string sDay = sBaseName.substr(6, 2);
+                std::string sHour = sBaseName.substr(9, 2);
+                std::string sDateTime = sYear + "-" + s;onth + "-" + sDay + "T" + sHour + ":00:00";
+                std::tm tTimeStamp = {};
+                if (!(sd >> std::get_time(&tTimeStamp, "%Y-%m-%dT%H:%M:%S"))) {
+                    std::cerr << "SonicAvg:: error: Date-time not parsed from FSR input file name" << std::endl;
+                    return 4;
+                }
                 std::time_t iTimeStamp = std::mktime( &tTimeStamp );
                 ivTimeStamp.push_back( iTimeStamp );
 
