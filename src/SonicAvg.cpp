@@ -52,7 +52,7 @@ int main(int argc, char** argv)
                 // Get base name, convert it to an epoch time stamp, and store to vector
                 std::string sBaseName = fEntry.path().filename().string();
                 std::string sYear = sBaseName.substr(0, 4);
-                std::string sMonth = sBaseName.substr(4, 6);
+                std::string sMonth = sBaseName.substr(4, 2);
                 std::string sDay = sBaseName.substr(6, 2);
                 std::string sHour = sBaseName.substr(9, 2);
                 std::string sDateTime = sYear + "-" + sMonth + "-" + sDay + "T" + sHour + ":00:00";
