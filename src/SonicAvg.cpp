@@ -6,6 +6,7 @@
 #include <vector>
 #include <math.h>
 #include <filesystem>
+#include <iomanip>
 
 int main(int argc, char** argv)
 {
@@ -49,11 +50,18 @@ int main(int argc, char** argv)
                 svFiles.push_back(sFileName);
 
                 // Get base name, convert it to an epoch time stamp, and store to vector
-                std::string sBaseName = fEntry.path().filename().wstring();
-                static const std::wstring timeStampFormat(L"%Y%m%d.%H");
-                std::wstringstream sd( sBaseName );
-                std::tm tTimeStamp;
-                sd >> std::get_time(&tTimeStamp, timeStampFormat.c_str());
+                std::string sBaseName = fEntry.path().filename().string();
+                std::string sYear = sBaseName.substr(0, 4);
+                std::string sMonth = sBaseName.substr(4, 2);
+                std::string sDay = sBaseName.substr(6, 2);
+                std::string sHour = sBaseName.substr(9, 2);
+                std::string sDateTime = sYear + "-" + sMonth + "-" + sDay + "T" + sHour + ":00:00";
+                std::istringstream sd(sDateTime);
+                std::tm tTimeStamp = {};
+                if (!(sd >> std::get_time(&tTimeStamp, "%Y-%m-%dT%H:%M:%S"))) {
+                    std::cerr << "SonicAvg:: error: Date-time not parsed from FSR input file name" << std::endl;
+                    return 4;
+                }
                 std::time_t iTimeStamp = std::mktime( &tTimeStamp );
                 ivTimeStamp.push_back( iTimeStamp );
 
@@ -77,29 +85,19 @@ int main(int argc, char** argv)
     std::vector<float> rvSumUV;
     std::vector<float> rvSumUW;
     std::vector<float> rvSumVW;
-    ivNumData.reserve(iNumBlocks);
-    rvSumU.reserve(iNumBlocks);
-    rvSumV.reserve(iNumBlocks);
-    rvSumW.reserve(iNumBlocks);
-    rvSumUU.reserve(iNumBlocks);
-    rvSumVV.reserve(iNumBlocks);
-    rvSumWW.reserve(iNumBlocks);
-    rvSumUV.reserve(iNumBlocks);
-    rvSumUW.reserve(iNumBlocks);
-    rvSumVW.reserve(iNumBlocks);
     auto fOut = std::fstream(sOutFile, std::ios::out);
     fOut << "Time.Stamp, U, V, W, StdDev.U, StdDev.V, StdDev.W, Cov.UV, Cov.UW, Cov.VW" << std::endl;
-    for (int i; i < iNumBlocks; ++i) {
-        ivNumData[i] = 0;
-        rvU[i] = 0.f;
-        rvV[i] = 0.f;
-        rvW[i] = 0.f;
-        rvUU[i] = 0.f;
-        rvVV[i] = 0.f;
-        rvWW[i] = 0.f;
-        rvUV[i] = 0.f;
-        rvUV[i] = 0.f;
-        rvVW[i] = 0.f;
+    for (int i = 0; i < iNumBlocks; ++i) {
+        ivNumData.push_back(0);
+        rvSumU.push_back(0.f);
+        rvSumV.push_back(0.f);
+        rvSumW.push_back(0.f);
+        rvSumUU.push_back(0.f);
+        rvSumVV.push_back(0.f);
+        rvSumWW.push_back(0.f);
+        rvSumUV.push_back(0.f);
+        rvSumUW.push_back(0.f);
+        rvSumVW.push_back(0.f);
     }
     for (int iFileIdx = 0; iFileIdx < svFiles.size(); ++iFileIdx) {
 
@@ -167,9 +165,14 @@ int main(int argc, char** argv)
             }
         }
 
-        // Render statistics
+        // Generate block specific time stamps
         std::vector<std::time_t> ivBlockTimeStamp;
-        std::vector<std::wstring> svBlockTimeStamp;
+        for (int i = 0; i < iNumBlocks; ++i) {
+            ivBlockTimeStamp.push_back(iTimeStamp + i * iAvgTime);
+        }
+
+        // Render statistics
+        std::vector<std::string> svBlockTimeStamp;
         std::vector<float> rvBlockU;
         std::vector<float> rvBlockV;
         std::vector<float> rvBlockW;
@@ -180,23 +183,24 @@ int main(int argc, char** argv)
         std::vector<float> rvBlockUW;
         std::vector<float> rvBlockVW;
         for (int i = 0; i < iNumBlocks; ++i) {
+            iTimeStamp = ivBlockTimeStamp[i];
             ivBlockTimeStamp.push_back(iTimeStamp + i * iAvgTime);
-            struct tm * timeinfo;
+            struct tm timeinfo;
             char cvBuffer[80];
             time_t iCurTime = ivBlockTimeStamp[i];
-            timeinfo = std::gmtime(&iCurTime);
-            std::strftime(cvBuffer, sizeof(cvBuffer), "%Y-%m-%d %H:%M:%S", timeinfo);
+            gmtime_s(&timeinfo, &iCurTime);
+            std::strftime(cvBuffer, sizeof(cvBuffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
             svBlockTimeStamp.push_back(cvBuffer);
             if (ivNumData[i] > 0) {
                 rvBlockU.push_back(rvSumU[i] / ivNumData[i]);
                 rvBlockV.push_back(rvSumV[i] / ivNumData[i]);
                 rvBlockW.push_back(rvSumW[i] / ivNumData[i]);
-                rvBlockUU.push_back(rvSumUU[i] / ivNumData[i] - rvSumU[i] * rvSumU[i] / ivNumData[i]);
-                rvBlockVV.push_back(rvSumVV[i] / ivNumData[i] - rvSumV[i] * rvSumV[i] / ivNumData[i]);
-                rvBlockWW.push_back(rvSumWW[i] / ivNumData[i] - rvSumW[i] * rvSumW[i] / ivNumData[i]);
-                rvBlockUU.push_back(rvSumUV[i] / ivNumData[i] - rvSumU[i] * rvSumV[i] / ivNumData[i]);
-                rvBlockVV.push_back(rvSumUW[i] / ivNumData[i] - rvSumU[i] * rvSumW[i] / ivNumData[i]);
-                rvBlockWW.push_back(rvSumVW[i] / ivNumData[i] - rvSumV[i] * rvSumW[i] / ivNumData[i]);
+                rvBlockUU.push_back(rvSumUU[i] / ivNumData[i] - (rvSumU[i] / ivNumData[i]) * (rvSumU[i] / ivNumData[i]));
+                rvBlockVV.push_back(rvSumVV[i] / ivNumData[i] - (rvSumV[i] / ivNumData[i]) * (rvSumV[i] / ivNumData[i]));
+                rvBlockWW.push_back(rvSumWW[i] / ivNumData[i] - (rvSumW[i] / ivNumData[i]) * (rvSumW[i] / ivNumData[i]));
+                rvBlockUV.push_back(rvSumUV[i] / ivNumData[i] - (rvSumU[i] / ivNumData[i]) * (rvSumV[i] / ivNumData[i]));
+                rvBlockUW.push_back(rvSumUW[i] / ivNumData[i] - (rvSumU[i] / ivNumData[i]) * (rvSumW[i] / ivNumData[i]));
+                rvBlockVW.push_back(rvSumVW[i] / ivNumData[i] - (rvSumV[i] / ivNumData[i]) * (rvSumW[i] / ivNumData[i]));
             }
             else {
                 rvBlockU.push_back(-9999.9f);
@@ -205,9 +209,9 @@ int main(int argc, char** argv)
                 rvBlockUU.push_back(-9999.9f);
                 rvBlockVV.push_back(-9999.9f);
                 rvBlockWW.push_back(-9999.9f);
-                rvBlockUU.push_back(-9999.9f);
-                rvBlockVV.push_back(-9999.9f);
-                rvBlockWW.push_back(-9999.9f);
+                rvBlockUV.push_back(-9999.9f);
+                rvBlockUW.push_back(-9999.9f);
+                rvBlockVW.push_back(-9999.9f);
             }
         }
         for (int i = 0; i < iNumBlocks; ++i) {
