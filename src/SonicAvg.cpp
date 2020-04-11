@@ -165,8 +165,13 @@ int main(int argc, char** argv)
             }
         }
 
-        // Render statistics
+        // Generate block specific time stamps
         std::vector<std::time_t> ivBlockTimeStamp;
+        for (int i = 0; i < iNumBlocks; ++i) {
+            ivBlockTimeStamp.push_back(iTimeStamp + i * iAvgTime);
+        }
+
+        // Render statistics
         std::vector<std::string> svBlockTimeStamp;
         std::vector<float> rvBlockU;
         std::vector<float> rvBlockV;
