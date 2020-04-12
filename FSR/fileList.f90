@@ -35,6 +35,18 @@ contains
         ! Assume success (will falsify on failure)
         iRetCode = 0
         
+        ! First step: Count lines in input file
+        iNumFiles = 0
+        open(iLUN, file=sFileName, status='old', action='read', iostat=iErrCode)
+        if(iErrCode /= 0) then
+            iRetCode = 1
+            return
+        end if
+        
+        ! Second step: Actual read
+        rewind(iLun)
+        close(iLUN)
+        
     end function readFileList
 
 end module fileList
