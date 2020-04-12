@@ -49,9 +49,19 @@ contains
             if(iErrCode /= 0) exit
             iNumFiles = iNumFiles + 1
         end do
+        if(iNumFiles <= 0) then
+            iRetCode = 2
+            close(iLUN)
+            return
+        end if
+        if(allocated(svFiles)) deallocate(svFiles)
+        allocate(svFiles(iNumFiles))
         
         ! Second step: Actual read
         rewind(iLUN)
+        do iFile = 1, iNumFiles
+            read(iLUN, "(a)") svFiles(iFile)
+        end do
         close(iLUN)
         
     end function readFileList
