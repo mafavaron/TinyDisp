@@ -15,7 +15,6 @@ program td_pre
     
     ! Locals
     character(len=256)                              :: sFsrList
-    character(len=256)                              :: sFileName
     character(len=16)                               :: sBuffer
     integer                                         :: iAvgTime
     character(len=256)                              :: sOutFile
@@ -101,7 +100,7 @@ program td_pre
         write(sDateTime, "(a4,2('-',a2),1x,a2,':00:00')") sYear, sMonth, sDay, sHour
 
 		! Get file
-		iRetCode = fileRead(svFiles(i), rvTimeStamp, rvU, rvV, rvW, rvT, rmQuantity, svQuantity)
+        iRetCode = fileRead(svFiles(i), rvTimeStamp, rvU, rvV, rvW, rvT, rmQuantity, svQuantity)
         if(iRetCode /= 0) then
             print *, 'td_pre:: error: File termination before completing data read'
             stop
@@ -204,7 +203,7 @@ program td_pre
     end do
     close(10)
 
-	! Leave
-	print *, "*** END JOB *** (Time elapsed:", rTimeEnd - rTimeBegin, ")"
+    ! Leave
+    print *, "*** END JOB ***"
 
 end program td_pre
