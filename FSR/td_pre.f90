@@ -44,6 +44,16 @@ program td_pre
     real(4), dimension(:), allocatable              :: rvAvgV
     real(4), dimension(:), allocatable              :: rvAvgW
     real(4), dimension(:), allocatable              :: rvAvgT
+    real(4), dimension(:), allocatable              :: rvStdDevU
+    real(4), dimension(:), allocatable              :: rvStdDevV
+    real(4), dimension(:), allocatable              :: rvStdDevW
+    real(4), dimension(:), allocatable              :: rvStdDevT
+    real(4), dimension(:), allocatable              :: rvCovUV
+    real(4), dimension(:), allocatable              :: rvCovUW
+    real(4), dimension(:), allocatable              :: rvCovVW
+    real(4), dimension(:), allocatable              :: rvCovUT
+    real(4), dimension(:), allocatable              :: rvCovVT
+    real(4), dimension(:), allocatable              :: rvCovWT
     
     ! Get command arguments
     if(command_argument_count() /= 3) then
@@ -78,6 +88,8 @@ program td_pre
     end if
 
     ! Main loop: process files in turn
+    open(10, file=sOutFile, status='unknown', action='write')
+    write(10, "('Time.Stamp, U, V, W, StdDev.U, StdDev.V, StdDev.W, Cov.UV, Cov.UW, Cov.VW')")
     do i = 1, size(svFiles)
 
         ! Get date and hour from file name
@@ -126,14 +138,71 @@ program td_pre
             print *, 'td_pre:: warning: Some problem computing mean'
             cycle
         end if
+        iRetCode = stddev(rvTimeStamp, rvU, real(iAvgTime), rvAvgTime, rvStdDevU)
+        if(iRetCode /= 0) then
+            print *, 'td_pre:: warning: Some problem computing mean'
+            cycle
+        end if
+        iRetCode = stddev(rvTimeStamp, rvV, real(iAvgTime), rvAvgTime, rvStdDevV)
+        if(iRetCode /= 0) then
+            print *, 'td_pre:: warning: Some problem computing mean'
+            cycle
+        end if
+        iRetCode = stddev(rvTimeStamp, rvW, real(iAvgTime), rvAvgTime, rvStdDevW)
+        if(iRetCode /= 0) then
+            print *, 'td_pre:: warning: Some problem computing mean'
+            cycle
+        end if
+        iRetCode = stddev(rvTimeStamp, rvT, real(iAvgTime), rvAvgTime, rvStdDevT)
+        if(iRetCode /= 0) then
+            print *, 'td_pre:: warning: Some problem computing mean'
+            cycle
+        end if
+        iRetCode = cov(rvTimeStamp, rvU, rvV, real(iAvgTime), rvAvgTime, rvCovUV)
+        if(iRetCode /= 0) then
+            print *, 'td_pre:: warning: Some problem computing mean'
+            cycle
+        end if
+        iRetCode = cov(rvTimeStamp, rvU, rvW, real(iAvgTime), rvAvgTime, rvCovUW)
+        if(iRetCode /= 0) then
+            print *, 'td_pre:: warning: Some problem computing mean'
+            cycle
+        end if
+        iRetCode = cov(rvTimeStamp, rvV, rvW, real(iAvgTime), rvAvgTime, rvCovVW)
+        if(iRetCode /= 0) then
+            print *, 'td_pre:: warning: Some problem computing mean'
+            cycle
+        end if
+        iRetCode = cov(rvTimeStamp, rvU, rvT, real(iAvgTime), rvAvgTime, rvCovUT)
+        if(iRetCode /= 0) then
+            print *, 'td_pre:: warning: Some problem computing mean'
+            cycle
+        end if
+        iRetCode = cov(rvTimeStamp, rvV, rvT, real(iAvgTime), rvAvgTime, rvCovVT)
+        if(iRetCode /= 0) then
+            print *, 'td_pre:: warning: Some problem computing mean'
+            cycle
+        end if
+        iRetCode = cov(rvTimeStamp, rvW, rvT, real(iAvgTime), rvAvgTime, rvCovWT)
+        if(iRetCode /= 0) then
+            print *, 'td_pre:: warning: Some problem computing mean'
+            cycle
+        end if
 		
-		! Print
-		write(*, "(a4,2('-',a2),1x,a2,2(':',i2.2),4(',',f8.2))") &
-			sYear, sMonth, sDay, sHour, iMinute, iSecond, &
-			minval(rvAvgVel), maxval(rvAvgVel), &
-			rvAvgVel(ivPos(1)), rvHourlyAvgVel(1)
+		! Write data to TinyDisp file
+        do i = 1, size(rvAvgTime)
+            iSecond = floor(rvAvgTime(i))
+            iMinute = (iSecond / 60)
+            iSecond = iSecond - iMinute * 60
+            write(10, "(a4,2('-',a2),1x,a2,2(':',i2.2),9(',',f8.2))") &
+                sYear, sMonth, sDay, sHour, iMinute, iSecond, &
+                rvAvgU(i), rvAvgV(i), rvAvgW(i), &
+                rvStdDevU(i), rvStdDevV(i), rvStdDevW(i), &
+                rvCovUV(i), rvCovUW(i), rvCovVW(i)
+        end do
 
-	end do
+    end do
+    close(10)
 
 	! Leave
 	print *, "*** END JOB *** (Time elapsed:", rTimeEnd - rTimeBegin, ")"
