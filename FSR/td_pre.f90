@@ -15,7 +15,6 @@ program td_pre
     
     ! Locals
     character(len=256)                              :: sFsrList
-    character(len=256)                              :: sFileName
     character(len=16)                               :: sBuffer
     integer                                         :: iAvgTime
     character(len=256)                              :: sOutFile
@@ -93,7 +92,7 @@ program td_pre
     do i = 1, size(svFiles)
 
         ! Get date and hour from file name
-        iDateStart = len_trim(svFiles(i)) - 15
+        iDateStart = len_trim(svFiles(i)) - 14
         sYear  = svFiles(i)(iDateStart:iDateStart+3)
         sMonth = svFiles(i)(iDateStart+4:iDateStart+5)
         sDay   = svFiles(i)(iDateStart+6:iDateStart+7)
@@ -101,7 +100,7 @@ program td_pre
         write(sDateTime, "(a4,2('-',a2),1x,a2,':00:00')") sYear, sMonth, sDay, sHour
 
 		! Get file
-		iRetCode = fileRead(svFiles(i), rvTimeStamp, rvU, rvV, rvW, rvT, rmQuantity, svQuantity)
+        iRetCode = fileRead(svFiles(i), rvTimeStamp, rvU, rvV, rvW, rvT, rmQuantity, svQuantity)
         if(iRetCode /= 0) then
             print *, 'td_pre:: error: File termination before completing data read'
             stop
@@ -194,7 +193,7 @@ program td_pre
             iSecond = floor(rvAvgTime(j))
             iMinute = (iSecond / 60)
             iSecond = iSecond - iMinute * 60
-            write(10, "(a4,2('-',a2),1x,a2,2(':',i2.2),9(',',f8.2))") &
+            write(10, "(a4,2('-',a2),1x,a2,2(':',i2.2),3(',',f8.2),6(',',f8.4))") &
                 sYear, sMonth, sDay, sHour, iMinute, iSecond, &
                 rvAvgU(j), rvAvgV(j), rvAvgW(j), &
                 rvStdDevU(j), rvStdDevV(j), rvStdDevW(j), &
@@ -204,7 +203,7 @@ program td_pre
     end do
     close(10)
 
-	! Leave
-	print *, "*** END JOB *** (Time elapsed:", rTimeEnd - rTimeBegin, ")"
+    ! Leave
+    print *, "*** END JOB ***"
 
 end program td_pre
