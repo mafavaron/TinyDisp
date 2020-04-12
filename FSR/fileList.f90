@@ -29,8 +29,10 @@ contains
         integer                                                     :: iRetCode
         
         ! Locals
-        integer :: iErrCode
-        integer :: iNumFiles
+        integer             :: iErrCode
+        integer             :: iNumFiles
+        integer             :: iFile
+        character(len=256)  :: sBuffer
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -42,9 +44,14 @@ contains
             iRetCode = 1
             return
         end if
+        do
+            read(iLUN, "(a)", iostat=iErrCode) sBuffer
+            if(iErrCode /= 0) exit
+            iNumFiles = iNumFiles + 1
+        end do
         
         ! Second step: Actual read
-        rewind(iLun)
+        rewind(iLUN)
         close(iLUN)
         
     end function readFileList
