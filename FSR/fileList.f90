@@ -12,7 +12,6 @@ module fileList
     private
     
     ! Public interface
-    public  :: svFiles
     public  :: readFileList
     
     ! Declarations
@@ -20,15 +19,15 @@ module fileList
     
 contains
 
-    function readFileList(iLUN, sFileName, svFiles) result(iRetCode)
+    function readFileList(sFileName, svFiles) result(iRetCode)
     
         ! Routine arguments
-        integer, intent(in)                                         :: iLUN
         character(len=256), intent(in)                              :: sFileName
         character(len=256), dimension(:), allocatable, intent(out)  :: svFiles
         integer                                                     :: iRetCode
         
         ! Locals
+        integer             :: iLUN
         integer             :: iErrCode
         integer             :: iNumFiles
         integer             :: iFile
@@ -39,7 +38,7 @@ contains
         
         ! First step: Count lines in input file
         iNumFiles = 0
-        open(iLUN, file=sFileName, status='old', action='read', iostat=iErrCode)
+        open(newunit=iLUN, file=sFileName, status='old', action='read', iostat=iErrCode)
         if(iErrCode /= 0) then
             iRetCode = 1
             return
