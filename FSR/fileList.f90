@@ -14,9 +14,6 @@ module fileList
     ! Public interface
     public  :: readFileList
     
-    ! Declarations
-    
-    
 contains
 
     function readFileList(sFileName, svFiles) result(iRetCode)
