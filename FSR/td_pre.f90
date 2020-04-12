@@ -92,7 +92,7 @@ program td_pre
     do i = 1, size(svFiles)
 
         ! Get date and hour from file name
-        iDateStart = len_trim(svFiles(i)) - 15
+        iDateStart = len_trim(svFiles(i)) - 14
         sYear  = svFiles(i)(iDateStart:iDateStart+3)
         sMonth = svFiles(i)(iDateStart+4:iDateStart+5)
         sDay   = svFiles(i)(iDateStart+6:iDateStart+7)
@@ -193,7 +193,7 @@ program td_pre
             iSecond = floor(rvAvgTime(j))
             iMinute = (iSecond / 60)
             iSecond = iSecond - iMinute * 60
-            write(10, "(a4,2('-',a2),1x,a2,2(':',i2.2),9(',',f8.2))") &
+            write(10, "(a4,2('-',a2),1x,a2,2(':',i2.2),3(',',f8.2),6(',',f8.4))") &
                 sYear, sMonth, sDay, sHour, iMinute, iSecond, &
                 rvAvgU(j), rvAvgV(j), rvAvgW(j), &
                 rvStdDevU(j), rvStdDevV(j), rvStdDevW(j), &
