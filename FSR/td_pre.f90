@@ -21,7 +21,7 @@ program td_pre
     character(len=256)                              :: sOutFile
     integer                                         :: iRetCode
     character(len=256), dimension(:), allocatable   :: svFiles
-    integer                                         :: i
+    integer                                         :: i, j
     integer                                         :: iDateStart
     character(len=4)                                :: sYear
     character(len=2)                                :: sMonth
@@ -190,15 +190,15 @@ program td_pre
         end if
 		
 		! Write data to TinyDisp file
-        do i = 1, size(rvAvgTime)
-            iSecond = floor(rvAvgTime(i))
+        do j = 1, size(rvAvgTime)
+            iSecond = floor(rvAvgTime(j))
             iMinute = (iSecond / 60)
             iSecond = iSecond - iMinute * 60
             write(10, "(a4,2('-',a2),1x,a2,2(':',i2.2),9(',',f8.2))") &
                 sYear, sMonth, sDay, sHour, iMinute, iSecond, &
-                rvAvgU(i), rvAvgV(i), rvAvgW(i), &
-                rvStdDevU(i), rvStdDevV(i), rvStdDevW(i), &
-                rvCovUV(i), rvCovUW(i), rvCovVW(i)
+                rvAvgU(j), rvAvgV(j), rvAvgW(j), &
+                rvStdDevU(j), rvStdDevV(j), rvStdDevW(j), &
+                rvCovUV(j), rvCovUW(j), rvCovVW(j)
         end do
 
     end do
