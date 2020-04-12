@@ -229,6 +229,7 @@ contains
         allocate(rvSumX(iNumSteps), rvSumY(iNumSteps), rvSumXY(iNumSteps))
         ivNumData = 0
         rvSumX    = 0.
+        rvSumY    = 0.
         rvSumXY   = 0.
         
         ! Sum step values
