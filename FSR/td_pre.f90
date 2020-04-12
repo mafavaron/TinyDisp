@@ -7,15 +7,18 @@
 !
 program td_pre
 
+    use fileList
+
     implicit none
     
     ! Locals
-    character(len=256)  :: sFsrList
-    character(len=256)  :: sFileName
-    character(len=16)   :: sBuffer
-    integer             :: iAvgTime
-    character(len=256)  :: sOutFile
-    integer             :: iRetCode
+    character(len=256)                              :: sFsrList
+    character(len=256)                              :: sFileName
+    character(len=16)                               :: sBuffer
+    integer                                         :: iAvgTime
+    character(len=256)                              :: sOutFile
+    integer                                         :: iRetCode
+    character(len=256), dimension(:), allocatable   :: svFiles
     
     ! Get command arguments
     if(command_argument_count() /= 3) then
@@ -41,5 +44,12 @@ program td_pre
         stop 2
     end if
     call get_command_argument(3, sOutFile)
+    
+    ! Read file list
+    iRetCode = readFileList(10, sFsrList, svFiles)
+    if(iRetCode /= 0) then
+        print *, 'td_pre:: error: Data files list not read.'
+        stop 2
+    end if
 
 end program td_pre
