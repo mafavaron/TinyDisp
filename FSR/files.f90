@@ -145,9 +145,7 @@ contains
         integer                                                 :: iRetCode
 
         ! Locals
-        integer :: iLUN
-        integer :: iErrCode
-        integer :: iNumData
+        ! --none--
 
         ! Assume success (will falsify on failure)
         iRetCode = 0
