@@ -64,6 +64,29 @@ contains
             return
         end if
         
+        ! Store intermediates to structure, for any later use
+        this % iLUN = iLUN
+        if(iMaxPart < 0) then
+            iMaxPart = -iMaxPart
+        else
+            this % lTwoDimensional = .true.
+        end if
+        
+        ! Reserve storage space, if needed
+        if(iNumPart <= 0) then
+            iRetCode = 3
+            close(iLUN)
+            return
+        end if
+        if(allocated(this % ivTimeStamp)) deallocate(this % ivTimeStamp)
+        if(allocated(this % rvX))         deallocate(this % rvX)
+        if(allocated(this % rvY))         deallocate(this % rvY)
+        if(allocated(this % rvZ))         deallocate(this % rvZ)
+        allocate(this % ivTimeStamp(iNumPart))
+        allocate(this % rvX(iNumPart))
+        allocate(this % rvY(iNumPart))
+        allocate(this % rvZ(iNumPart))
+        
     end function prtOpen
 
 
