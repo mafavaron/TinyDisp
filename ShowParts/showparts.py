@@ -172,7 +172,7 @@ if __name__ == "__main__":
         iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp = get_next_particles(fParticles)
 
         # Plot current particle pool
-        ax.scatter(rvX, rvY, s=0.75, c='red', alpha=0.2)
+        ax.scatter(rvX, rvY, s=0.75, c='red', alpha=0.05)
         ax.set_xlim((xMin, xMax))
         ax.set_ylim((yMin, yMax))
         ax.set_aspect('equal')
@@ -181,7 +181,7 @@ if __name__ == "__main__":
         camera.snap()
 
         # Tell users which step is this
-        print("Frame %d of %d generated" % (iNumIter, iNumParticlePools))
+        print("Frame %d of %d generated - Min/Max X: %f/%f - Min/Max Y: %f/%f" % (iNumIter, iNumParticlePools, np.min(rvX), np.max(rvX), np.min(rvY), np.max(rvY))))
 
     print('Animation completed: generating movie')
     anim = camera.animate(blit=True)
