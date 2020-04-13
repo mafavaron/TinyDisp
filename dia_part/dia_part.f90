@@ -14,10 +14,11 @@ program dia_part
     ! Locals
     type(ParticlesFileType) :: tPart
     character(len=256)      :: sInputFile
+    integer                 :: iRetCode
     integer                 :: iTimeStep
     
     ! Get parameters
-    if(command_argument_count()) then
+    if(command_argument_count() /= 1) then
         print *, "dia_part - Procedure, for performing plausibility checks on particles file"
         print *
         print *, "Usage:"
@@ -30,6 +31,7 @@ program dia_part
         stop
     end if
     call get_command_argument(1, sInputFile)
+    print *, trim(sInputFile)
     
     ! Access input file
     iRetCode = tPart % connect(sInputFile)
@@ -41,8 +43,8 @@ program dia_part
     ! Main loop: Iterate over time steps
     do iTimeStep = 1, tPart % iNumTimeSteps
         iRetCode = tPart % get()
-        if(iRetCide /= 0) cycle
-        print *, iTimeStep, tPart % iCurTime, tPart % iNumPart
+        if(iRetCode /= 0) cycle
+        print *, iTimeStep, tPart % iCurTime, size(tPart % ivTimeStamp)
     end do
     
     ! Leave
