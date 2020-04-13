@@ -45,10 +45,11 @@ module TinyDispFiles
     
 contains
 
-    function prtOpen(this) result(iRetCode)
+    function prtOpen(this, sInputFile) result(iRetCode)
     
         ! Routine arguments
         class(ParticlesFileType), intent(out)   :: this
+        character(len=256), intent(in)          :: sInputFile
         integer                                 :: iRetCode
         
         ! Locals
@@ -64,7 +65,7 @@ contains
         this % lTwoDimensional = .false.
         
         ! Access file
-        open(newunit=iLUN, status='old', action='read', access='stream', iostat=iErrCode)
+        open(newunit=iLUN, file=sInputFile, status='old', action='read', access='stream', iostat=iErrCode)
         if(iErrCode /= 0) then
             iRetCode = 1
             return
@@ -104,6 +105,8 @@ contains
         ! Locals
         integer :: iLUN
         integer :: iErrCode
+        integer :: iNumPart
+        integer :: iIteration
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -186,7 +189,7 @@ contains
         iRetCode = 0
         
         ! Disconnect file (doing nothing in case it is already disconnected)
-        close(this % iLUN, stat=iErrCode)
+        close(this % iLUN, iostat=iErrCode)
         
     end function prtClose
 
