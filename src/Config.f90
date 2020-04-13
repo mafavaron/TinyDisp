@@ -22,6 +22,10 @@ module Config
         integer                 :: iDebugLevel
         ! Domain
         real                    :: rEdgeLength
+        real                    :: rXmin
+        real                    :: rYmin
+        real                    :: rXmax
+        real                    :: rYmax
         ! Meteo file
         character(len=256)      :: sMeteoFile
         ! Particles
@@ -36,10 +40,6 @@ module Config
         ! Grid
         logical                 :: lEnableCounting
         integer                 :: iNumCells
-        real                    :: rXmin
-        real                    :: rYmin
-        real                    :: rXmax
-        real                    :: rYmax
         real                    :: rDxy
         character(len=256)      :: sCountingFile
     contains
