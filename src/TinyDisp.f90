@@ -75,7 +75,11 @@ program TinyDisp
     
     ! Initialize particles file
     open(10, file=tCfg % sParticlesFile, status='unknown', action='write', access='stream')
-    write(10) tCfg % iMaxPart, size(tMeteo % ivTimeStamp)
+    if(tPart % lTwoDimensional) then
+        write(10)  tCfg % iMaxPart, size(tMeteo % ivTimeStamp)
+    else
+        write(10) -tCfg % iMaxPart, size(tMeteo % ivTimeStamp)
+    end if
     
     ! Initialize grid file, if requested
     if(tCfg % lEnableCounting) then
@@ -116,7 +120,13 @@ program TinyDisp
         )
         
         ! Write particles
-        iNumActiveParticles = count(tPart % ivTimeStampAtBirth >= 0)
+        iNumActiveParticles = count( &
+            tPart % ivTimeStampAtBirth >= 0 .and. &
+            tPart % rvX >= tCfg % rXmin .and. &
+            tPart % rvX <= tCfg % rXmax .and. &
+            tPart % rvY >= tCfg % rYmin .and. &
+            tPart % rvY <= tCfg % rYmax &
+        )
         if(tPart % lTwoDimensional) then
             write(10) &
                 iMeteo, &
@@ -144,24 +154,48 @@ program TinyDisp
         end if
         if(iNumActiveParticles > 0) then
             do i = 1, tCfg % iMaxPart
-                if(tPart % ivTimeStampAtBirth(i) >= 0) then
+                if( &
+                    tPart % ivTimeStampAtBirth(i) >= 0 .and. &
+                    tPart % rvX(i) >= tCfg % rXmin .and. &
+                    tPart % rvX(i) <= tCfg % rXmax .and. &
+                    tPart % rvY(i) >= tCfg % rYmin .and. &
+                    tPart % rvY(i) <= tCfg % rYmax &
+                ) then
                     write(10) tPart % rvX(i)
                 end if
             end do
             do i = 1, tCfg % iMaxPart
-                if(tPart % ivTimeStampAtBirth(i) >= 0) then
+                if( &
+                    tPart % ivTimeStampAtBirth(i) >= 0 .and. &
+                    tPart % rvX(i) >= tCfg % rXmin .and. &
+                    tPart % rvX(i) <= tCfg % rXmax .and. &
+                    tPart % rvY(i) >= tCfg % rYmin .and. &
+                    tPart % rvY(i) <= tCfg % rYmax &
+                ) then
                     write(10) tPart % rvY(i)
                 end if
             end do
             if(.not. tPart % lTwoDimensional) then
                 do i = 1, tCfg % iMaxPart
-                    if(tPart % ivTimeStampAtBirth(i) >= 0) then
+                    if( &
+                        tPart % ivTimeStampAtBirth(i) >= 0 .and. &
+                        tPart % rvX(i) >= tCfg % rXmin .and. &
+                        tPart % rvX(i) <= tCfg % rXmax .and. &
+                        tPart % rvY(i) >= tCfg % rYmin .and. &
+                        tPart % rvY(i) <= tCfg % rYmax &
+                    ) then
                         write(10) tPart % rvZ(i)
                     end if
                 end do
             end if
             do i = 1, tCfg % iMaxPart
-                if(tPart % ivTimeStampAtBirth(i) >= 0) then
+                if( &
+                    tPart % ivTimeStampAtBirth(i) >= 0 .and. &
+                    tPart % rvX(i) >= tCfg % rXmin .and. &
+                    tPart % rvX(i) <= tCfg % rXmax .and. &
+                    tPart % rvY(i) >= tCfg % rYmin .and. &
+                    tPart % rvY(i) <= tCfg % rYmax &
+                ) then
                     write(10) tPart % ivTimeStampAtBirth(i)
                 end if
             end do
@@ -171,7 +205,13 @@ program TinyDisp
         if(tCfg % lEnableCounting) then
             imCount = 0
             do i = 1, tCfg % iMaxPart
-                if(tPart % ivTimeStampAtBirth(i) >= 0) then
+                if( &
+                    tPart % ivTimeStampAtBirth(i) >= 0 .and. &
+                    tPart % rvX(i) >= tCfg % rXmin .and. &
+                    tPart % rvX(i) <= tCfg % rXmax .and. &
+                    tPart % rvY(i) >= tCfg % rYmin .and. &
+                    tPart % rvY(i) <= tCfg % rYmax &
+                ) then
                     iPartX = floor((tPart % rvX(i) - tCfg % rXmin) / tCfg % rDxy) + 1
                     iPartY = floor((tPart % rvY(i) - tCfg % rYmin) / tCfg % rDxy) + 1
                     if(1 <= iPartX .and. iPartX <= tCfg % iNumCells .and. 1 <= iPartY .and. iPartY <= tCfg % iNumCells) then
@@ -180,7 +220,7 @@ program TinyDisp
                 end if
             end do
             write(11) tMeteo % ivTimeStamp(iMeteo)
-            do i = 1, iPartY
+            do i = 1, size(imCount, dim=2)
                 write(11) imCount(:,i)
             end do
         end if
