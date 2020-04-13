@@ -24,28 +24,50 @@ module TinyDispFiles
         real, dimension(:), allocatable     :: rvY
         real, dimension(:), allocatable     :: rvZ
     contains
-        procedure open
-        procedure read
-        procedure close
+        procedure open  => prtOpen
+        procedure read  => prtRead
+        procedure close => prtClose
     end type ParticlesFileType
     
 contains
 
-    function open(this) result(iRetCode)
+    function prtOpen(this) result(iRetCode)
     
         ! Routine arguments
         class(ParticlesFileType), intent(out)   :: this
         integer                                 :: iRetCode
         
         ! Locals
+        integer :: iLUN
+        integer :: iErrCode
+        integer :: iMaxPart
+        integer :: iNumPart
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
+
+        ! Initialize structure
+        this % lTwoDimensional = .false.
         
-    end function open
+        ! Access file
+        open(newunit=iLUN, status='old', action='read', access='stream', iostat=iErrCode)
+        if(iErrCode /= 0) then
+            iRetCode = 1
+            return
+        end if
+        
+        ! Get heading information
+        read(iLUN, iostat=iErrCode) iMaxPart, iNumPart
+        if(iErrCode /= 0) then
+            iRetCode = 2
+            close(iLUN)
+            return
+        end if
+        
+    end function prtOpen
 
 
-    function read(this) result(iRetCode)
+    function prtRead(this) result(iRetCode)
     
         ! Routine arguments
         class(ParticlesFileType), intent(inout) :: this
@@ -56,10 +78,10 @@ contains
         ! Assume success (will falsify on failure)
         iRetCode = 0
         
-    end function read
+    end function prtRead
 
 
-    function close(this) result(iRetCode)
+    function prtClose(this) result(iRetCode)
     
         ! Routine arguments
         class(ParticlesFileType), intent(inout) :: this
@@ -70,6 +92,6 @@ contains
         ! Assume success (will falsify on failure)
         iRetCode = 0
         
-    end function close
+    end function prtClose
 
 end module TinyDispFiles
