@@ -8,6 +8,7 @@
 program dia_part
 
     use TinyDispFiles
+    use calendar
     
     implicit none
     
@@ -16,6 +17,7 @@ program dia_part
     character(len=256)      :: sInputFile
     integer                 :: iRetCode
     integer                 :: iTimeStep
+    integer                 :: iYear, iMonth, iDay, iHour, iMinute, iSecond
     
     ! Get parameters
     if(command_argument_count() /= 1) then
@@ -44,7 +46,13 @@ program dia_part
     do iTimeStep = 1, tPart % iNumTimeSteps
         iRetCode = tPart % get()
         if(iRetCode /= 0) cycle
-        print *, iTimeStep, tPart % iCurTime, size(tPart % ivTimeStamp)
+        call UnpackTime(tPart % iCurTime, iYear, iMonth, iDay, iHour, iMinute, iSecond)
+        write(6,"(i6,1x,i4.4,2('-',i2.2),'T',i2.2,2(':',i2.2),1x,i8,4(1x,f9.2))") &
+            iTimeStep, &
+            iYear, iMonth, iDay, iHour, iMinute, iSecond, &
+            size(tPart % ivTimeStamp), &
+            minval(tPart % rvX), maxval(tPart % rvX), &
+            minval(tPart % rvY), maxval(tPart % rvY)
     end do
     
     ! Leave
