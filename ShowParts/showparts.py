@@ -181,7 +181,7 @@ if __name__ == "__main__":
         camera.snap()
 
         # Tell users which step is this
-        print("Frame %d of %d generated - Min/Max X: %f/%f - Min/Max Y: %f/%f" % (iNumIter, iNumParticlePools, np.min(rvX), np.max(rvX), np.min(rvY), np.max(rvY))))
+        print("Frame %d of %d generated - Min/Max X: %f/%f - Min/Max Y: %f/%f" % (iNumIter, iNumParticlePools, np.min(rvX), np.max(rvX), np.min(rvY), np.max(rvY)))
 
     print('Animation completed: generating movie')
     anim = camera.animate(blit=True)
