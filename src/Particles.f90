@@ -83,6 +83,7 @@ contains
         ! Initialize with relevant values
         this % ivTimeStampAtBirth = -1  ! Meaning "inactive"
         this % iNextPart          =  1
+        this % lTwoDimensional    = lTwoDimensional
     
     end function Create
 
