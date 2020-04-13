@@ -6,4 +6,46 @@
 ! Author: Patti M. Favaron
 !
 program dia_part
+
+    use TinyDispFiles
+    
+    implicit none
+    
+    ! Locals
+    type(ParticlesFileType) :: tPart
+    character(len=256)      :: sInputFile
+    integer                 :: iTimeStep
+    
+    ! Get parameters
+    if(command_argument_count()) then
+        print *, "dia_part - Procedure, for performing plausibility checks on particles file"
+        print *
+        print *, "Usage:"
+        print *
+        print *, "  ./dia_part <Particles_File>"
+        print *
+        print *, "Copyright 2020 by Servizi Territorio srl"
+        print *, "                  This is open-source code, covered by the MIT license"
+        print *
+        stop
+    end if
+    call get_command_argument(1, sInputFile)
+    
+    ! Access input file
+    iRetCode = tPart % connect(sInputFile)
+    if(iRetCode /= 0) then
+        print *, "dia_part:: error: Input file not opened"
+        stop
+    end if
+    
+    ! Main loop: Iterate over time steps
+    do iTimeStep = 1, tPart % iNumTimeSteps
+        iRetCode = tPart % get()
+        if(iRetCide /= 0) cycle
+        print *, iTimeStep, tPart % iCurTime, tPart % iNumPart
+    end do
+    
+    ! Leave
+    iRetCode = tPart % disconnect()
+    
 end program dia_part
