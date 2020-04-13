@@ -75,7 +75,11 @@ program TinyDisp
     
     ! Initialize particles file
     open(10, file=tCfg % sParticlesFile, status='unknown', action='write', access='stream')
-    write(10) tCfg % iMaxPart, size(tMeteo % ivTimeStamp)
+    if(tPart % lTwoDimensional) then
+        write(10)  tCfg % iMaxPart, size(tMeteo % ivTimeStamp)
+    else
+        write(10) -tCfg % iMaxPart, size(tMeteo % ivTimeStamp)
+    end if
     
     ! Initialize grid file, if requested
     if(tCfg % lEnableCounting) then
