@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import PillowWriter
 from celluloid import Camera
 import configparser
-import os
+import time
 import sys
 import struct
 
@@ -171,11 +171,15 @@ if __name__ == "__main__":
         # Try getting new particle pool
         iRetCode, iIteration, iCurTime, rU, rV, rStdDevU, rStdDevV, rCovUV, rvX, rvY, ivTimeStamp = get_next_particles(fParticles)
 
+        # Convert time from integer to string form
+        sTimeStamp = time.strftime("%Y-%m-%d %H", time.gmtime(iCurTime))
+
         # Plot current particle pool
         ax.scatter(rvX, rvY, s=0.75, c='red', alpha=0.05)
         ax.set_xlim((xMin, xMax))
         ax.set_ylim((yMin, yMax))
         ax.set_aspect('equal')
+        #ax.title.set_text(sTimeStamp)
 
         # Take snapshot
         camera.snap()
