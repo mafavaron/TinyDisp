@@ -17,16 +17,30 @@ module TinyDispFiles
     ! Data types
     
     type ParticlesFileType
+        ! Generalities
         logical                             :: lTwoDimensional
         integer                             :: iLUN
+        integer                             :: iNumTimeSteps
+        ! Meteorology
+        integer                             :: iCurTime
+        real                                :: rU
+        real                                :: rV
+        real                                :: rW
+        real                                :: rStdDevU
+        real                                :: rStdDevV
+        real                                :: rStdDevW
+        real                                :: rCovUV
+        real                                :: rCovUW
+        real                                :: rCovVW
+        ! Particles
         integer, dimension(:), allocatable  :: ivTimeStamp
         real, dimension(:), allocatable     :: rvX
         real, dimension(:), allocatable     :: rvY
         real, dimension(:), allocatable     :: rvZ
     contains
-        procedure open  => prtOpen
-        procedure read  => prtRead
-        procedure close => prtClose
+        procedure :: connect    => prtOpen
+        procedure :: get        => prtRead
+        procedure :: disconnect => prtClose
     end type ParticlesFileType
     
 contains
@@ -41,7 +55,7 @@ contains
         integer :: iLUN
         integer :: iErrCode
         integer :: iMaxPart
-        integer :: iNumPart
+        integer :: iNumMeteo
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -57,9 +71,14 @@ contains
         end if
         
         ! Get heading information
-        read(iLUN, iostat=iErrCode) iMaxPart, iNumPart
+        read(iLUN, iostat=iErrCode) iMaxPart, iNumMeteo
         if(iErrCode /= 0) then
             iRetCode = 2
+            close(iLUN)
+            return
+        end if
+        if(iMaxPart == 0 .or. iNumMeteo <= 0) then
+            iRetCode = 3
             close(iLUN)
             return
         end if
@@ -71,21 +90,7 @@ contains
         else
             this % lTwoDimensional = .true.
         end if
-        
-        ! Reserve storage space, if needed
-        if(iNumPart <= 0) then
-            iRetCode = 3
-            close(iLUN)
-            return
-        end if
-        if(allocated(this % ivTimeStamp)) deallocate(this % ivTimeStamp)
-        if(allocated(this % rvX))         deallocate(this % rvX)
-        if(allocated(this % rvY))         deallocate(this % rvY)
-        if(allocated(this % rvZ))         deallocate(this % rvZ)
-        allocate(this % ivTimeStamp(iNumPart))
-        allocate(this % rvX(iNumPart))
-        allocate(this % rvY(iNumPart))
-        allocate(this % rvZ(iNumPart))
+        this % iNumTimeSteps = iNumMeteo
         
     end function prtOpen
 
@@ -97,9 +102,73 @@ contains
         integer                                 :: iRetCode
         
         ! Locals
+        integer :: iLUN
+        integer :: iErrCode
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
+        
+        ! Get steering data
+        iLUN = this % iLUN
+        
+        ! Get this block meteo data and size
+        if(this % lTwoDimensional) then
+            read(iLUN, iostat=iErrCode) &
+                iIteration, &
+                this % iCurTime, &
+                this % rU, &
+                this % rV, &
+                this % rStdDevU, &
+                this % rStdDevV, &
+                this % rCovUV, &
+                iNumPart
+            this % rW       = 0.
+            this % rStdDevW = 0.
+            this % rCovUW   = 0.
+            this % rCovVW   = 0.
+        else
+            read(iLUN, iostat=iErrCode) &
+                iIteration, &
+                this % iCurTime, &
+                this % rU, &
+                this % rV, &
+                this % rW, &
+                this % rStdDevU, &
+                this % rStdDevV, &
+                this % rStdDevW, &
+                this % rCovUV, &
+                this % rCovUW, &
+                this % rCovVW, &
+                iNumPart
+        end if
+        if(iErrCode /= 0) then
+            iRetCode = -1
+            return
+        end if
+        
+        ! Reserve storage space, if needed
+        if(allocated(this % ivTimeStamp)) deallocate(this % ivTimeStamp)
+        if(allocated(this % rvX))         deallocate(this % rvX)
+        if(allocated(this % rvY))         deallocate(this % rvY)
+        if(allocated(this % rvZ))         deallocate(this % rvZ)
+        allocate(this % ivTimeStamp(iNumPart))
+        allocate(this % rvX(iNumPart))
+        allocate(this % rvY(iNumPart))
+        allocate(this % rvZ(iNumPart))
+        
+        ! Gather data
+        if(this % lTwoDimensional) then
+            read(iLUN, iostat=iErrCode) &
+                this % rvX, &
+                this % rvY, &
+                this % ivTimeStamp
+        else
+            read(iLUN, iostat=iErrCode) &
+                this % rvX, &
+                this % rvY, &
+                this % rvZ, &
+                this % ivTimeStamp
+        end if
         
     end function prtRead
 
@@ -111,9 +180,13 @@ contains
         integer                                 :: iRetCode
         
         ! Locals
+        integer :: iErrCode
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
+        
+        ! Disconnect file (doing nothing in case it is already disconnected)
+        close(this % iLUN, stat=iErrCode)
         
     end function prtClose
 
