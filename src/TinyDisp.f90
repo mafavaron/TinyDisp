@@ -184,7 +184,7 @@ program TinyDisp
                 end if
             end do
             write(11) tMeteo % ivTimeStamp(iMeteo)
-            do i = 1, iPartY
+            do i = 1, size(imCount, dim=2)
                 write(11) imCount(:,i)
             end do
         end if
