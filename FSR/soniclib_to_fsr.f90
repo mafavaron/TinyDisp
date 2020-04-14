@@ -101,8 +101,8 @@ program Soniclib_To_FSR
         read(10, "(a)") sBuffer
         iData = 0
         do
-            read(10, *) iTimeStamp, rU, rV, rW, rT
-            if(iRetCode /= 0) cycle
+            read(10, *, iostat=iRetCode) iTimeStamp, rU, rV, rW, rT
+            if(iRetCode /= 0) exit
             if(rU <= -9990. .or. rV <= -9990. .or. rV <= -9990. .or. rW <= -9990. .or. rT <= -9990.) cycle
             iData = iData + 1
             rvTimeStamp(iData) = iTimeStamp
