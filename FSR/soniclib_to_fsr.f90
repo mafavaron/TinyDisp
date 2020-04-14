@@ -76,6 +76,9 @@ program Soniclib_To_FSR
         do
             read(10, "(a)", iostat=iRetCode) sBuffer
             if(iRetCode /= 0) exit
+            read(sBuffer, *, iostat=iRetCode) iTimeStamp, rU, rV, rW, rT
+            if(iRetCode /= 0) cycle
+            if(rU <= -9990. .or. rV <= -9990. .or. rV <= -9990. .or. rW <= -9990. .or. rT <= -9990.) cycle
             iNumData = iNumData + 1
         end do
         if(iNumData <= 0) then
@@ -96,8 +99,12 @@ program Soniclib_To_FSR
         ! -1- Really read data
         rewind(10)
         read(10, "(a)") sBuffer
-        do iData = 1, iNumData
+        iData = 0
+        do
             read(10, *) iTimeStamp, rU, rV, rW, rT
+            if(iRetCode /= 0) cycle
+            if(rU <= -9990. .or. rV <= -9990. .or. rV <= -9990. .or. rW <= -9990. .or. rT <= -9990.) cycle
+            iData = iData + 1
             rvTimeStamp(iData) = iTimeStamp
             rvU(iData) = rU
             rvV(iData) = rV
@@ -105,6 +112,9 @@ program Soniclib_To_FSR
             rvT(iData) = rT
         end do
         close(10)
+        
+        ! Defensive programming, in theory not necessary
+        if(iData /= iNumData) cycle
 
         ! Write data in binary form
         open(11, file=sOutputFileName, status='unknown', action='write', access='stream')
