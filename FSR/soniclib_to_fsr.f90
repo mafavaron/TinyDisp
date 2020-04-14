@@ -27,7 +27,7 @@ program Soniclib_To_FSR
 
     ! Get command arguments
     if(command_argument_count() /= 2) then
-        print *, "fp - Ultrasonic anemometer raw data encoding procedure"
+        print *, "soniclib_to_fsr - Ultrasonic anemometer raw data encoding procedure"
         print *
         print *, "error:: Invalid command line"
         print *
@@ -54,7 +54,7 @@ program Soniclib_To_FSR
     do i = 1, size(svFiles)
     
         sInputFileName = svFiles(i)
-        sOutputFileName = baseName(sInputFileName, '\\')
+        sOutputFileName = trim(sOutputPath) // '\\' // baseName(sInputFileName, '\\')
         sOutputFileName = sOutputFileName(1:len_trim(sOutputFileName)-3) // 'fsr'
 
         ! Process file
