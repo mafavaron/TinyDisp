@@ -13,15 +13,13 @@ program Soniclib_To_FSR
     character(len=256)  :: sInputListFile
     character(len=256)  :: sOutputPath
     integer             :: iRetCode
-    integer(4)          :: iLength
     character(len=256)  :: sInputFileName
     character(len=256)  :: sOutputFileName
     character(len=256)  :: sBuffer
-    integer             :: iPos
+    integer             :: i
     integer             :: iNumData
     integer             :: iData
     integer             :: iTimeStamp
-    integer             :: iU, iV, iW, iT
     real                :: rU, rV, rW, rT
     integer(2)          :: zero = 0
     real, dimension(:), allocatable                 :: rvTimeStamp, rvU, rvV, rvW, rvT
