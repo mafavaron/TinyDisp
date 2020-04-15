@@ -157,8 +157,13 @@ program met_split
     
     ! Compute the descriptive statistics
     rvVel = sqrt(rvU**2 + rvV**2)
-    rvUnitU = rvU / rvVel
-    rvUnitV = rvV / rvVel
+    where(rvVel > 0.)
+        rvUnitU = rvU / rvVel
+        rvUnitV = rvV / rvVel
+    elsewhere
+        rvUnitU = 0.
+        rvUnitV = 0.
+    endwhere
     allocate(rvVectorVel(iNumDays))
     allocate(rvScalarVel(iNumDays))
     allocate(rvCircularVar(iNumDays))
@@ -181,8 +186,9 @@ program met_split
     open(10, file=sDiaFile, status='unknown', action='write')
     write(10, "('Time.Stamp, Vel, Scalar.Vel, Circ.Var')")
     do iDayIdx = 1, iNumDays
+        call unpacktime(ivDayStamp(iDayIdx), iYear, iMonth, iDay, iHour, iMinute, iSecond)
         write(10, "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2),2(',',f6.3),',',f6.4)") &
-            iYear, iMonth, iDay, iHour, iMinutee, iSecond, &
+            iYear, iMonth, iDay, iHour, iMinute, iSecond, &
             rvVectorVel(iDayIdx), rvScalarVel(iDayIdx), &
             rvCircularVar(iDayIdx)
     end do
