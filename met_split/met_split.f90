@@ -38,6 +38,7 @@ program met_split
     integer                             :: iCurTime
     integer                             :: iOldDay
     integer                             :: iCurDay
+    integer                             :: iDayIdx
     
     ! Get command arguments
     if(command_argument_count() /= 3) then
@@ -74,8 +75,8 @@ program met_split
         iNumLines = iNumLines + 1
     end do
     rewind(10)
-    if(iNumLines <= 0) then
-        print *, 'met_split:: error: Meteorological input file is empty'
+    if(iNumLines <= 1) then
+        print *, 'met_split:: error: Meteorological input file is empty or contains a single data line'
         stop
     end if
     allocate(ivTimeStamp(iNumLines))
@@ -107,9 +108,9 @@ program met_split
     close(10)
     
     ! Count number of days in meteo file
-    iOldDay = 0
+    iOldDay = ivTimeStamp(1) / 86400
     iNumDays = 0
-    do iLine = 1, iNumLines
+    do iLine = 2, iNumLines
         iCurTime = ivTimeStamp(iLine)
         iCurDay = iCurTime / 86400
         if(iCurDay /= iOldDay) then
@@ -119,6 +120,26 @@ program met_split
     end do
     allocate(ivDayBegin(iNumDays))
     allocate(ivDayEnd(iNumDays))
+    
+    ! Delimit days
+    iOldDay = ivTimeStamp(1) / 86400
+    iDayIdx = 0
+    ivDayBegin(1) = 1
+    do iLine = 2, iNumLines
+        iCurTime = ivTimeStamp(iLine)
+        iCurDay = iCurTime / 86400
+        if(iCurDay /= iOldDay) then
+            iDayIdx = iDayIdx + 1
+            ivDayEnd(iDayIdx) = iLine - 1
+            ivDayBegin(iDayIdx + 1) = iLine
+            iOldDay = iCurDay
+        end if
+    end do
+    ivDayEnd(iNumDays) = iNumLines
+    
+    do iDayIdx = 1, iNumDays
+        print *, iDayIdx, ivDayBegin(iDayIdx), ivDayEnd(iDayIdx), ivDayEnd(iDayIdx)-ivDayBegin(iDayIdx)+1
+    end do
     
     ! Leave
     deallocate(ivDayEnd)
