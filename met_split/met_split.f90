@@ -91,7 +91,7 @@ program met_split
         read(10, "(a)") sBuffer
         read(sBuffer, "(i4,5(1x,i2))") iYear, iMonth, iDay, iHour, iMinute, iSecond
         call packtime(ivTimeStamp(iLine), iYear, iMonth, iDay, iHour, iMinute, iSecond)
-        read(sBuffer,*) &
+        read(sBuffer(21:),*) &
             rvU(iLine), &
             rvV(iLine), &
             rvW(iLine), &
