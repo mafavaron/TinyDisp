@@ -29,9 +29,16 @@ program met_split
     real, dimension(:), allocatable     :: rvCovUV
     real, dimension(:), allocatable     :: rvCovUW
     real, dimension(:), allocatable     :: rvCovVW
+    real, dimension(:), allocatable     :: rvVel
+    real, dimension(:), allocatable     :: rvUnitU
+    real, dimension(:), allocatable     :: rvUnitV
     integer, dimension(:), allocatable  :: ivDayBegin
     integer, dimension(:), allocatable  :: ivDayEnd
+    integer, dimension(:), allocatable  :: ivDayStamp
     integer                             :: iNumDays
+    real, dimension(:), allocatable     :: rvVectorVel
+    real, dimension(:), allocatable     :: rvScalarVel
+    real, dimension(:), allocatable     :: rvCircularVar
     character(len=256)                  :: sHeader
     character(len=256)                  :: sBuffer
     integer                             :: iYear, iMonth, iDay, iHour, iMinute, iSecond
@@ -39,6 +46,9 @@ program met_split
     integer                             :: iOldDay
     integer                             :: iCurDay
     integer                             :: iDayIdx
+    integer                             :: iBegin
+    integer                             :: iEnd
+    integer                             :: iDataInDay
     
     ! Get command arguments
     if(command_argument_count() /= 3) then
@@ -89,6 +99,9 @@ program met_split
     allocate(rvCovUV(iNumLines))
     allocate(rvCovUW(iNumLines))
     allocate(rvCovVW(iNumLines))
+    allocate(rvVel(iNumLines))
+    allocate(rvUnitU(iNumLines))
+    allocate(rvUnitV(iNumLines))
     read(10, "(a)") sHeader
     do iLine = 1, iNumLines
         read(10, "(a)") sBuffer
@@ -121,11 +134,13 @@ program met_split
     iNumDays = iNumDays + 1
     allocate(ivDayBegin(iNumDays))
     allocate(ivDayEnd(iNumDays))
+    allocate(ivDayStamp(iNumDays))
     
     ! Delimit days
     iOldDay = ivTimeStamp(1) / 86400
     iDayIdx = 0
     ivDayBegin(1) = 1
+    ivDayStamp(1) = iOldDay * 86400
     do iLine = 2, iNumLines
         iCurTime = ivTimeStamp(iLine)
         iCurDay = iCurTime / 86400
@@ -133,20 +148,55 @@ program met_split
             iDayIdx = iDayIdx + 1
             ivDayEnd(iDayIdx) = iLine - 1
             ivDayBegin(iDayIdx + 1) = iLine
+            ivDayStamp(iDayIdx + 1) = iCurDay * 86400
             iOldDay = iCurDay
         end if
     end do
     iDayIdx = iDayIdx + 1
-    ivDayBegin(iDayIdx) = ivDayEnd(iDayIdx-1) + 1
     ivDayEnd(iDayIdx) = iNumLines
     
+    ! Compute the descriptive statistics
+    rvVel = sqrt(rvU**2 + rvV**2)
+    rvUnitU = rvU / rvVel
+    rvUnitV = rvV / rvVel
+    allocate(rvVectorVel(iNumDays))
+    allocate(rvScalarVel(iNumDays))
+    allocate(rvCircularVar(iNumDays))
     do iDayIdx = 1, iNumDays
-        print *, iDayIdx, ivDayBegin(iDayIdx), ivDayEnd(iDayIdx), ivDayEnd(iDayIdx)-ivDayBegin(iDayIdx)+1
+        iBegin = ivDayBegin(iDayIdx)
+        iEnd   = ivDayEnd(iDayIdx)
+        iDataInDay = iEnd - iBegin + 1
+        rvScalarVel(iDayIdx) = sum(rvVel(iBegin:iEnd)) / iDataInDay
+        rvVectorVel(iDayIdx) = sqrt( &
+            (sum(rvU(iBegin:iEnd)) / iDataInDay)**2 + &
+            (sum(rvV(iBegin:iEnd)) / iDataInDay)**2   &
+        )
+        rvCircularVar(iDayIdx) = 1. - sqrt( &
+            (sum(rvUnitU(iBegin:iEnd)) / iDataInDay)**2 + &
+            (sum(rvUnitV(iBegin:iEnd)) / iDataInDay)**2   &
+        )
     end do
     
+    ! Write data
+    open(10, file=sDiaFile, status='unknown', action='write')
+    write(10, "('Time.Stamp, Vel, Scalar.Vel, Circ.Var')")
+    do iDayIdx = 1, iNumDays
+        write(10, "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2),2(',',f6.3),',',f6.4)") &
+            iYear, iMonth, iDay, iHour, iMinutee, iSecond, &
+            rvVectorVel(iDayIdx), rvScalarVel(iDayIdx), &
+            rvCircularVar(iDayIdx)
+    end do
+    close(10)
+    
     ! Leave
+    deallocate(rvCircularVar)
+    deallocate(rvScalarVel)
+    deallocate(rvVectorVel)
     deallocate(ivDayEnd)
     deallocate(ivDayBegin)
+    deallocate(rvUnitV)
+    deallocate(rvUnitU)
+    deallocate(rvVel)
     deallocate(rvCovVW)
     deallocate(rvCovUW)
     deallocate(rvCovUV)
