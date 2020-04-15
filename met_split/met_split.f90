@@ -48,5 +48,12 @@ program met_split
     call get_command_argument(1, sInputFile)
     call get_command_argument(2, sDiaFile)
     call get_command_argument(3, sOutputPrefix)
+    
+    ! Read meteo file
+    open(10, file=sInputFile, status='old', action='read', iostat=iRetCode)
+    close(10)
+    
+    ! Leave
+    print *, '*** END JOB ***'
 
 end program met_split
