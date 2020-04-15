@@ -209,7 +209,7 @@ program met_split
         call unpacktime(ivDayStamp(iDayIdx), iYear, iMonth, iDay, iHour, iMinute, iSecond)
         write(sFileName, "(a,i4.4,2(i2.2),',csv')") &
             trim(sOutputPrefix), &
-            iYear, iMonth, iDay, iHour
+            iYear, iMonth, iDay
         open(10, file=sFileName, status='unknown', action='write')
         write(10, "(a)") sHeader
         do iLine = iBegin, iEnd
