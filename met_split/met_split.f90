@@ -203,13 +203,17 @@ program met_split
         write(sFileName, "(a,i4.4,2(i2.2),',csv')") &
             trim(sOutputPrefix), &
             iYear, iMonth, iDay, iHour
-        print *, trim(sFileName)
-        !open(10, file=sFileName, status='unknown', action='write')
-        !write(10, "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2),2(',',f6.3),',',f6.4)") &
-        !    iYear, iMonth, iDay, iHour, iMinute, iSecond, &
-        !    rvVectorVel(iDayIdx), rvScalarVel(iDayIdx), &
-        !    rvCircularVar(iDayIdx)
-        !close(10)
+        open(10, file=sFileName, status='unknown', action='write')
+        write(10, "(a)") sHeader
+        do iLine = iBegin, iEnd
+            call unpacktime(ivTimeStamp(iLine), iYear, iMonth, iDay, iHour, iMinute, iSecond)
+            write(10, "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2),3(',',f8.2),6(',',f8.4))") &
+                iYear, iMonth, iDay, iHour, iMinute, iSecond, &
+                rvU(iLine), rvV(iLine), rvW(iLine), &
+                rvStdDevU(iLine), rvStdDevV(iLine), rvStdDevW(iLine), &
+                rvCovUV(iLine), rvCovUW(iLine), rvCovVW(iLine)
+        end do
+        close(10)
     end do
     
     ! Leave
