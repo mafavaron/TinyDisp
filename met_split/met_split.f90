@@ -118,6 +118,7 @@ program met_split
             iOldDay = iCurDay
         end if
     end do
+    iNumDays = iNumDays + 1
     allocate(ivDayBegin(iNumDays))
     allocate(ivDayEnd(iNumDays))
     
@@ -135,7 +136,9 @@ program met_split
             iOldDay = iCurDay
         end if
     end do
-    ivDayEnd(iNumDays) = iNumLines
+    iDayIdx = iDayIdx + 1
+    ivDayBegin(iDayIdx) = ivDayEnd(iDayIdx-1) + 1
+    ivDayEnd(iDayIdx) = iNumLines
     
     do iDayIdx = 1, iNumDays
         print *, iDayIdx, ivDayBegin(iDayIdx), ivDayEnd(iDayIdx), ivDayEnd(iDayIdx)-ivDayBegin(iDayIdx)+1
