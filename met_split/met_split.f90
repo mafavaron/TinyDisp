@@ -37,6 +37,8 @@ program met_split
     integer, dimension(:), allocatable  :: ivDayEnd
     integer, dimension(:), allocatable  :: ivDayStamp
     integer                             :: iNumDays
+    real, dimension(:), allocatable     :: rvminVel
+    real, dimension(:), allocatable     :: rvMaxVel
     real, dimension(:), allocatable     :: rvVectorVel
     real, dimension(:), allocatable     :: rvScalarVel
     real, dimension(:), allocatable     :: rvCircularVar
@@ -165,6 +167,8 @@ program met_split
         rvUnitU = 0.
         rvUnitV = 0.
     endwhere
+    allocate(rvMinVel(iNumDays))
+    allocate(rvMaxVel(iNumDays))
     allocate(rvVectorVel(iNumDays))
     allocate(rvScalarVel(iNumDays))
     allocate(rvCircularVar(iNumDays))
@@ -172,6 +176,8 @@ program met_split
         iBegin = ivDayBegin(iDayIdx)
         iEnd   = ivDayEnd(iDayIdx)
         iDataInDay = iEnd - iBegin + 1
+        rvMinVel(iDayIdx) = minval(rvVel(iBegin:iEnd))
+        rvMaxVel(iDayIdx) = maxval(rvVel(iBegin:iEnd))
         rvScalarVel(iDayIdx) = sum(rvVel(iBegin:iEnd)) / iDataInDay
         rvVectorVel(iDayIdx) = sqrt( &
             (sum(rvU(iBegin:iEnd)) / iDataInDay)**2 + &
@@ -185,11 +191,12 @@ program met_split
     
     ! Write diagnostic data
     open(10, file=sDiaFile, status='unknown', action='write')
-    write(10, "('Time.Stamp, Vel, Scalar.Vel, Circ.Var')")
+    write(10, "('Time.Stamp, Min.Vel, Max.Vel, Vector.Vel, Scalar.Vel, Circ.Var')")
     do iDayIdx = 1, iNumDays
         call unpacktime(ivDayStamp(iDayIdx), iYear, iMonth, iDay, iHour, iMinute, iSecond)
-        write(10, "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2),2(',',f6.3),',',f6.4)") &
+        write(10, "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2),4(',',f6.3),',',f6.4)") &
             iYear, iMonth, iDay, iHour, iMinute, iSecond, &
+            rvMinVel(iDayIdx), rvMaxVel(iDayIdx), &
             rvVectorVel(iDayIdx), rvScalarVel(iDayIdx), &
             rvCircularVar(iDayIdx)
     end do
@@ -220,6 +227,8 @@ program met_split
     deallocate(rvCircularVar)
     deallocate(rvScalarVel)
     deallocate(rvVectorVel)
+    deallocate(rvMaxVel)
+    deallocate(rvMinVel)
     deallocate(ivDayEnd)
     deallocate(ivDayBegin)
     deallocate(rvUnitV)
