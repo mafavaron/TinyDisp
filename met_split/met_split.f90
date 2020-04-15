@@ -106,7 +106,7 @@ program met_split
     end do
     close(10)
     
-    ! Count number of days
+    ! Count number of days in meteo file
     iOldDay = 0
     iNumDays = 0
     do iLine = 1, iNumLines
@@ -117,10 +117,12 @@ program met_split
             iOldDay = iCurDay
         end if
     end do
-    
-    print *, iNumDays
+    allocate(ivDayBegin(iNumDays))
+    allocate(ivDayEnd(iNumDays))
     
     ! Leave
+    deallocate(ivDayEnd)
+    deallocate(ivDayBegin)
     deallocate(rvCovVW)
     deallocate(rvCovUW)
     deallocate(rvCovUV)
