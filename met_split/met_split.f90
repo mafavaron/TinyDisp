@@ -200,7 +200,7 @@ program met_split
         iBegin = ivDayBegin(iDayIdx)
         iEnd   = ivDayEnd(iDayIdx)
         call unpacktime(ivDayStamp(iDayIdx), iYear, iMonth, iDay, iHour, iMinute, iSecond)
-        write(sFileName, "(a,i4.4,2(i2.2),'.',i2.2,',csv')") &
+        write(sFileName, "(a,i4.4,2(i2.2),',csv')") &
             trim(sOutputPrefix), &
             iYear, iMonth, iDay, iHour
         print *, trim(sFileName)
