@@ -16,6 +16,7 @@ program met_split
     integer                             :: iRetCode
     character(len=256)                  :: sInputFile
     character(len=256)                  :: sDiaFile
+    character(len=256)                  :: sFileName
     character(len=256)                  :: sOutputPrefix
     integer                             :: iNumLines
     integer                             :: iLine
@@ -182,7 +183,7 @@ program met_split
         )
     end do
     
-    ! Write data
+    ! Write diagnostic data
     open(10, file=sDiaFile, status='unknown', action='write')
     write(10, "('Time.Stamp, Vel, Scalar.Vel, Circ.Var')")
     do iDayIdx = 1, iNumDays
@@ -193,6 +194,23 @@ program met_split
             rvCircularVar(iDayIdx)
     end do
     close(10)
+    
+    ! Divide the original file in daily blocks
+    do iDayIdx = 1, iNumDays
+        iBegin = ivDayBegin(iDayIdx)
+        iEnd   = ivDayEnd(iDayIdx)
+        call unpacktime(ivDayStamp(iDayIdx), iYear, iMonth, iDay, iHour, iMinute, iSecond)
+        write(sFileName, "(a,i4.4,2(i2.2),'.',i2.2,',csv')") &
+            trim(sOutputPrefix), &
+            iYear, iMonth, iDay, iHour
+        print *, trim(sFileName)
+        !open(10, file=sFileName, status='unknown', action='write')
+        !write(10, "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2),2(',',f6.3),',',f6.4)") &
+        !    iYear, iMonth, iDay, iHour, iMinute, iSecond, &
+        !    rvVectorVel(iDayIdx), rvScalarVel(iDayIdx), &
+        !    rvCircularVar(iDayIdx)
+        !close(10)
+    end do
     
     ! Leave
     deallocate(rvCircularVar)
