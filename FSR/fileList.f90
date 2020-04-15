@@ -13,6 +13,7 @@ module fileList
     
     ! Public interface
     public  :: readFileList
+    public  :: baseName
     
 contains
 
@@ -61,5 +62,26 @@ contains
         close(iLUN)
         
     end function readFileList
+    
+    
+    function baseName(sFullName, cSeparator) result(sBaseName)
+    
+        ! Routine arguments
+        character(len=256), intent(in)  :: sFullName
+        character, intent(in), optional :: cSeparator
+        character(len=256)              :: sBaseName
+        
+        ! Local variables
+        integer :: iPos
+        
+        ! Locate the last occurrence of path separator character
+        iPos = index(sFullName, cSeparator, back=.true.)
+        if(iPos <= 0) then
+            sBaseName = sFullName
+        else
+            sBaseName = sFullName(iPos+1:)
+        end if
+        
+    end function baseName
 
 end module fileList
