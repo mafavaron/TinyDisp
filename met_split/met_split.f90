@@ -36,6 +36,8 @@ program met_split
     character(len=256)                  :: sBuffer
     integer                             :: iYear, iMonth, iDay, iHour, iMinute, iSecond
     integer                             :: iCurTime
+    integer                             :: iOldDay
+    integer                             :: iCurDay
     
     ! Get command arguments
     if(command_argument_count() /= 3) then
@@ -103,6 +105,20 @@ program met_split
             rvCovVW(iLine)
     end do
     close(10)
+    
+    ! Count number of days
+    iOldDay = 0
+    iNumDays = 0
+    do iLine = 1, iNumLines
+        iCurTime = ivTimeStamp(iLine)
+        iCurDay = iCurTime / 86400
+        if(iCurDay /= iOldDay) then
+            iNumDays = iNumDays + 1
+            iOldDay = iCurDay
+        end if
+    end do
+    
+    print *, iNumDays
     
     ! Leave
     deallocate(rvCovVW)
