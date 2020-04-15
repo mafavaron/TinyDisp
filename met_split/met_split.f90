@@ -17,6 +17,8 @@ program met_split
     character(len=256)                  :: sInputFile
     character(len=256)                  :: sDiaFile
     character(len=256)                  :: sOutputPrefix
+    integer                             :: iNumLines
+    integer                             :: iLine
     integer, dimension(:), allocatable  :: ivTimeStamp
     real, dimension(:), allocatable     :: rvU
     real, dimension(:), allocatable     :: rvV
@@ -30,7 +32,10 @@ program met_split
     integer, dimension(:), allocatable  :: ivDayBegin
     integer, dimension(:), allocatable  :: ivDayEnd
     integer                             :: iNumDays
+    character(len=256)                  :: sHeader
     character(len=256)                  :: sBuffer
+    integer                             :: iYear, iMonth, iDay, iHour, iMinute, iSecond
+    integer                             :: iCurTime
     
     ! Get command arguments
     if(command_argument_count() /= 3) then
@@ -50,10 +55,65 @@ program met_split
     call get_command_argument(3, sOutputPrefix)
     
     ! Read meteo file
+    iNumLines = 0
     open(10, file=sInputFile, status='old', action='read', iostat=iRetCode)
+    if(iRetCode /= 0) then
+        print *, 'met_split:: error: Meteorological input file not opened'
+        stop
+    end if
+    read(10, "(a)", iostat=iRetCode) sHeader
+    if(iRetCode /= 0) then
+        print *, 'met_split:: error: Meteorological input file is empty'
+        stop
+    end if
+    do
+        read(10, "(a)", iostat=iRetCode) sBuffer
+        if(iRetCode /= 0) exit
+        iNumLines = iNumLines + 1
+    end do
+    rewind(10)
+    if(iNumLines <= 0) then
+        print *, 'met_split:: error: Meteorological input file is empty'
+        stop
+    end if
+    allocate(ivTimeStamp(iNumLines))
+    allocate(rvU(iNumLines))
+    allocate(rvV(iNumLines))
+    allocate(rvW(iNumLines))
+    allocate(rvStdDevU(iNumLines))
+    allocate(rvStdDevV(iNumLines))
+    allocate(rvStdDevW(iNumLines))
+    allocate(rvCovUV(iNumLines))
+    allocate(rvCovUW(iNumLines))
+    allocate(rvCovVW(iNumLines))
+    read(10, "(a)") sHeader
+    do iLine = 1, iNumLines
+        read(10, "(a)") sBuffer
+        read(sBuffer, "(i4,5(1x,i2))") iYear, iMonth, iDay, iHour, iMinute, iSecond
+        call packtime(ivTimeStamp(iLine), iYear, iMonth, iDay, iHour, iMinute, iSecond)
+        read(sBuffer,*) &
+            rvU(iLine), &
+            rvV(iLine), &
+            rvW(iLine), &
+            rvStdDevU(iLine), &
+            rvStdDevV(iLine), &
+            rvStdDevW(iLine), &
+            rvCovUV(iLine), &
+            rvCovUW(iLine), &
+            rvCovVW(iLine)
+    end do
     close(10)
     
     ! Leave
+    deallocate(rvCovVW)
+    deallocate(rvCovUW)
+    deallocate(rvCovUV)
+    deallocate(rvStdDevW)
+    deallocate(rvStdDevV)
+    deallocate(rvStdDevU)
+    deallocate(rvW)
+    deallocate(rvV)
+    deallocate(rvU)
     print *, '*** END JOB ***'
 
 end program met_split
