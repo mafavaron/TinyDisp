@@ -23,6 +23,11 @@ program counter
     real                                    :: rYmin
     real                                    :: rDxy
     integer                                 :: iNumCells
+    integer                                 :: iPartX
+    integer                                 :: iPartY
+    real(8)                                 :: rTotal
+    real                                    :: rX
+    real                                    :: rY
     
     ! Get parameters
     if(command_argument_count() /= 2) then
@@ -61,12 +66,27 @@ program counter
         call unpacktime(iTimeStamp, iYear, iMonth, iDay, iHour, iMinute, iSecond)
         read(10) imCount
         imTotal = imTotal + imCount
-        print "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2), 1x, i10)", &
-            iYear, iMonth, iDay, iHour, iMinute, iSecond, sum(imCount)
+        if(mod(iTimeStamp, 3600) == 0) then
+            print "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2))", &
+                iYear, iMonth, iDay, iHour, iMinute, iSecond
+        end if
     end do
+    close(10)
+    
+    ! Write results
+    rTotal = sum(real(imTotal,kind=8))
+    open(10, file=sOutputFile, status='unknown', action='write')
+    write(10, "('E, N, Normalized.Count')")
+    do iPartX = 1, iNumCells
+        rX = rXmin + (iPartX - 1) * rDxy
+        do iPartY = 1, iNumCells
+            rY = rYmin + (iPartY - 1) * rDxy
+            write(10, "(f10.3,',',f10.3,',',e15.7)") rX, rY, imTotal(iPartX,iPartY) / rTotal
+        end do
+    end do
+    close(10)
     
     ! Leave
     deallocate(imCount, imTotal)
-    close(10)
 
 end program counter
