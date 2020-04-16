@@ -50,6 +50,7 @@ program counter
         print *, 'counter:: error: Input file is invalid'
         stop
     end if
+    print *, rXmin, rYmin, rDxy, iNumCells
     
     close(10)
 
