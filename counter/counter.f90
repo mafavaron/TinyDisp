@@ -17,6 +17,7 @@ program counter
     character(len=256)                      :: sOutputFile
     integer, dimension(:,:), allocatable    :: imCount
     integer, dimension(:,:), allocatable    :: imTotal
+    integer                                 :: iTimeStamp
     integer                                 :: iYear, iMonth, iDay, iHour, iMinute, iSecond
     real                                    :: rXmin
     real                                    :: rYmin
@@ -50,8 +51,22 @@ program counter
         print *, 'counter:: error: Input file is invalid'
         stop
     end if
-    print *, rXmin, rYmin, rDxy, iNumCells
+    allocate(imCount(iNumCells,iNumCells), imTotal(iNumCells,iNumCells))
     
+    ! Main loop: iterate over count matrices
+    imTotal = 0
+    do
+        read(10, iostat=iRetCode) iTimeStamp
+        if(iRetCode /= 0) exit
+        call unpacktime(iTimeStamp, iYear, iMonth, iDay, iHour, iMinute, iSecond)
+        read(10) imCount
+        imTotal = imTotal + imCount
+        print "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2), 1x, i10)", &
+            iYear, iMonth, iDay, iHour, iMinute, iSecond, sum(imCount)
+    end do
+    
+    ! Leave
+    deallocate(imCount, imTotal)
     close(10)
 
 end program counter
