@@ -78,9 +78,9 @@ program counter
     open(10, file=sOutputFile, status='unknown', action='write')
     write(10, "('E, N, Normalized.Count')")
     do iPartX = 1, iNumCells
-        rX = rXmin + (iPartX - 1) * rDxy
+        rX = rXmin + rDxy/2. + (iPartX - 1) * rDxy
         do iPartY = 1, iNumCells
-            rY = rYmin + (iPartY - 1) * rDxy
+            rY = rYmin + rDxy/2. + (iPartY - 1) * rDxy
             write(10, "(f10.3,',',f10.3,',',e15.7)") rX, rY, imTotal(iPartX,iPartY) / rTotal
         end do
     end do
