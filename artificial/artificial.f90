@@ -24,7 +24,7 @@ program artificial
     ! Decode command line
     iOptCode = decodeOptions()
     if(iOptCode <= 0) then
-        print *, "artificial:: error: Some command line parameter is wrong - Ret.code = ", iOptCode
+        print *, "artificial:: error: Some command line parameter is wrong - Opt.code = ", iOptCode
         stop
     end if
     
@@ -33,7 +33,7 @@ program artificial
     if(iOptCode == 1) then  ! --constant
     
         open(10, file=sOutputFile, status='unknown', action='write')
-        write(10, "(Time.Stamp, U, V, W, StdDev.U, StdDev.V, StdDev.W, Cov.UV, Cov.UW, Cov.VW)")
+        write(10, "('Time.Stamp, U, V, W, StdDev.U, StdDev.V, StdDev.W, Cov.UV, Cov.UW, Cov.VW')")
         do iFrame = 1, iNumFrames
             iCurTime = iStartTime + (iFrame - 1) * iTimeStep
             call unpacktime(iCurTime, iYear, iMonth, iDay, iHour, iMinute, iSecond)
