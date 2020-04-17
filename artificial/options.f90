@@ -14,7 +14,10 @@ module options
     private
     
     ! Public interface
+    ! -1- Procedures
     public  :: printUsage
+    public  :: decodeOptions
+    ! -1- State
     public  :: iNumFrames
     public  :: iTimeStep
     public  :: iStartTime
@@ -111,6 +114,7 @@ contains
             iOptCode = -4
             return
         end if
+        call packtime(iStartTime, iYear, iMonth, iDay, iHour, iMinute, iSecond)
         
         call get_command_argument(4, sOutputFile)
         
