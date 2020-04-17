@@ -100,6 +100,13 @@ contains
             return
         end if
         
+        call get_command_argument(3, sBuffer)
+        read(sBuffer, "(i4.4,5(1x,i2.2))", iostat = iErrCode) iYear, iMonth, iDay, iHour, iMinute, iSecond
+        if(iErrCode /= 0) then
+            iOptCode = -4
+            return
+        end if
+        
     end function decodeOptions
 
 end module options
