@@ -111,6 +111,7 @@ contains
         call get_command_argument(4, sOutputFile)
         
         call get_command_argument(4, sOption)
+        call toLower(sOption)
         
     end function decodeOptions
     
