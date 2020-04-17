@@ -110,8 +110,32 @@ contains
         
         call get_command_argument(4, sOutputFile)
         
-        call get_command_argument(4, sOption)
+        call get_command_argument(5, sOption)
         call toLower(sOption)
+        
+        ! Options-specific processing
+        if(sOption == "--constant") then
+            
+            if(iNumParameter /= 7) then
+                iOptCode = -5
+                return
+            end if
+            
+            call get_command_argument(6, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rVel
+            if(iErrCode /= 0) then
+                iOptCode = -6
+                return
+            end if
+            
+            call get_command_argument(6, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rDir
+            if(iErrCode /= 0) then
+                iOptCode = -7
+                return
+            end if
+            
+        end if
         
     end function decodeOptions
     
