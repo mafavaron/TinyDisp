@@ -7,10 +7,18 @@
 !
 program artificial
 
-    use Calendar
+    use calendar
+    use options
     
     implicit none
     
     ! Locals
+    integer :: iOptCode
+    
+    ! Decode command line
+    iOptCode = decodeOptions()
+    if(iOptCode <= 0) then
+        print *, "artificial:: error: Some command line parameter is wrong - Ret.code = ", iOptCode
+    end if
     
 end program artificial
