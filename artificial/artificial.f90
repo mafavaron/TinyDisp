@@ -19,7 +19,7 @@ program artificial
     integer :: iYear, iMonth, iDay, iHour, iMinute, iSecond
     
     ! Constants (please don't change)
-    real, parameter :. TO_RAD = 3.1415926535 / 180.0
+    real, parameter :: TO_RAD = 3.1415926535 / 180.0
     
     ! Decode command line
     iOptCode = decodeOptions()
