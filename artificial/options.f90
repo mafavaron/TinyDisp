@@ -73,6 +73,7 @@ contains
         
         ! Locals
         integer             :: iYear, iMonth, iDay, iHour, iMinute, iSecond
+        character(len=256)  :: sOption
         character(len=256)  :: sBuffer
         integer             :: iNumParameter
         integer             :: iErrCode
@@ -107,6 +108,31 @@ contains
             return
         end if
         
+        call get_command_argument(4, sOutputFile)
+        
+        call get_command_argument(4, sOption)
+        
     end function decodeOptions
+    
+    ! *********************
+    ! * Internal routines *
+    ! *********************
+    
+    subroutine toLower(sString)
+    
+        ! Routine arguments
+        character(len=*), intent(inout) :: sString
+        
+        ! Locals
+        integer :: i
+        
+        ! Change case to lower in place
+        do i = 1, len_trim(sString)
+            if(sString(i:i) >= 'A' .and. sString(i:i) <= 'Z') then
+                sString(i:i) = char(ichar(sString(i:i)) - ichar('A') + ichar('a'))
+            end if
+        end do
+        
+    end subroutine toLower
 
 end module options
