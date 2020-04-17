@@ -31,6 +31,7 @@ module options
     character(len=256)  :: sOutputFile
     real                :: rVel
     real                :: rDir
+    real                :: rSigma
     real                :: rCov
     
 contains
