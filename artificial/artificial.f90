@@ -39,7 +39,7 @@ program artificial
             call unpacktime(iCurTime, iYear, iMonth, iDay, iHour, iMinute, iSecond)
             write(10, "(i4.4,2('-',i2.2),1x,i2.2,2(':',i2.2),3(',',f8.2),6(',',f8.4))") &
                 iYear, iMonth, iDay, iHour, iMinute, iSecond, &
-                rVel * cos(TO_RAD * rDir), rVel * sin(TO_RAD * rDir), &
+                rVel * cos(-TO_RAD * rDir), rVel * sin(-TO_RAD * rDir), &
                 0.0, &
                 rSigma, rSigma, &
                 0.0, &
