@@ -22,6 +22,7 @@ module options
     public  :: rVel
     public  :: rDir
     public  :: rSigma
+    public  :: rCov
     
     ! Internal state
     integer             :: iNumFrames
@@ -30,7 +31,7 @@ module options
     character(len=256)  :: sOutputFile
     real                :: rVel
     real                :: rDir
-    real                :: rSigma
+    real                :: rCov
     
 contains
 
@@ -51,7 +52,7 @@ contains
         print *
         print *, 'where <option> may assume the following values:'
         print *
-        print *, '--constant <wind_speed> <wind_provenance_direction> <sigma>'
+        print *, '--constant <wind_speed> <wind_provenance_direction> <sigma> <covar>'
         print *
         print *, ''
         print *
@@ -118,7 +119,7 @@ contains
         ! Options-specific processing
         if(sOption == "--constant") then
             
-            if(iNumParameter /= 8) then
+            if(iNumParameter /= 9) then
                 iOptCode = -5
                 return
             end if
@@ -141,6 +142,13 @@ contains
             read(sBuffer, *, iostat = iErrCode) rSigma
             if(iErrCode /= 0) then
                 iOptCode = -8
+                return
+            end if
+            
+            call get_command_argument(9, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rCov
+            if(iErrCode /= 0) then
+                iOptCode = -9
                 return
             end if
             
