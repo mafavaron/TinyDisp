@@ -26,6 +26,7 @@ module options
     public  :: rDir
     public  :: rSigma
     public  :: rCov
+    public  :: iNumLoops
     
     ! Internal state
     integer             :: iNumFrames
