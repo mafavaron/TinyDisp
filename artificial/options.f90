@@ -36,6 +36,7 @@ module options
     real                :: rDir
     real                :: rSigma
     real                :: rCov
+    integer             :: iNumLoops
     
 contains
 
@@ -58,7 +59,7 @@ contains
         print *
         print *, '--constant <wind_speed> <wind_provenance_direction> <sigma> <covar>'
         print *
-        print *, ''
+        print *, '--circular <wind_speed> <wind_provenance_direction> <sigma> <covar> <total_loops>'
         print *
         print *
         print *
@@ -158,6 +159,50 @@ contains
             end if
             
             iOptCode = 1
+            
+        elseif(sOption == "--circular") then
+        
+            if(iNumParameter /= 10) then
+                iOptCode = -10
+                return
+            end if
+            
+            call get_command_argument(6, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rVel
+            if(iErrCode /= 0) then
+                iOptCode = -11
+                return
+            end if
+            
+            call get_command_argument(7, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rDir
+            if(iErrCode /= 0) then
+                iOptCode = -12
+                return
+            end if
+            
+            call get_command_argument(8, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rSigma
+            if(iErrCode /= 0) then
+                iOptCode = -13
+                return
+            end if
+            
+            call get_command_argument(9, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rCov
+            if(iErrCode /= 0) then
+                iOptCode = -14
+                return
+            end if
+            
+            call get_command_argument(10, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) iNumLoops
+            if(iErrCode /= 0) then
+                iOptCode = -15
+                return
+            end if
+            
+            iOptCode = 2
             
         end if
         
