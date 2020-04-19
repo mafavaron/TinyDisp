@@ -14,13 +14,19 @@ module options
     private
     
     ! Public interface
+    ! -1- Procedures
     public  :: printUsage
+    public  :: decodeOptions
+    ! -1- State
     public  :: iNumFrames
     public  :: iTimeStep
     public  :: iStartTime
     public  :: sOutputFile
     public  :: rVel
     public  :: rDir
+    public  :: rSigma
+    public  :: rCov
+    public  :: iNumLoops
     
     ! Internal state
     integer             :: iNumFrames
@@ -29,6 +35,10 @@ module options
     character(len=256)  :: sOutputFile
     real                :: rVel
     real                :: rDir
+    real                :: rSigma
+    real                :: rCov
+    integer             :: iNumLoops
+    real                :: rAmplitude
     
 contains
 
@@ -49,18 +59,11 @@ contains
         print *
         print *, 'where <option> may assume the following values:'
         print *
-        print *, '--constant <wind_speed> <wind_provenance_direction>'
+        print *, '--constant <wind_speed> <wind_provenance_direction> <sigma> <covar>'
         print *
-        print *, ''
+        print *, '--circular <wind_speed> <wind_provenance_direction> <sigma> <covar> <total_loops>'
         print *
-        print *
-        print *
-        print *
-        print *
-        print *
-        print *
-        print *
-        print *
+        print *, '--meandering <wind_speed> <wind_provenance_direction> <sigma> <covar> <total_loops> <ampli>'
         print *
         
     end subroutine printUsage
@@ -107,6 +110,7 @@ contains
             iOptCode = -4
             return
         end if
+        call packtime(iStartTime, iYear, iMonth, iDay, iHour, iMinute, iSecond)
         
         call get_command_argument(4, sOutputFile)
         
@@ -116,7 +120,7 @@ contains
         ! Options-specific processing
         if(sOption == "--constant") then
             
-            if(iNumParameter /= 7) then
+            if(iNumParameter /= 9) then
                 iOptCode = -5
                 return
             end if
@@ -128,12 +132,124 @@ contains
                 return
             end if
             
-            call get_command_argument(6, sBuffer)
+            call get_command_argument(7, sBuffer)
             read(sBuffer, *, iostat = iErrCode) rDir
             if(iErrCode /= 0) then
                 iOptCode = -7
                 return
             end if
+            
+            call get_command_argument(8, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rSigma
+            if(iErrCode /= 0) then
+                iOptCode = -8
+                return
+            end if
+            
+            call get_command_argument(9, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rCov
+            if(iErrCode /= 0) then
+                iOptCode = -9
+                return
+            end if
+            
+            iOptCode = 1
+            
+        elseif(sOption == "--circular") then
+        
+            if(iNumParameter /= 10) then
+                iOptCode = -10
+                return
+            end if
+            
+            call get_command_argument(6, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rVel
+            if(iErrCode /= 0) then
+                iOptCode = -11
+                return
+            end if
+            
+            call get_command_argument(7, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rDir
+            if(iErrCode /= 0) then
+                iOptCode = -12
+                return
+            end if
+            
+            call get_command_argument(8, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rSigma
+            if(iErrCode /= 0) then
+                iOptCode = -13
+                return
+            end if
+            
+            call get_command_argument(9, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rCov
+            if(iErrCode /= 0) then
+                iOptCode = -14
+                return
+            end if
+            
+            call get_command_argument(10, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) iNumLoops
+            if(iErrCode /= 0) then
+                iOptCode = -15
+                return
+            end if
+            
+            iOptCode = 2
+            
+        elseif(sOption == "--meandering") then
+        
+            if(iNumParameter /= 10) then
+                iOptCode = -11
+                return
+            end if
+            
+            call get_command_argument(6, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rVel
+            if(iErrCode /= 0) then
+                iOptCode = -12
+                return
+            end if
+            
+            call get_command_argument(7, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rDir
+            if(iErrCode /= 0) then
+                iOptCode = -13
+                return
+            end if
+            
+            call get_command_argument(8, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rSigma
+            if(iErrCode /= 0) then
+                iOptCode = -14
+                return
+            end if
+            
+            call get_command_argument(9, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rCov
+            if(iErrCode /= 0) then
+                iOptCode = -15
+                return
+            end if
+            
+            call get_command_argument(10, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) iNumLoops
+            if(iErrCode /= 0) then
+                iOptCode = -16
+                return
+            end if
+            
+            call get_command_argument(11, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rAmplitude
+            if(iErrCode /= 0) then
+                iOptCode = -16
+                return
+            end if
+            rAmplitude = rAmplitude / 2.
+            
+            iOptCode = 3
             
         end if
         
