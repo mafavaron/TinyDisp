@@ -62,14 +62,7 @@ contains
         print *
         print *, '--circular <wind_speed> <wind_provenance_direction> <sigma> <covar> <total_loops>'
         print *
-        print *
-        print *
-        print *
-        print *
-        print *
-        print *
-        print *
-        print *
+        print *, '--meandering <wind_speed> <wind_provenance_direction> <sigma> <covar> <total_loops> <ampli>'
         print *
         
     end subroutine printUsage
