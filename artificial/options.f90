@@ -38,6 +38,7 @@ module options
     real                :: rSigma
     real                :: rCov
     integer             :: iNumLoops
+    real                :: rAmplitude
     
 contains
 
@@ -197,6 +198,58 @@ contains
             end if
             
             iOptCode = 2
+            
+        elseif(sOption == "--meandering") then
+        
+            if(iNumParameter /= 10) then
+                iOptCode = -11
+                return
+            end if
+            
+            call get_command_argument(6, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rVel
+            if(iErrCode /= 0) then
+                iOptCode = -12
+                return
+            end if
+            
+            call get_command_argument(7, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rDir
+            if(iErrCode /= 0) then
+                iOptCode = -13
+                return
+            end if
+            
+            call get_command_argument(8, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rSigma
+            if(iErrCode /= 0) then
+                iOptCode = -14
+                return
+            end if
+            
+            call get_command_argument(9, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rCov
+            if(iErrCode /= 0) then
+                iOptCode = -15
+                return
+            end if
+            
+            call get_command_argument(10, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) iNumLoops
+            if(iErrCode /= 0) then
+                iOptCode = -16
+                return
+            end if
+            
+            call get_command_argument(11, sBuffer)
+            read(sBuffer, *, iostat = iErrCode) rAmplitude
+            if(iErrCode /= 0) then
+                iOptCode = -16
+                return
+            end if
+            rAmplitude = rAmplitude / 2.
+            
+            iOptCode = 3
             
         end if
         
