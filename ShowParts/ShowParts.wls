@@ -1,0 +1,1 @@
+sPartsFile = SystemDialogInput["FileOpen"];
